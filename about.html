@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/02/Sunehri-5.png">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   ABOUT US — theme-proof build
+
+   Same scoping discipline as the hero: every rule sits under the
+   #ab id, so each selector carries at least 1,0,0 specificity and
+   outranks the class-based selectors WordPress themes and page
+   builders use (`.entry-content h2`, `.elementor p` — 0,2,0 at
+   worst). Custom properties are --ab-* declared on #ab rather than
+   :root, and keyframes are ab-prefixed, because keyframe names are
+   global and a theme's own `fadeUp` would silently hijack ours.
+
+   Drop the whole block into a page and it renders identically with
+   or without the site's stylesheet loaded. Header and footer are
+   intentionally out of scope.
+══════════════════════════════════════════════════════════════ */
+
+/* Only rule outside the #ab scope — makes the file correct as a
+   standalone page. Safe to delete when pasting into a theme that
+   already normalises body. */
+html, body { margin: 0; padding: 0; }
+
+#ab {
+  --ab-gold:  #BF9B4D;
+  --ab-ink:   #07070A;
+  --ab-paper: #FFFFFF;
+  --ab-mist:  #F4F4F2;
+  --ab-body:  #55565A;
+  --ab-line:  rgba(7,7,10,0.10);
+
+  --ab-ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
+  --ab-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* Section rhythm. One number drives the whole vertical scale, so
+     the page tightens or opens up as a unit. */
+  --ab-gap: clamp(64px, 9vw, 128px);
+  --ab-pad: clamp(22px, 6vw, 96px);
+}
+
+/* ────────────────────────────
+   SCOPED RESET
+   Neutralises inherited theme styling inside the page section only.
+   Every component rule below is #ab-scoped too, and later in source
+   order, so this never fights our own CSS.
+──────────────────────────── */
+#ab, #ab *, #ab *::before, #ab *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  max-width: none;
+  list-style: none;
+}
+
+/* Buttons and links take the heaviest theme fire. The !important
+   flags are the minimum needed to beat theme declarations that are
+   themselves !important — specificity alone loses to those, and
+   `button { background:#e6e6e6 !important }` is exactly what paints
+   the carousel dots as grey boxes. */
+#ab button,
+#ab a {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none !important;
+  text-align: inherit;
+  line-height: normal;
+  width: auto;
+  height: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Icon plugins inject pseudo-element glyphs into buttons. Only the
+   dot hit-area below re-enables one. */
+#ab button::before,
+#ab button::after { content: none; display: none; }
+
+#ab img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100% !important;
+}
+
+/* ────────────────────────────
+   ROOT
+──────────────────────────── */
+#ab {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow-x: clip;          /* stops the wide bleeds creating h-scroll */
+  background: var(--ab-paper) !important;
+  isolation: isolate;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ab-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Shared inner rail. Everything on the page aligns to this, which
+   is what keeps the eye travelling straight down through eleven
+   very differently-shaped sections. */
+#ab .ab-wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-left:  var(--ab-pad);
+  padding-right: var(--ab-pad);
+}
+#ab .ab-wrap--tight { max-width: 1040px; }
+
+#ab .ab-sec { padding-top: var(--ab-gap); padding-bottom: var(--ab-gap); }
+
+/* ────────────────────────────
+   TYPE SCALE
+   The !important flags land only on the properties themes force on
+   bare h1/h2/h3/p — font stack, colour, and the vertical-rhythm
+   margins. Sizing and spacing stay flag-free.
+──────────────────────────── */
+#ab .ab-eyebrow {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3.4px;
+  text-transform: uppercase;
+  color: var(--ab-gold) !important;
+  margin: 0 0 16px !important;
+}
+
+#ab .ab-h2 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(23px, 3.1vw, 34px) !important;
+  font-weight: 300 !important;
+  line-height: 1.28 !important;
+  letter-spacing: -0.1px;
+  color: var(--ab-ink) !important;
+  margin: 0 0 22px !important;
+}
+
+#ab .ab-h3 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(20px, 2.5vw, 27px) !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+  color: var(--ab-ink) !important;
+  margin: 0 0 18px !important;
+}
+
+#ab .ab-p {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(13px, 1.05vw, 14.5px) !important;
+  font-weight: 300 !important;
+  line-height: 2.0 !important;
+  color: var(--ab-body) !important;
+  margin: 0 0 18px !important;
+}
+#ab .ab-p:last-child { margin-bottom: 0 !important; }
+
+#ab .ab-center { text-align: center; }
+#ab .ab-center .ab-p { margin-left: auto; margin-right: auto; max-width: 660px; }
+
+/* ────────────────────────────
+   SCROLL REVEAL
+   JS adds .is-in when the element crosses the viewport. The initial
+   state is applied by JS too (see the boot block), so the page
+   still renders fully if scripting is off — nothing is stranded at
+   opacity 0.
+──────────────────────────── */
+#ab .ab-rv {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.9s var(--ab-ease-quart),
+              transform 0.9s var(--ab-ease-expo);
+}
+#ab .ab-rv.is-in { opacity: 1; transform: none; }
+
+/* Stagger for grouped children */
+#ab .ab-rv[data-d="1"] { transition-delay: 0.10s; }
+#ab .ab-rv[data-d="2"] { transition-delay: 0.20s; }
+#ab .ab-rv[data-d="3"] { transition-delay: 0.30s; }
+
+/* ══════════════════════════════════════
+   1 · HERO
+══════════════════════════════════════ */
+#ab .ab-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(320px, 46vh, 460px);
+  overflow: hidden;
+  background: var(--ab-ink);
+}
+
+#ab .ab-hero__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://ddfintech.net/wp-content/uploads/2026/02/Sunehri-5.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.06);
+  animation: ab-heroIn 2.4s var(--ab-ease-expo) both;
+}
+
+@keyframes ab-heroIn {
+  from { transform: scale(1.12); opacity: 0.35; }
+  to   { transform: scale(1.00); opacity: 1;    }
+}
+
+/* Weighted to the bottom-left, where the title sits, rather than a
+   symmetric vignette — the plate is bright and the copy has to hold
+   against it at every viewport width. */
+#ab .ab-hero__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg,
+      rgba(7,7,10,0.80) 0%,
+      rgba(7,7,10,0.52) 34%,
+      rgba(7,7,10,0.18) 68%,
+      rgba(7,7,10,0.05) 100%),
+    linear-gradient(to top,
+      rgba(7,7,10,0.72) 0%,
+      rgba(7,7,10,0.00) 52%);
+  pointer-events: none;
+}
+
+#ab .ab-hero__inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding-bottom: clamp(34px, 6vh, 62px);
+}
+
+#ab .ab-crumb {
+  font-size: 8.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.46) !important;
+  margin: 0 0 14px !important;
+  animation: ab-fadeUp 0.9s var(--ab-ease-expo) 0.5s both;
+}
+#ab .ab-crumb a { color: inherit !important; transition: color 0.28s ease; }
+#ab .ab-crumb a:hover { color: var(--ab-gold) !important; }
+#ab .ab-crumb span { opacity: 0.5; margin: 0 7px; }
+
+#ab .ab-hero__title {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(30px, 5vw, 56px) !important;
+  font-weight: 700 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.6px;
+  color: #fff !important;
+  margin: 0 !important;
+  text-shadow: 0 2px 30px rgba(7,7,10,0.4);
+  animation: ab-fadeUp 1s var(--ab-ease-expo) 0.62s both;
+}
+
+@keyframes ab-fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ══════════════════════════════════════
+   2 · WHERE VISION MEETS MOTION
+══════════════════════════════════════ */
+#ab .ab-intro { padding-bottom: clamp(46px, 6vw, 72px); }
+
+/* Brand marks. Greyscale at rest so three very different logos read
+   as one row; colour returns on hover. */
+#ab .ab-marks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: clamp(30px, 7vw, 88px);
+  margin-top: clamp(38px, 5vw, 58px);
+}
+
+#ab .ab-mark {
+  flex: 0 0 auto;
+  width: clamp(96px, 13vw, 132px);
+}
+#ab .ab-mark img {
+  filter: grayscale(1);
+  opacity: 0.72;
+  transition: filter 0.45s ease, opacity 0.45s ease, transform 0.45s var(--ab-ease-expo);
+}
+#ab .ab-mark:hover img { filter: none; opacity: 1; transform: translateY(-3px); }
+
+/* Vision / Mission / Value */
+#ab .ab-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(26px, 4vw, 56px);
+  margin-top: clamp(46px, 6vw, 76px);
+  padding-top: clamp(30px, 4vw, 44px);
+  border-top: 1px solid var(--ab-line) !important;
+}
+
+#ab .ab-pillar__k {
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 2.8px;
+  text-transform: uppercase;
+  color: var(--ab-ink) !important;
+  margin: 0 0 14px !important;
+}
+
+#ab .ab-pillar__t {
+  font-size: 12.5px !important;
+  font-weight: 300 !important;
+  line-height: 1.95 !important;
+  color: var(--ab-body) !important;
+  margin: 0 !important;
+}
+
+/* ══════════════════════════════════════
+   3 · WHY SAERA — mist band
+══════════════════════════════════════ */
+#ab .ab-band-mist {
+  background: var(--ab-mist) !important;
+  padding-top: clamp(50px, 7vw, 84px);
+  padding-bottom: clamp(50px, 7vw, 84px);
+}
+
+/* ══════════════════════════════════════
+   4–7 · ALTERNATING FEATURE ROWS
+   Text and image swap sides on odd rows via .ab-row--flip. On
+   narrow screens the grid collapses and `order` puts the image
+   first every time, so the reading pattern stays consistent
+   instead of alternating unpredictably.
+══════════════════════════════════════ */
+#ab .ab-rows { padding-top: clamp(56px, 7vw, 96px); }
+
+#ab .ab-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(30px, 5.5vw, 78px);
+  margin-bottom: clamp(56px, 8vw, 104px);
+}
+#ab .ab-row:last-child { margin-bottom: 0; }
+
+#ab .ab-row--flip .ab-row__media { order: 2; }
+#ab .ab-row--flip .ab-row__copy  { order: 1; }
+
+#ab .ab-row__copy { max-width: 460px; }
+#ab .ab-row--flip .ab-row__copy { margin-left: auto; }
+
+/* Hairline above each row heading — the only ornament on these
+   rows, and it's what makes four near-identical blocks feel
+   composed rather than repeated. */
+#ab .ab-row__copy .ab-h3 { position: relative; padding-top: 20px; }
+#ab .ab-row__copy .ab-h3::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 34px;
+  height: 2px;
+  background: var(--ab-gold);
+}
+
+#ab .ab-shot {
+  position: relative;
+  overflow: hidden;
+  background: var(--ab-mist);
+  box-shadow: 0 20px 60px -28px rgba(7,7,10,0.42) !important;
+}
+#ab .ab-shot img {
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 1.1s var(--ab-ease-expo);
+}
+#ab .ab-shot:hover img { transform: scale(1.07); }
+
+/* ══════════════════════════════════════
+   8 · A LEGACY OF INNOVATION — carousel
+   Transform-based track, not scroll-snap: the dots need to be the
+   single source of truth for position, and a scroll container would
+   let momentum land the track between slides.
+══════════════════════════════════════ */
+#ab .ab-legacy { padding-bottom: clamp(56px, 8vw, 96px); }
+
+#ab .ab-car {
+  position: relative;
+  margin-top: clamp(34px, 5vw, 52px);
+  overflow: hidden;
+}
+
+#ab .ab-car__track {
+  display: flex;
+  gap: var(--ab-car-gap, 24px);
+  transition: transform 0.85s var(--ab-ease-expo);
+  will-change: transform;
+}
+#ab .ab-car.is-dragging .ab-car__track { transition: none; }
+
+#ab .ab-car__cell {
+  flex: 0 0 var(--ab-car-cell, calc((100% - 24px) / 2));
+  overflow: hidden;
+  background: var(--ab-mist);
+}
+#ab .ab-car__cell img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  pointer-events: none;      /* drag never picks up the native ghost */
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+#ab .ab-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-top: clamp(22px, 3vw, 32px);
+}
+
+/* These !important flags answer the reset above, which had to use
+   them to beat the theme. Scoped to this component, they go no
+   further. */
+#ab .ab-dot {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: rgba(7,7,10,0.16) !important;
+  transition: background 0.34s ease, transform 0.34s var(--ab-ease-expo);
+}
+/* Generous invisible hit area — no missed taps on mobile. */
+#ab .ab-dot::before {
+  content: '';
+  display: block;
+  position: absolute;
+  inset: -11px;
+}
+#ab .ab-dot:hover { background: rgba(7,7,10,0.34) !important; }
+#ab .ab-dot.is-active {
+  background: var(--ab-gold) !important;
+  transform: scale(1.34);
+  cursor: default;
+}
+#ab .ab-dot:focus-visible { outline: 1.5px solid var(--ab-gold); outline-offset: 4px; }
+
+/* ══════════════════════════════════════
+   9 · OUR FAMILY OF BRANDS — ink band
+══════════════════════════════════════ */
+#ab .ab-band-ink {
+  background: var(--ab-ink) !important;
+  padding-top: clamp(52px, 7vw, 86px);
+  padding-bottom: clamp(52px, 7vw, 86px);
+  text-align: center;
+}
+
+#ab .ab-band-ink .ab-eyebrow {
+  color: rgba(255,255,255,0.42) !important;
+  margin-bottom: clamp(26px, 3.4vw, 38px) !important;
+}
+
+#ab .ab-brands { display: block; }
+
+#ab .ab-brands li {
+  font-size: clamp(15px, 1.9vw, 21px) !important;
+  font-weight: 300 !important;
+  line-height: 1.5 !important;
+  color: rgba(255,255,255,0.88) !important;
+  padding: clamp(11px, 1.5vw, 16px) 0;
+}
+#ab .ab-brands li + li { border-top: 1px solid rgba(255,255,255,0.09) !important; }
+#ab .ab-brands b { font-weight: 600 !important; color: #fff !important; }
+
+/* ══════════════════════════════════════
+   10 · LATEST LAUNCH
+══════════════════════════════════════ */
+#ab .ab-launch {
+  display: grid;
+  grid-template-columns: 1fr 1.06fr;
+  align-items: center;
+  gap: clamp(32px, 5.5vw, 76px);
+}
+
+#ab .ab-launch__t {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(27px, 3.7vw, 42px) !important;
+  font-weight: 300 !important;
+  line-height: 1.14 !important;
+  letter-spacing: -0.5px;
+  color: var(--ab-ink) !important;
+  margin: 0 0 24px !important;
+}
+
+/* Two square plates on top, one wide plate beneath — the wide one
+   spans both columns so the group reads as a single composition
+   rather than three loose thumbnails. */
+#ab .ab-gal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(10px, 1.4vw, 16px);
+}
+#ab .ab-gal__cell { overflow: hidden; background: var(--ab-mist); }
+#ab .ab-gal__cell--wide { grid-column: 1 / -1; }
+#ab .ab-gal__cell img {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transition: transform 1s var(--ab-ease-expo);
+}
+#ab .ab-gal__cell--wide img { aspect-ratio: 2 / 1; }
+#ab .ab-gal__cell:hover img { transform: scale(1.06); }
+
+/* ══════════════════════════════════════
+   11 · CAREERS CTA
+══════════════════════════════════════ */
+#ab .ab-cta {
+  position: relative;
+  overflow: hidden;
+  background: var(--ab-ink);
+  text-align: center;
+  padding-top: clamp(78px, 12vw, 152px);
+  padding-bottom: clamp(78px, 12vw, 152px);
+}
+
+#ab .ab-cta__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://ddfintech.net/wp-content/uploads/2026/03/Untitled-design-24.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#ab .ab-cta__veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(7,7,10,0.72);
+  pointer-events: none;
+}
+
+#ab .ab-cta__inner { position: relative; z-index: 2; }
+
+#ab .ab-cta .ab-eyebrow { color: var(--ab-gold) !important; }
+
+#ab .ab-cta__t {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(25px, 4.2vw, 46px) !important;
+  font-weight: 300 !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.4px;
+  color: #fff !important;
+  margin: 0 0 20px !important;
+}
+
+#ab .ab-cta .ab-p {
+  color: rgba(255,255,255,0.62) !important;
+  max-width: 560px;
+  margin: 0 auto 34px !important;
+}
+
+#ab .ab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ab-ink) !important;
+  background: var(--ab-gold) !important;
+  padding: 15px 30px !important;
+  transition: background 0.3s ease, transform 0.3s var(--ab-ease-expo);
+}
+#ab .ab-btn:hover { background: #d4ae5c !important; transform: translateY(-2px); }
+#ab .ab-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+#ab .ab-btn .ab-arr {
+  display: inline-block;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  transition: transform 0.32s var(--ab-ease-expo);
+}
+#ab .ab-btn:hover .ab-arr { transform: translateX(5px); }
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  #ab .ab-row,
+  #ab .ab-launch {
+    grid-template-columns: 1fr;
+    gap: clamp(24px, 5vw, 36px);
+  }
+  /* Image always leads on narrow screens, whichever side it took
+     on desktop. */
+  #ab .ab-row .ab-row__media,
+  #ab .ab-row--flip .ab-row__media { order: 1; }
+  #ab .ab-row .ab-row__copy,
+  #ab .ab-row--flip .ab-row__copy  { order: 2; margin-left: 0; max-width: none; }
+
+  #ab .ab-pillars { grid-template-columns: 1fr; gap: 28px; }
+  #ab .ab-pillar + .ab-pillar { padding-top: 24px; border-top: 1px solid var(--ab-line) !important; }
+}
+
+@media (max-width: 680px) {
+  #ab .ab-car { --ab-car-cell: 100%; --ab-car-gap: 14px; }
+  #ab .ab-marks { gap: 28px 34px; }
+  #ab .ab-mark { width: 88px; }
+  #ab .ab-hero { min-height: 300px; }
+  #ab .ab-btn { padding: 14px 24px !important; letter-spacing: 2.4px; }
+}
+
+/* ════════════════════════════════════════════
+   REDUCED MOTION
+   Movement goes, the page stays. Reveals resolve to their final
+   state rather than being left mid-transition.
+══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  #ab .ab-rv {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  #ab .ab-hero__bg,
+  #ab .ab-crumb,
+  #ab .ab-hero__title { animation: none !important; opacity: 1; transform: none; }
+
+  #ab .ab-car__track { transition-duration: 0.01ms; }
+  #ab .ab-shot img,
+  #ab .ab-gal__cell img,
+  #ab .ab-mark img { transition-duration: 0.01ms; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABOUT US
+     Header and footer are deliberately not included — this block
+     drops between the site's existing ones.
+
+     COPY NOTE: every heading, label and brand line below is taken
+     from the reference page. The body paragraphs tagged with a
+     "COPY" comment are placeholders of matching length and tone;
+     paste the live text over them.
+════════════════════════════════════════════════════════════ -->
+<main class="ab" id="ab">
+
+  <!-- ═══ 1 · HERO ═══ -->
+  <section class="ab-hero" aria-label="About Us">
+    <div class="ab-hero__bg" aria-hidden="true"></div>
+    <div class="ab-hero__veil" aria-hidden="true"></div>
+    <div class="ab-hero__inner">
+      <div class="ab-wrap">
+        <p class="ab-crumb">
+          <a href="/">Home</a><span aria-hidden="true">/</span>About Us
+        </p>
+        <h1 class="ab-hero__title">About Us</h1>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 2 · WHERE VISION MEETS MOTION ═══ -->
+  <section class="ab-sec ab-intro">
+    <div class="ab-wrap ab-wrap--tight">
+
+      <div class="ab-center">
+        <h2 class="ab-h2 ab-rv">Where Vision Meets Motion</h2>
+        <!-- COPY -->
+        <p class="ab-p ab-rv" data-d="1">
+          At Saera, we are more than a company — we are a group of brands united
+          by a single purpose: to move people and goods cleanly, reliably and with
+          dignity. Three brands, one commitment, and a shared belief that the way
+          India moves should be quiet, efficient and built to last.
+        </p>
+      </div>
+
+      <!-- Brand marks -->
+      <div class="ab-marks ab-rv" data-d="2">
+        <div class="ab-mark">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/01/Untitled-design-5.png"
+               alt="Mayuri" loading="lazy" decoding="async" width="264" height="132">
+        </div>
+        <div class="ab-mark">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/01/Untitled-design-11-2.png"
+               alt="Sunehri" loading="lazy" decoding="async" width="264" height="132">
+        </div>
+        <div class="ab-mark">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/01/Untitled-design-7.png"
+               alt="Saera Golf Carts" loading="lazy" decoding="async" width="264" height="132">
+        </div>
+      </div>
+
+      <!-- Vision · Mission · Value -->
+      <div class="ab-pillars">
+        <div class="ab-pillar ab-rv">
+          <p class="ab-pillar__k">Vision</p>
+          <!-- COPY -->
+          <p class="ab-pillar__t">
+            We aim to become one of the leading Electric Vehicle companies by
+            elevating the level of automotive technology.
+          </p>
+        </div>
+        <div class="ab-pillar ab-rv" data-d="1">
+          <p class="ab-pillar__k">Mission</p>
+          <!-- COPY -->
+          <p class="ab-pillar__t">
+            We are dedicated to accepting challenges of making and reaching goals
+            in India with quality, worthwhile customer satisfaction.
+          </p>
+        </div>
+        <div class="ab-pillar ab-rv" data-d="2">
+          <p class="ab-pillar__k">Value</p>
+          <!-- COPY -->
+          <p class="ab-pillar__t">
+            Integrity, commitment and innovation are our core values, and they
+            make us an outstanding performer in the industry.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ 3 · WHY SAERA ═══ -->
+  <section class="ab-band-mist">
+    <div class="ab-wrap ab-wrap--tight ab-center">
+      <h2 class="ab-h2 ab-rv" style="margin-bottom:14px !important">Why Saera?</h2>
+      <!-- COPY -->
+      <p class="ab-p ab-rv" data-d="1">
+        Built on three of India's most trusted electric vehicle brands.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ 4–7 · FEATURE ROWS ═══ -->
+  <section class="ab-rows" style="padding-bottom: var(--ab-gap)">
+    <div class="ab-wrap">
+
+      <!-- Row 1 — copy left, image right -->
+      <div class="ab-row ab-row--flip">
+        <div class="ab-row__copy ab-rv">
+          <h3 class="ab-h3">Our Craft, Your Journey</h3>
+          <!-- COPY -->
+          <p class="ab-p">
+            We don't just make products — we create vehicles that are lived in
+            every day. Every detail, from the fit of a panel to the finish of a
+            dashboard, is decided with care.
+          </p>
+          <!-- COPY -->
+          <p class="ab-p">
+            Every component, every feature, every hour behind it exists so your
+            journey feels effortless.
+          </p>
+        </div>
+        <div class="ab-row__media ab-rv" data-d="1">
+          <figure class="ab-shot">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/Vintage-Dashboard-High-Res-1.png"
+                 alt="Illuminated instrument cluster and dashboard detail"
+                 loading="lazy" decoding="async" width="1200" height="750">
+          </figure>
+        </div>
+      </div>
+
+      <!-- Row 2 — image left, copy right -->
+      <div class="ab-row">
+        <div class="ab-row__media ab-rv">
+          <figure class="ab-shot">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/Sunehri-Manufacturing.png"
+                 alt="Technicians assembling a vehicle on the Sunehri manufacturing line"
+                 loading="lazy" decoding="async" width="1200" height="750">
+          </figure>
+        </div>
+        <div class="ab-row__copy ab-rv" data-d="1">
+          <h3 class="ab-h3">Driven by People, Fueled by Passion</h3>
+          <!-- COPY -->
+          <p class="ab-p">
+            Saera is built because of our people — engineers, technicians and the
+            teams on the line who bring precision and care to every vehicle that
+            leaves the floor.
+          </p>
+          <!-- COPY -->
+          <p class="ab-p">
+            We are proud of the skill and the effort behind every machine we build.
+          </p>
+        </div>
+      </div>
+
+      <!-- Row 3 — copy left, image right -->
+      <div class="ab-row ab-row--flip">
+        <div class="ab-row__copy ab-rv">
+          <h3 class="ab-h3">Advancing Sustainable Futures</h3>
+          <!-- COPY -->
+          <p class="ab-p">
+            Sustainability is not a slogan — it is a design constraint we hold
+            ourselves to, from the materials we choose to the emissions we never
+            release.
+          </p>
+          <!-- COPY -->
+          <p class="ab-p">
+            From every efficient design to responsible manufacturing choices, we
+            aim to make a cleaner, quieter future.
+          </p>
+        </div>
+        <div class="ab-row__media ab-rv" data-d="1">
+          <figure class="ab-shot">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/6-Seater-Golf-Cart.png"
+                 alt="Saera six-seater electric golf cart on a landscaped course"
+                 loading="lazy" decoding="async" width="1200" height="750">
+          </figure>
+        </div>
+      </div>
+
+      <!-- Row 4 — image left, copy right -->
+      <div class="ab-row">
+        <div class="ab-row__media ab-rv">
+          <figure class="ab-shot">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/Rattan-Blueprint.png"
+                 alt="Engineering blueprint of the Rattan L5 auto"
+                 loading="lazy" decoding="async" width="1200" height="750">
+          </figure>
+        </div>
+        <div class="ab-row__copy ab-rv" data-d="1">
+          <h3 class="ab-h3">Looking Ahead</h3>
+          <!-- COPY -->
+          <p class="ab-p">
+            We're already ahead of many of the roads we are working on, exploring
+            new ways to make the electric drivetrain smarter, lighter and further
+            reaching.
+          </p>
+          <!-- COPY -->
+          <p class="ab-p">
+            Every step we take towards a wider, better-connected, more efficient
+            future is a step we take together.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ 8 · A LEGACY OF INNOVATION ═══ -->
+  <section class="ab-legacy">
+    <div class="ab-wrap">
+
+      <div class="ab-center">
+        <h2 class="ab-h2 ab-rv">A Legacy of Innovation</h2>
+        <!-- COPY -->
+        <p class="ab-p ab-rv" data-d="1">
+          For more than a decade, Saera has believed in the design of a driving
+          culture built on experience — people first, and the technology that
+          serves them second.
+        </p>
+      </div>
+
+      <!-- Carousel -->
+      <div class="ab-car ab-rv" data-d="2" id="abCar"
+           role="group" aria-roledescription="carousel" aria-label="A legacy of innovation">
+        <div class="ab-car__track" id="abTrack">
+          <figure class="ab-car__cell" role="group" aria-roledescription="slide" aria-label="1 of 5">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-2.png"
+                 alt="Saera electric auto on a city street" loading="lazy" decoding="async"
+                 width="1600" height="900">
+          </figure>
+          <figure class="ab-car__cell" role="group" aria-roledescription="slide" aria-label="2 of 5">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/07/SAERA-GOLF-CART-Six-seats.-Silent-electric-drive.-Built-for-resorts-campuses-and-communities-the-new-SAERA-moves-everyone-alloy-in-comfort-with-LED-lighting-and-all-day-range.-1920-x-1080-px.webp"
+                 alt="Saera golf cart built for resorts, campuses and communities"
+                 loading="lazy" decoding="async" width="1920" height="1080">
+          </figure>
+          <figure class="ab-car__cell" role="group" aria-roledescription="slide" aria-label="3 of 5">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-25.webp"
+                 alt="Saera vehicle in service" loading="lazy" decoding="async"
+                 width="1600" height="900">
+          </figure>
+          <figure class="ab-car__cell" role="group" aria-roledescription="slide" aria-label="4 of 5">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-30.png"
+                 alt="Saera vehicle on the road" loading="lazy" decoding="async"
+                 width="1600" height="900">
+          </figure>
+          <figure class="ab-car__cell" role="group" aria-roledescription="slide" aria-label="5 of 5">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-31.png"
+                 alt="Saera vehicle at work" loading="lazy" decoding="async"
+                 width="1600" height="900">
+          </figure>
+        </div>
+      </div>
+
+      <div class="ab-dots" id="abDots"></div>
+
+      <!-- Screen-reader announcement channel, kept out of the visual design. -->
+      <p id="abLive" aria-live="polite" aria-atomic="true"
+         style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"></p>
+
+    </div>
+  </section>
+
+  <!-- ═══ 9 · OUR FAMILY OF BRANDS ═══ -->
+  <section class="ab-band-ink">
+    <div class="ab-wrap ab-wrap--tight">
+      <p class="ab-eyebrow ab-rv">Our Family of Brands</p>
+      <ul class="ab-brands">
+        <li class="ab-rv"><b>Mayuri</b> — India's 1st e-Rickshaw Brand</li>
+        <li class="ab-rv" data-d="1"><b>Saera Golf Carts</b> — Premium &amp; Luxurious, Custom-Made</li>
+        <li class="ab-rv" data-d="2"><b>Sunehri</b> — Everyday reliability with thoughtful design</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ 10 · LATEST LAUNCH ═══ -->
+  <section class="ab-sec">
+    <div class="ab-wrap">
+      <div class="ab-launch">
+
+        <div class="ab-rv">
+          <p class="ab-eyebrow">Our Latest Launch</p>
+          <h2 class="ab-launch__t">2026 Sunehri<br>Rattan L5 Auto<br>(Flexi)</h2>
+          <!-- COPY -->
+          <p class="ab-p">
+            The 2026 Sunehri Rattan L5 Auto (Flexi) is built with a refined cabin,
+            a reworked L5 platform and a flexible seating layout made for everyday
+            work. Designed around real routes and real loads, it carries more,
+            costs less to run, and holds its comfort over a long day.
+          </p>
+        </div>
+
+        <div class="ab-gal ab-rv" data-d="1">
+          <figure class="ab-gal__cell">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/Mayuri-3-1-e1768901710446.png"
+                 alt="Sunehri Rattan L5 Auto — front three-quarter view"
+                 loading="lazy" decoding="async" width="800" height="800">
+          </figure>
+          <figure class="ab-gal__cell">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/Mayuri-1-e1768893812860.png"
+                 alt="Sunehri Rattan L5 Auto — side profile"
+                 loading="lazy" decoding="async" width="800" height="800">
+          </figure>
+          <figure class="ab-gal__cell ab-gal__cell--wide">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/Sunehri-Market-Shot.png"
+                 alt="Sunehri Rattan L5 Auto at work in a market street"
+                 loading="lazy" decoding="async" width="1200" height="600">
+          </figure>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 11 · CAREERS ═══ -->
+  <section class="ab-cta">
+    <div class="ab-cta__bg" aria-hidden="true"></div>
+    <div class="ab-cta__veil" aria-hidden="true"></div>
+    <div class="ab-cta__inner">
+      <div class="ab-wrap ab-wrap--tight">
+        <p class="ab-eyebrow ab-rv">Careers</p>
+        <h2 class="ab-cta__t ab-rv" data-d="1">Build What Moves the World Forward</h2>
+        <!-- COPY -->
+        <p class="ab-p ab-rv" data-d="2">
+          Join the team building India's electric future — on the line, in the
+          workshop and everywhere in between.
+        </p>
+        <div class="ab-rv" data-d="3">
+          <a class="ab-btn" href="#">Explore Careers <span class="ab-arr" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+
+<script>
+(function () {
+  'use strict';
+
+  var ab = document.getElementById('ab');
+  if (!ab) return;
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── SCROLL REVEAL ───────────────────────────────────────────
+     Elements ship visible in the markup and are only hidden here,
+     once we know JS is running and IntersectionObserver exists.
+     Without that check a script error or an old browser would leave
+     the entire page at opacity 0.
+  ── */
+  var rv = Array.prototype.slice.call(ab.querySelectorAll('.ab-rv'));
+
+  if (!reduce && 'IntersectionObserver' in window && rv.length) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);          /* one-shot — never re-hides */
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+
+    rv.forEach(function (el) { io.observe(el); });
+  } else {
+    rv.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ── CAROUSEL ────────────────────────────────────────────────
+     Per-view count comes from the CSS breakpoint rather than a
+     second JS media query, so there is one source of truth: we read
+     the rendered cell width back off the DOM and derive everything
+     from it. Resizing recomputes without re-reading any constants.
+  ── */
+  var car   = document.getElementById('abCar');
+  var track = document.getElementById('abTrack');
+  var dotsW = document.getElementById('abDots');
+  var live  = document.getElementById('abLive');
+  if (!car || !track || !dotsW) return;
+
+  var cells = Array.prototype.slice.call(track.children);
+  var TOTAL = cells.length;
+  if (!TOTAL) return;
+
+  var index = 0;
+  var pages = 1;
+  var step  = 0;
+
+  function metrics() {
+    var cw = cells[0].getBoundingClientRect().width;
+    var gapRaw = getComputedStyle(track).columnGap || getComputedStyle(track).gap || '0';
+    var gap = parseFloat(gapRaw) || 0;
+    step = cw + gap;
+
+    /* How many cells fit the viewport, rounded to tolerate the
+       sub-pixel width the browser hands back for fractional grids. */
+    var per = Math.max(1, Math.round(car.clientWidth / step));
+    pages = Math.max(1, TOTAL - per + 1);
+    if (index > pages - 1) index = pages - 1;
+  }
+
+  function apply() {
+    track.style.transform = 'translate3d(' + (-index * step) + 'px,0,0)';
+    Array.prototype.forEach.call(dotsW.children, function (d, i) {
+      var on = i === index;
+      d.classList.toggle('is-active', on);
+      if (on) d.setAttribute('aria-current', 'true');
+      else    d.removeAttribute('aria-current');
+    });
+  }
+
+  function buildDots() {
+    dotsW.textContent = '';
+    for (var i = 0; i < pages; i++) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ab-dot';
+      b.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      (function (n) {
+        b.addEventListener('click', function () { go(n); });
+      }(i));
+      dotsW.appendChild(b);
+    }
+  }
+
+  function go(n) {
+    index = Math.max(0, Math.min(pages - 1, n));
+    apply();
+    if (live) live.textContent = 'Slide ' + (index + 1) + ' of ' + pages;
+  }
+
+  function layout() {
+    var before = pages;
+    metrics();
+    if (pages !== before || !dotsW.children.length) buildDots();
+    apply();
+  }
+
+  layout();
+
+  /* Debounced: a resize fires dozens of times per drag of the
+     window edge, and each pass does a forced layout read. */
+  var rT = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(rT);
+    rT = setTimeout(layout, 140);
+  });
+
+  /* Images settling in can change the measured cell width — remeasure
+     once the last one lands rather than trusting the first frame. */
+  var pending = cells.length;
+  cells.forEach(function (c) {
+    var img = c.querySelector('img');
+    if (!img || img.complete) { if (--pending === 0) layout(); return; }
+    img.addEventListener('load',  function () { if (--pending === 0) layout(); }, { once: true });
+    img.addEventListener('error', function () { if (--pending === 0) layout(); }, { once: true });
+  });
+
+  /* ── SWIPE ──
+     Bails on a vertical gesture so page scrolling is never hijacked. */
+  var tx = 0, ty = 0, tid = null, locked = false;
+
+  car.addEventListener('touchstart', function (e) {
+    if (tid !== null) return;
+    var t = e.changedTouches[0];
+    tid = t.identifier;
+    tx = t.clientX;
+    ty = t.clientY;
+    locked = false;
+  }, { passive: true });
+
+  car.addEventListener('touchmove', function (e) {
+    if (tid === null || locked) return;
+    var t = e.changedTouches[0];
+    if (t.identifier !== tid) return;
+    if (Math.abs(t.clientY - ty) > Math.abs(t.clientX - tx)) locked = true;
+  }, { passive: true });
+
+  car.addEventListener('touchend', function (e) {
+    var t = null, i;
+    for (i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === tid) { t = e.changedTouches[i]; break; }
+    }
+    tid = null;
+    if (!t || locked) return;
+    var dx = t.clientX - tx;
+    if (Math.abs(dx) > 44) go(index + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  car.addEventListener('touchcancel', function () { tid = null; }, { passive: true });
+
+  /* ── KEYBOARD ──
+     Left/Right only. Up/Down must stay with the page. */
+  dotsW.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight')     { e.preventDefault(); go(index + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(index - 1); }
+  });
+}());
+</script>
+
+</body>
+</html>
