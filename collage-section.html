@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecosystem Collage</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   ECOSYSTEM COLLAGE — theme-proof build
+
+   Same discipline as the hero: everything is scoped to #gw, so
+   every rule carries at least 1,0,0 specificity and outranks the
+   class-based selectors WordPress themes and page builders use
+   (`.entry-content img`, `.elementor-widget figure`, and friends).
+   Custom properties are --gw-* on #gw rather than :root, and every
+   @keyframes name is gw-prefixed, because keyframe names are global
+   and a later theme definition of `float` or `fadeUp` would
+   silently hijack ours.
+
+   Palette and rhythm are deliberately identical to the hero
+   (#07070A ink, #BF9B4D gold, Montserrat) so the two sections read
+   as one page rather than two components bolted together.
+══════════════════════════════════════════════════════════════ */
+
+/* Only rule outside the #gw scope — present so the file is correct
+   standalone. Safe to delete when pasting into a theme that
+   already normalises body. */
+html, body { margin: 0; padding: 0; background: #07070A; }
+
+#gw {
+  --gw-gold:  #BF9B4D;
+  --gw-ink:   #07070A;
+  --gw-ink-2: #0C0C11;   /* one step up from ink, for card wells */
+
+  /* Collage geometry — single source of truth. Changing the gap
+     here moves the column gutters, the row gutters and the
+     staggered column offset together, so the grid stays coherent. */
+  --gw-gap:    clamp(10px, 1.15vw, 18px);
+  --gw-radius: clamp(10px, 0.9vw, 16px);
+
+  /* Marquee speeds. Columns run at deliberately non-multiple
+     durations so the four tracks never sync up into a visible
+     "everything lines up" beat. */
+  --gw-sp-1: 58s;
+  --gw-sp-2: 71s;
+  --gw-sp-3: 64s;
+  --gw-sp-4: 79s;
+
+  --gw-ease-expo: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ────────────────────────────
+   SCOPED RESET
+   Neutralises inherited theme styling inside the section only.
+   Sits above the component rules, all of which are #gw-scoped and
+   therefore more specific — so this never fights our own CSS.
+──────────────────────────── */
+#gw, #gw *, #gw *::before, #gw *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  list-style: none;
+}
+
+/* Links are what themes hit hardest, and the !important flags are
+   the minimum needed to beat theme declarations that are themselves
+   !important — specificity alone loses to those. */
+#gw a {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Themes and icon plugins inject pseudo-element glyphs into links
+   (external-link arrows, mostly). Nothing here wants one. */
+#gw a::before, #gw a::after { content: none; display: none; }
+
+/* ────────────────────────────
+   SECTION SHELL
+   The container is a <section>, which themes love to pad and
+   colour (`body section { padding: 40px !important }` would inset
+   the whole block and expose a page-coloured frame around it).
+──────────────────────────── */
+#gw {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: clamp(72px, 10.5vh, 132px) clamp(24px, 6.2vw, 108px) !important;
+  border: 0 !important;
+  overflow: hidden;
+  background: var(--gw-ink) !important;
+  isolation: isolate;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hairline seam at the top so the section butts against the hero
+   without a hard edge. */
+#gw::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.05);
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Warm ambient wash behind the collage. Keeps the right half of
+   the block from reading as a flat black rectangle, and picks the
+   gold up out of the photography rather than sitting on top of it. */
+#gw::after {
+  content: '';
+  position: absolute;
+  top: -12%;
+  right: -14%;
+  width: 62%;
+  height: 118%;
+  background: radial-gradient(closest-side,
+                rgba(191,155,77,0.11) 0%,
+                rgba(191,155,77,0.04) 46%,
+                rgba(191,155,77,0) 78%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ────────────────────────────
+   LAYOUT
+   Copy left, collage right. minmax(0,·) on both tracks is what
+   stops the marquee's duplicated content from forcing the grid
+   wider than the viewport.
+──────────────────────────── */
+#gw .gw-wrap {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+  gap: clamp(40px, 5.4vw, 92px);
+  align-items: center;
+  max-width: 1560px;
+  margin: 0 auto !important;
+}
+
+/* ────────────────────────────
+   COPY COLUMN
+──────────────────────────── */
+#gw .gw-copy { max-width: 560px; }
+
+#gw .gw-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 8.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3.4px;
+  line-height: 1 !important;
+  text-transform: uppercase;
+  color: var(--gw-gold) !important;
+  margin: 0 0 26px !important;
+}
+#gw .gw-eyebrow::before {
+  content: '';
+  display: block;
+  width: 34px;
+  height: 1px;
+  background: var(--gw-gold);
+  flex: 0 0 auto;
+}
+
+/* Typography carries !important only on the properties themes
+   force onto bare h2/p selectors — font stack, colour, and the
+   vertical-rhythm margins. Everything else stays flag-free. */
+#gw .gw-title {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(30px, 3.5vw, 54px) !important;
+  font-weight: 800 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.6px;
+  text-transform: uppercase !important;
+  color: #fff !important;
+  margin: 0 0 22px !important;
+}
+#gw .gw-title em {
+  font-style: normal;
+  color: var(--gw-gold) !important;
+}
+
+#gw .gw-lede {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(13px, 1.02vw, 15px) !important;
+  font-weight: 300 !important;
+  line-height: 1.85 !important;
+  color: rgba(255,255,255,0.56) !important;
+  margin: 0 0 34px !important;
+}
+
+/* ── Pillars ──
+   A rule-separated list rather than a card row: at this scale
+   boxes would compete with the collage for attention. */
+#gw .gw-pillars {
+  display: grid;
+  gap: 0;
+  margin: 0 0 38px !important;
+  border-top: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+#gw .gw-pillar {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 15px 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+#gw .gw-pillar span {
+  flex: 0 0 auto;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.4px;
+  line-height: 1.6 !important;
+  color: rgba(191,155,77,0.72) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+#gw .gw-pillar p {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(12px, 0.92vw, 13.5px) !important;
+  font-weight: 500 !important;
+  line-height: 1.6 !important;
+  letter-spacing: 0.2px;
+  color: rgba(255,255,255,0.82) !important;
+  margin: 0 !important;
+}
+
+/* ── CTA — matches the hero's link treatment exactly ── */
+#gw .gw-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 8.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62) !important;
+  padding-bottom: 6px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.18) !important;
+  transition: color 0.28s ease, border-color 0.28s ease;
+}
+#gw .gw-cta:hover { color: var(--gw-gold) !important; border-color: var(--gw-gold) !important; }
+#gw .gw-cta:focus-visible { outline: 1.5px solid var(--gw-gold); outline-offset: 5px; }
+
+#gw .gw-arr {
+  display: inline-block;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  transition: transform 0.32s var(--gw-ease-expo);
+}
+#gw .gw-cta:hover .gw-arr { transform: translateX(5px); }
+
+/* ────────────────────────────
+   COLLAGE
+   Four independent marquee columns. The viewport is a fixed height
+   with a mask, so images dissolve into the background at the top
+   and bottom instead of being guillotined by an overflow edge —
+   that soft termination is most of what makes it read as premium.
+──────────────────────────── */
+#gw .gw-collage {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gw-gap);
+  height: clamp(520px, 76vh, 780px);
+  overflow: hidden;
+}
+
+/* The mask lives on each column, not on the grid, so the columns
+   can be re-flowed into two rows on small screens and still each
+   get their own soft top and bottom edge. */
+#gw .gw-col {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  /* Standard property last so it wins where both are supported. */
+  -webkit-mask-image: linear-gradient(to bottom,
+      transparent 0, #000 11%, #000 89%, transparent 100%);
+  mask-image: linear-gradient(to bottom,
+      transparent 0, #000 11%, #000 89%, transparent 100%);
+}
+
+#gw .gw-track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gw-gap);
+  will-change: transform;
+}
+
+/* The track holds the tile set twice. Travelling exactly -50%
+   lands the duplicate where the original started, so the seam is
+   mathematically invisible at any speed. The trailing gap is
+   folded into the distance via the calc, otherwise the loop point
+   drifts by one gutter every cycle.
+
+   The negative delays are the column stagger: a negative delay
+   starts a column partway through its own cycle, which offsets it
+   vertically without a transform. Doing it with translateY instead
+   would move the column's fade mask along with the content and
+   leave one column's soft edge sitting higher than its neighbours'. */
+#gw .gw-col:nth-child(1) .gw-track { animation: gw-up   var(--gw-sp-1) linear infinite; animation-delay: -3s;  }
+#gw .gw-col:nth-child(2) .gw-track { animation: gw-down var(--gw-sp-2) linear infinite; animation-delay: -21s; }
+#gw .gw-col:nth-child(3) .gw-track { animation: gw-up   var(--gw-sp-3) linear infinite; animation-delay: -34s; }
+#gw .gw-col:nth-child(4) .gw-track { animation: gw-down var(--gw-sp-4) linear infinite; animation-delay: -12s; }
+
+@keyframes gw-up {
+  from { transform: translateY(0); }
+  to   { transform: translateY(calc(-50% - var(--gw-gap) / 2)); }
+}
+@keyframes gw-down {
+  from { transform: translateY(calc(-50% - var(--gw-gap) / 2)); }
+  to   { transform: translateY(0); }
+}
+
+/* Hovering the collage stalls every column — lets someone actually
+   look at a frame that caught their eye. */
+#gw .gw-collage:hover .gw-track { animation-play-state: paused; }
+
+/* ── Tiles ──
+   Aspect ratio is set per tile, not globally: uniform tiles make a
+   contact sheet, mixed ratios make a collage. The well colour
+   shows for the instant before decode, so a slow connection sees a
+   composed grid of dark cards rather than white flashes. */
+#gw .gw-tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--gw-radius) !important;
+  background: var(--gw-ink-2) !important;
+  border: 1px solid rgba(255,255,255,0.07) !important;
+  box-shadow: 0 18px 40px -24px rgba(0,0,0,0.9) !important;
+}
+
+#gw .gw-r45 { aspect-ratio: 4 / 5; }
+#gw .gw-r11 { aspect-ratio: 1 / 1; }
+#gw .gw-r34 { aspect-ratio: 3 / 4; }
+#gw .gw-r54 { aspect-ratio: 5 / 4; }
+
+#gw .gw-tile img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0 !important;
+  /* Held slightly back at rest so twelve competing photographs
+     read as one surface; hover restores the full frame. */
+  filter: saturate(0.82) brightness(0.86);
+  transform: scale(1.01);
+  transition: filter 0.55s ease,
+              transform 0.75s var(--gw-ease-expo);
+}
+
+/* Inner edge — stops bright frames from bleeding into the gutters. */
+#gw .gw-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05),
+              inset 0 -40px 60px -40px rgba(7,7,10,0.9) !important;
+  pointer-events: none;
+}
+
+#gw .gw-tile:hover img {
+  filter: saturate(1.06) brightness(1);
+  transform: scale(1.055);
+}
+
+/* ────────────────────────────
+   REDUCED MOTION
+   Drop the travel, keep the composition. The columns become a
+   static staggered mosaic, and the mask is removed so nothing is
+   left permanently faded out with no motion to reveal it.
+──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #gw .gw-track { animation: none !important; }
+  #gw .gw-collage { height: auto; }
+  #gw .gw-col {
+    height: auto;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  /* Half the tiles are duplicates that exist only to close the
+     loop — with no loop, they are noise. */
+  #gw .gw-track .gw-dup { display: none; }
+  #gw .gw-tile img { transition-duration: 0.01ms; }
+}
+
+/* ────────────────────────────
+   RESPONSIVE
+──────────────────────────── */
+
+/* Tablet — copy above, collage below, still four columns but
+   shorter so the section doesn't eat two screens. */
+@media (max-width: 1080px) {
+  #gw .gw-wrap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(38px, 6vw, 56px);
+  }
+  #gw .gw-copy { max-width: 620px; }
+  #gw .gw-collage { height: clamp(440px, 58vh, 560px); }
+}
+
+/* Phone — two columns. Four would put every image below thumbnail
+   size. Rather than hide the other two columns and lose half the
+   photography, they wrap onto a second row of the same grid; each
+   column carries its own mask, so both bands terminate softly. */
+@media (max-width: 680px) {
+  #gw { padding: 68px 20px !important; }
+  #gw .gw-collage {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: clamp(300px, 38vh, 380px);
+    height: auto;
+  }
+  #gw .gw-title { font-size: clamp(26px, 8vw, 38px) !important; letter-spacing: -0.2px; }
+  #gw .gw-lede { font-size: 13px !important; }
+}
+
+/* Coarse pointers never get the hover states, so the tiles must
+   look finished at rest. */
+@media (hover: none) {
+  #gw .gw-tile img { filter: saturate(0.94) brightness(0.94); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     ECOSYSTEM COLLAGE
+     Each column's tile set is repeated once, marked aria-hidden
+     and .gw-dup on the copy. The duplicate is what makes the
+     marquee seamless; it must never reach the accessibility tree
+     or a screen reader hears all twelve captions twice.
+══════════════════════════════════════════ -->
+<section class="gw" id="gw" aria-labelledby="gwTitle">
+  <div class="gw-wrap">
+
+    <!-- ─ Copy ─ -->
+    <div class="gw-copy">
+      <p class="gw-eyebrow">The Ecosystem</p>
+
+      <h2 class="gw-title" id="gwTitle">
+        Grow with the<br><em>Saera</em> Ecosystem
+      </h2>
+
+      <p class="gw-lede">
+        From in-house manufacturing and assembly to distribution and
+        after-sales, every stage of the journey sits under one roof —
+        engineered, built and supported by the same team.
+      </p>
+
+      <div class="gw-pillars">
+        <div class="gw-pillar">
+          <span>01</span>
+          <p>In-house manufacturing &amp; assembly</p>
+        </div>
+        <div class="gw-pillar">
+          <span>02</span>
+          <p>Nationwide dealer &amp; distribution network</p>
+        </div>
+        <div class="gw-pillar">
+          <span>03</span>
+          <p>End-to-end service and spare-parts support</p>
+        </div>
+      </div>
+
+      <a class="gw-cta" href="#">Partner with us <span class="gw-arr" aria-hidden="true">→</span></a>
+    </div>
+
+    <!-- ─ Collage ─ -->
+    <div class="gw-collage" role="group" aria-label="Saera manufacturing, products and facilities">
+
+      <!-- Column 1 — travels up -->
+      <div class="gw-col">
+        <div class="gw-track">
+          <figure class="gw-tile gw-r45">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/DSC_6464.jpg" alt="Fleet of Saera electric golf carts lined up outdoors" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r34">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/DDD03390.jpg" alt="Technician fabricating a vehicle frame on the shop floor" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r11">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/Untitled-design-6.png" alt="Component preparation area inside the plant" loading="lazy" decoding="async">
+          </figure>
+          <!-- duplicate set — closes the loop -->
+          <figure class="gw-tile gw-r45 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/DSC_6464.jpg" alt="" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r34 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/DDD03390.jpg" alt="" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r11 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/Untitled-design-6.png" alt="" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </div>
+
+      <!-- Column 2 — travels down -->
+      <div class="gw-col">
+        <div class="gw-track">
+          <figure class="gw-tile gw-r54">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/ChatGPT-Image-Jan-23-2026-06_29_24-PM.png" alt="Saera three-wheelers and golf carts on display at a heritage property" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r34">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/03/Sunehri.png" alt="Sunehri electric loader three-wheeler" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r45">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/Untitled-design-7.png" alt="Spare-parts warehouse aisle stocked to the ceiling" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r54 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/01/ChatGPT-Image-Jan-23-2026-06_29_24-PM.png" alt="" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r34 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/03/Sunehri.png" alt="" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r45 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/Untitled-design-7.png" alt="" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </div>
+
+      <!-- Column 3 — travels up -->
+      <div class="gw-col">
+        <div class="gw-track">
+          <figure class="gw-tile gw-r34">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/pillar1.png" alt="Finished vehicles parked outside the dispatch bay" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r45">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/DDD04731.jpg" alt="Close-up of a Saera scooter handlebar and digital console" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r54">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/Assembly-Line-3-e1770281397109.jpeg" alt="Main assembly line running the length of the factory" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r34 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/pillar1.png" alt="" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r45 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/DDD04731.jpg" alt="" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r54 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/Assembly-Line-3-e1770281397109.jpeg" alt="" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </div>
+
+      <!-- Column 4 — travels down -->
+      <div class="gw-col">
+        <div class="gw-track">
+          <figure class="gw-tile gw-r45">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/Untitled-design-5.png" alt="Vehicles moving through the trim and final-fitment line" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r34">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/DDD02940.jpg" alt="Welder joining a chassis section, sparks in flight" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r11">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/03/Untitled-design-5.png" alt="Saera Electric Auto facility frontage with carts on the forecourt" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r45 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/Untitled-design-5.png" alt="" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r34 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/02/DDD02940.jpg" alt="" loading="lazy" decoding="async">
+          </figure>
+          <figure class="gw-tile gw-r11 gw-dup" aria-hidden="true">
+            <img src="https://ddfintech.net/wp-content/uploads/2026/03/Untitled-design-5.png" alt="" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
