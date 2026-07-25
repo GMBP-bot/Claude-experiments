@@ -620,9 +620,9 @@
 #saera-mega-nav .acc-chevron { width: 14px !important; height: 14px !important; flex-shrink: 0 !important; color: var(--ink-2) !important; transition: transform var(--ease) !important; }
 #saera-mega-nav .acc-item.open .acc-chevron { transform: rotate(180deg) !important; }
 
-/* max-height is written by JS from the panel's real scrollHeight.
-   The v2 hard-coded 600px clipped the Vehicles list, which is the
-   longest one in the drawer. */
+/* max-height is written by JS from the panel's real scrollHeight,
+   replacing v2's hard-coded 600px — that value clears today's
+   longest list but clips silently as soon as a menu grows. */
 #saera-mega-nav .acc-body { max-height: 0 !important; overflow: hidden !important; background: var(--fog) !important; transition: max-height 280ms ease-out !important; }
 #saera-mega-nav .acc-sub { padding: 6px 0 10px !important; }
 #saera-mega-nav .acc-sub-section { padding: 12px 22px 4px !important; }
