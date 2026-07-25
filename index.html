@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Showcase</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400&display=swap" rel="stylesheet">
+
+<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/07/2-1-1.webp">
+<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/07/SUNEHRI-1.webp">
+<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/07/1-1-1.webp">
+
+<style>
+/* ────────────────────────────
+   BASE
+──────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --gold: #BF9B4D;
+  --ink:  #07070A;
+
+  /* Timing — single source of truth. JS reads these at boot,
+     so changing a number here changes it everywhere. */
+  --dwell: 5800ms;   /* how long each slide holds  */
+  --fade:  1100ms;   /* crossfade duration         */
+
+  --ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+body {
+  background: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ────────────────────────────
+   HERO — sits in page flow
+──────────────────────────── */
+.hs {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;          /* dodges mobile URL-bar jitter */
+  max-height: 960px;
+  min-height: 560px;
+  overflow: hidden;
+  background: var(--ink);
+  isolation: isolate;
+}
+.hs:focus { outline: none; }
+.hs:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+/* ────────────────────────────
+   SLIDES
+   Two independent state classes, and that separation is the
+   whole trick:
+     .is-active  → owns opacity / stacking (the crossfade)
+     .is-in      → owns the entrance animations
+   An outgoing slide drops .is-active immediately but keeps .is-in
+   until the fade finishes, so its text and Ken Burns hold their
+   final pose while it dissolves instead of snapping back to the
+   pre-animation state mid-fade.
+──────────────────────────── */
+.hs-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--fade) var(--ease-quart),
+              visibility 0s linear var(--fade);
+}
+
+.hs-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+  transition: opacity var(--fade) var(--ease-quart),
+              visibility 0s linear 0s;
+}
+
+/* Only the two slides in play get promoted — keeps the
+   compositor from holding layers it doesn't need. */
+.hs-slide.is-active,
+.hs-slide.is-in { will-change: opacity; }
+
+/* ────────────────────────────
+   BACKGROUND + KEN BURNS
+   Duration equals dwell + fade, so the zoom is still travelling
+   when the slide hands off. It never reaches its endpoint and
+   never visibly parks.
+──────────────────────────── */
+.hs-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.05);
+  will-change: transform;
+}
+
+.hs-slide.is-in .hs-bg {
+  animation: kb calc(var(--dwell) + var(--fade)) linear both;
+}
+
+@keyframes kb {
+  from { transform: scale(1.05); }
+  to   { transform: scale(1.13); }
+}
+
+.hs-slide--a .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/SUNEHRI-1.webp'); }
+.hs-slide--b .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/2-1-1.webp'); }
+.hs-slide--c .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/1-1-1.webp'); }
+
+/* ────────────────────────────
+   CINEMATIC OVERLAY
+──────────────────────────── */
+.hs-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(108deg,
+      rgba(7,7,10,0.90) 0%,
+      rgba(7,7,10,0.52) 42%,
+      rgba(7,7,10,0.08) 100%),
+    linear-gradient(to top,
+      rgba(7,7,10,0.84) 0%,
+      rgba(7,7,10,0.00) 48%);
+  pointer-events: none;
+}
+
+/* ────────────────────────────
+   CONTENT
+──────────────────────────── */
+.hs-content {
+  position: absolute;
+  bottom: clamp(88px, 15.5vh, 148px);
+  left:   clamp(32px, 8vw, 120px);
+  max-width: min(600px, 80vw);
+}
+
+/* ────────────────────────────
+   TITLE — line-by-line curtain reveal
+   Each .hs-line is a shutter (overflow:hidden); .hs-line-in
+   starts beneath it and slides up into view.
+──────────────────────────── */
+.hs-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(32px, 4.8vw, 68px);
+  font-weight: 800;
+  line-height: 1.05;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  margin-bottom: 20px;
+}
+
+.hs-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;   /* descenders clear the shutter */
+}
+
+.hs-line-in {
+  display: block;
+  opacity: 0;
+  transform: translateY(110%);
+}
+
+/* Staggered 130ms apart */
+.hs-slide.is-in .hs-line:nth-child(1) .hs-line-in { animation: lineUp 0.9s var(--ease-expo) 0.26s both; }
+.hs-slide.is-in .hs-line:nth-child(2) .hs-line-in { animation: lineUp 0.9s var(--ease-expo) 0.39s both; }
+.hs-slide.is-in .hs-line:nth-child(3) .hs-line-in { animation: lineUp 0.9s var(--ease-expo) 0.52s both; }
+.hs-slide.is-in .hs-line:nth-child(4) .hs-line-in { animation: lineUp 0.9s var(--ease-expo) 0.65s both; }
+
+@keyframes lineUp {
+  from { opacity: 0; transform: translateY(110%); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ────────────────────────────
+   SUBTITLE
+──────────────────────────── */
+.hs-sub {
+  font-family: 'Noto Sans Devanagari', 'Montserrat', sans-serif;
+  font-size: clamp(11px, 1.22vw, 14.5px);
+  font-weight: 300;
+  line-height: 1.95;
+  color: rgba(255,255,255,0.48);
+  margin-bottom: 36px;
+  opacity: 0;
+}
+
+.hs-slide.is-in .hs-sub { animation: fadeUp 0.85s var(--ease-expo) 0.60s both; }
+
+/* ────────────────────────────
+   CTA
+──────────────────────────── */
+.hs-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255,255,255,0.55);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  opacity: 0;
+  transition: color 0.28s ease, border-color 0.28s ease;
+}
+
+.hs-slide.is-in .hs-cta { animation: fadeUp 0.75s var(--ease-expo) 0.76s both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.hs-cta:hover { color: var(--gold); border-color: var(--gold); }
+.hs-cta:focus-visible { outline: 1.5px solid var(--gold); outline-offset: 5px; }
+
+.hs-arr {
+  display: inline-block;
+  font-size: 13px;
+  line-height: 1;
+  transition: transform 0.32s var(--ease-expo);
+}
+.hs-cta:hover .hs-arr { transform: translateX(5px); }
+
+/* Inactive slides must never be tab-stops or click targets. */
+.hs-slide:not(.is-active) .hs-cta { pointer-events: none; }
+
+/* ────────────────────────────
+   BRAND WATERMARK
+──────────────────────────── */
+.hs-brand {
+  position: absolute;
+  top: 6%;
+  right: 6%;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.09);
+  opacity: 0;
+}
+
+.hs-slide.is-in .hs-brand { animation: ghostIn 1.5s ease 0.15s both; }
+
+@keyframes ghostIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ────────────────────────────
+   NAV CLUSTER — bottom right
+──────────────────────────── */
+.hs-nav {
+  position: absolute;
+  right: clamp(28px, 7.5vw, 108px);
+  bottom: clamp(30px, 5.5vh, 52px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  z-index: 10;
+}
+
+.hs-counter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.24);
+  font-variant-numeric: tabular-nums;   /* digits don't jitter on change */
+}
+.hs-cur { color: var(--gold); font-weight: 700; font-size: 10.5px; }
+.hs-rule {
+  display: inline-block;
+  width: 14px;
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+}
+
+/* ────────────────────────────
+   PILLS
+   The gold fill is a child element scaled by --p, which JS writes
+   from its own rAF clock. There is no CSS keyframe to fall out of
+   sync with, so pause/resume is exact and prefers-reduced-motion
+   can't shorten the progress bar out from under the timer.
+──────────────────────────── */
+.hs-pills { display: flex; gap: 8px; align-items: center; }
+
+.hs-pill {
+  position: relative;
+  width: 24px;
+  height: 2px;
+  background: rgba(255,255,255,0.16);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  transition: width 0.45s var(--ease-expo), background 0.3s ease;
+}
+
+/* Generous invisible hit area — no missed taps */
+.hs-pill::before {
+  content: '';
+  position: absolute;
+  inset: -12px -6px;
+}
+
+.hs-pill.is-active {
+  width: 48px;
+  background: rgba(255,255,255,0.1);
+  cursor: default;
+}
+
+.hs-pill__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  transform: scaleX(var(--p, 0));
+  transform-origin: left center;
+  opacity: 0;
+}
+.hs-pill.is-active .hs-pill__fill { opacity: 1; }
+
+.hs-pill:not(.is-active):hover { background: rgba(255,255,255,0.36); }
+.hs-pill:focus-visible { outline: 1.5px solid var(--gold); outline-offset: 4px; }
+
+/* ────────────────────────────
+   PREV / NEXT
+──────────────────────────── */
+.hs-arrow {
+  position: absolute;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(7,7,10,0.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 10;
+  transform: translateY(-50%) scale(0.94);
+  transition: opacity 0.4s ease,
+              transform 0.4s var(--ease-expo),
+              border-color 0.28s ease,
+              color 0.28s ease,
+              background 0.28s ease;
+}
+
+.hs:hover .hs-arrow,
+.hs:focus-within .hs-arrow {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+.hs-arrow:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(7,7,10,0.52);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.hs-arrow--prev { left:  clamp(16px, 3.5vw, 40px); }
+.hs-arrow--next { right: clamp(16px, 3.5vw, 40px); }
+.hs-arrow svg { width: 16px; height: 16px; }
+
+.hs-arrow:focus-visible {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+  outline: 1.5px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ────────────────────────────
+   BOTTOM RULE
+──────────────────────────── */
+.hs::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.05);
+  z-index: 9;
+  pointer-events: none;
+}
+
+/* ────────────────────────────
+   REDUCED MOTION
+   Kill the movement, keep the slideshow. Crossfade survives at a
+   shortened duration because a hard cut between full-bleed photos
+   is harsher than a quick dissolve.
+──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hs-slide,
+  .hs-slide.is-active { transition-duration: 300ms; }
+
+  .hs-slide.is-in .hs-bg { animation: none; }
+  .hs-bg { transform: none; }
+
+  /* !important is deliberate: the staggered title rules are
+     nth-child-qualified and would otherwise out-specify this
+     accessibility override, leaving the copy stuck at opacity 0. */
+  .hs-slide.is-in .hs-line .hs-line-in,
+  .hs-slide.is-in .hs-sub,
+  .hs-slide.is-in .hs-cta,
+  .hs-slide.is-in .hs-brand {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .hs-pill, .hs-arrow, .hs-arr { transition-duration: 0.01ms; }
+}
+
+/* ────────────────────────────
+   MOBILE
+──────────────────────────── */
+@media (max-width: 600px) {
+  .hs { height: 88vh; height: 88svh; min-height: 480px; }
+  .hs-title { font-size: clamp(28px, 9.5vw, 44px); letter-spacing: -0.2px; }
+  .hs-sub { font-size: 11.5px; }
+  .hs-arrow { display: none; }
+  .hs-nav { right: 20px; bottom: 22px; }
+  .hs-counter { display: none; }
+}
+
+/* Coarse pointers get no hover-only affordances at any width. */
+@media (hover: none) {
+  .hs-arrow { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     HERO SLIDER
+══════════════════════════════════════════ -->
+<section class="hs" id="hs" tabindex="0" aria-roledescription="carousel" aria-label="Product showcase">
+
+  <!-- ─ Slide 1: Rattan ─ -->
+  <div class="hs-slide hs-slide--a is-active is-in" role="group" aria-roledescription="slide" aria-label="1 of 3: Rattan">
+    <div class="hs-bg"></div>
+    <div class="hs-overlay"></div>
+    <span class="hs-brand" aria-hidden="true">Rattan</span>
+    <div class="hs-content">
+      <h1 class="hs-title">
+        <span class="hs-line"><span class="hs-line-in">Start Your</span></span>
+        <span class="hs-line"><span class="hs-line-in">Journey</span></span>
+        <span class="hs-line"><span class="hs-line-in">with Rattan</span></span>
+      </h1>
+      <p class="hs-sub">अपनी यात्रा की शुरुआत<br>Rattan के साथ करें।</p>
+      <a class="hs-cta" href="#">Explore Rattan <span class="hs-arr" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+
+  <!-- ─ Slide 2: Sunehri ─ -->
+  <div class="hs-slide hs-slide--b" role="group" aria-roledescription="slide" aria-label="2 of 3: Sunehri">
+    <div class="hs-bg"></div>
+    <div class="hs-overlay"></div>
+    <span class="hs-brand" aria-hidden="true">Sunehri</span>
+    <div class="hs-content">
+      <h2 class="hs-title">
+        <span class="hs-line"><span class="hs-line-in">Conquer</span></span>
+        <span class="hs-line"><span class="hs-line-in">Every</span></span>
+        <span class="hs-line"><span class="hs-line-in">Journey</span></span>
+      </h2>
+      <p class="hs-sub">SUNEHRI के साथ हर सफर पर<br>जीत हासिल करें।</p>
+      <a class="hs-cta" href="#">Experience Sunehri <span class="hs-arr" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+
+  <!-- ─ Slide 3: Saera ─ -->
+  <div class="hs-slide hs-slide--c" role="group" aria-roledescription="slide" aria-label="3 of 3: Saera">
+    <div class="hs-bg"></div>
+    <div class="hs-overlay"></div>
+    <span class="hs-brand" aria-hidden="true">Saera</span>
+    <div class="hs-content">
+      <h2 class="hs-title">
+        <span class="hs-line"><span class="hs-line-in">Redefining</span></span>
+        <span class="hs-line"><span class="hs-line-in">Every</span></span>
+        <span class="hs-line"><span class="hs-line-in">Ride</span></span>
+      </h2>
+      <p class="hs-sub">with SAERA Golf Carts —<br>precision, comfort &amp; performance.</p>
+      <a class="hs-cta" href="#">Discover SAERA <span class="hs-arr" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+
+  <!-- ─ Arrows ─ -->
+  <button class="hs-arrow hs-arrow--prev" id="hsPrev" type="button" aria-label="Previous slide">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  </button>
+  <button class="hs-arrow hs-arrow--next" id="hsNext" type="button" aria-label="Next slide">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  </button>
+
+  <!-- ─ Navigation cluster ─ -->
+  <div class="hs-nav">
+    <div class="hs-counter">
+      <span class="hs-cur" id="hsCur">01</span>
+      <span class="hs-rule" aria-hidden="true"></span>
+      <span>03</span>
+    </div>
+    <div class="hs-pills" id="hsPills">
+      <button class="hs-pill is-active" type="button" data-idx="0" aria-label="Go to slide 1" aria-current="true"><span class="hs-pill__fill"></span></button>
+      <button class="hs-pill" type="button" data-idx="1" aria-label="Go to slide 2"><span class="hs-pill__fill"></span></button>
+      <button class="hs-pill" type="button" data-idx="2" aria-label="Go to slide 3"><span class="hs-pill__fill"></span></button>
+    </div>
+  </div>
+
+  <!-- Screen-reader announcement channel, kept out of the visual design. -->
+  <p id="hsLive" aria-live="polite" aria-atomic="true"
+     style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"></p>
+
+</section>
+<!-- ═══════════════════════════════════════
+     Your page content continues here —
+     the slider never captures scroll or wheel.
+══════════════════════════════════════════ -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  var hs = document.getElementById('hs');
+  if (!hs) return;
+
+  var slides = Array.prototype.slice.call(hs.querySelectorAll('.hs-slide'));
+  var pills  = Array.prototype.slice.call(hs.querySelectorAll('.hs-pill'));
+  var hsCur  = document.getElementById('hsCur');
+  var live   = document.getElementById('hsLive');
+  var TOTAL  = slides.length;
+  if (TOTAL < 2) return;
+
+  /* ── TIMING: read from CSS so there is one source of truth ── */
+  function cssMs(name, fallback) {
+    var raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    if (!raw) return fallback;
+    var n = parseFloat(raw);
+    if (isNaN(n)) return fallback;
+    return /ms\s*$/.test(raw) ? n : n * 1000;
+  }
+  var DWELL = cssMs('--dwell', 5800);
+  var FADE  = cssMs('--fade', 1100);
+
+  /* ── STATE ── */
+  var current  = 0;
+  var elapsed  = 0;      /* ms accrued on the current slide */
+  var lastTs   = null;
+  var rafId    = null;
+  var running  = false;
+  var leaveT   = null;
+
+  /* Reasons the clock is held. Autoplay runs only when every one
+     is false, so hover, tab-blur and off-screen can't clobber
+     each other the way a single `paused` flag did. */
+  var hold = { hover: false, hidden: false, offscreen: false };
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function held() { return hold.hover || hold.hidden || hold.offscreen; }
+
+  /* ── PROGRESS CLOCK ────────────────────────────────────────
+     One rAF loop owns both the pill fill and the advance. They
+     read the same `elapsed`, so they cannot drift apart, and a
+     pause freezes the bar exactly where the timer stopped.
+  ── */
+  function paint() {
+    pills[current].firstElementChild.style.setProperty(
+      '--p', (elapsed / DWELL).toFixed(4)
+    );
+  }
+
+  function tick(ts) {
+    rafId = null;
+    if (!running) return;
+
+    if (lastTs === null) lastTs = ts;
+    /* Clamp the delta: a backgrounded tab or a long main-thread
+       stall would otherwise hand us one enormous frame and skip
+       a slide the moment we come back. */
+    elapsed += Math.min(ts - lastTs, 100);
+    lastTs = ts;
+
+    if (elapsed >= DWELL) {
+      elapsed = DWELL;
+      paint();
+      go(current + 1);
+      return;
+    }
+
+    paint();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function play() {
+    if (running || held()) return;
+    running = true;
+    lastTs = null;                        /* resume without a jump */
+    if (rafId === null) rafId = requestAnimationFrame(tick);
+  }
+
+  function stop() {
+    running = false;
+    lastTs = null;
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  function restartClock() {
+    stop();
+    elapsed = 0;
+    paint();
+    play();
+  }
+
+  /* ── SLIDE CHANGE ──────────────────────────────────────────
+     No lock: clicks always respond. The outgoing slide keeps
+     `is-in` for one fade so its copy and Ken Burns hold their
+     pose while dissolving; `is-active` is what actually fades.
+  ── */
+  function go(idx) {
+    idx = ((idx % TOTAL) + TOTAL) % TOTAL;
+
+    if (idx === current) { restartClock(); return; }
+
+    var outgoing = slides[current];
+
+    outgoing.classList.remove('is-active');
+    pills[current].classList.remove('is-active');
+    pills[current].removeAttribute('aria-current');
+    pills[current].firstElementChild.style.setProperty('--p', '0');
+
+    /* Strip `is-in` from every slide that is done fading, then let
+       the one just retired keep it for FADE ms. Re-running this
+       resets the timer, which is correct for rapid clicking. */
+    clearTimeout(leaveT);
+    slides.forEach(function (s) {
+      if (s !== outgoing) s.classList.remove('is-in');
+    });
+    leaveT = setTimeout(function () {
+      outgoing.classList.remove('is-in');
+    }, FADE);
+
+    current = idx;
+
+    var incoming = slides[current];
+    /* Reflow between remove and add so the entrance keyframes
+       actually restart when you return to a recent slide. */
+    incoming.classList.remove('is-in');
+    void incoming.offsetWidth;
+    incoming.classList.add('is-in', 'is-active');
+
+    pills[current].classList.add('is-active');
+    pills[current].setAttribute('aria-current', 'true');
+
+    hsCur.textContent = pad(current + 1);
+    live.textContent = 'Slide ' + (current + 1) + ' of ' + TOTAL;
+
+    restartClock();
+  }
+
+  var next = function () { go(current + 1); };
+  var prev = function () { go(current - 1); };
+
+  /* ── HOLD: HOVER ───────────────────────────────────────────
+     Only the controls pause the clock, not the whole hero. The
+     hero is full-viewport, so hovering it means "cursor is
+     somewhere on the page" — pausing there stalls the slider
+     indefinitely. Hovering a pill or arrow is real intent.
+  ── */
+  if (window.matchMedia('(hover: hover)').matches) {
+    [document.getElementById('hsPills'),
+     document.getElementById('hsPrev'),
+     document.getElementById('hsNext')].forEach(function (el) {
+      if (!el) return;
+      el.addEventListener('mouseenter', function () { hold.hover = true; stop(); });
+      el.addEventListener('mouseleave', function () { hold.hover = false; play(); });
+    });
+  }
+
+  /* ── HOLD: TAB VISIBILITY ── */
+  document.addEventListener('visibilitychange', function () {
+    hold.hidden = document.hidden;
+    if (document.hidden) stop(); else play();
+  });
+
+  /* ── HOLD: OFF-SCREEN ──
+     Scrolled past means nobody is watching; don't burn frames
+     or race through slides behind the user's back. */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      hold.offscreen = !entries[0].isIntersecting;
+      if (hold.offscreen) stop(); else play();
+    }, { threshold: 0.25 }).observe(hs);
+  }
+
+  /* ── SWIPE ──
+     Tracks a single touch and bails on a vertical gesture so
+     page scrolling is never hijacked. */
+  var tx = 0, ty = 0, tid = null;
+
+  hs.addEventListener('touchstart', function (e) {
+    if (tid !== null) return;
+    var t = e.changedTouches[0];
+    tid = t.identifier;
+    tx = t.clientX;
+    ty = t.clientY;
+  }, { passive: true });
+
+  hs.addEventListener('touchend', function (e) {
+    var t = null, i;
+    for (i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === tid) { t = e.changedTouches[i]; break; }
+    }
+    tid = null;
+    if (!t) return;
+    var dx = t.clientX - tx;
+    var dy = t.clientY - ty;
+    if (Math.abs(dx) > Math.abs(dy) * 1.6 && Math.abs(dx) > 44) {
+      dx < 0 ? next() : prev();
+    }
+  }, { passive: true });
+
+  hs.addEventListener('touchcancel', function () { tid = null; }, { passive: true });
+
+  /* ── CONTROLS ── */
+  pills.forEach(function (p) {
+    p.addEventListener('click', function () { go(+p.dataset.idx); });
+  });
+  document.getElementById('hsPrev').addEventListener('click', prev);
+  document.getElementById('hsNext').addEventListener('click', next);
+
+  /* ── KEYBOARD ──
+     Left/Right only. Up/Down must stay with the page — stealing
+     them breaks scrolling while the hero has focus. */
+  hs.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  /* ── DECODE-AHEAD ──
+     Pull the next two backgrounds into cache so the first
+     crossfade dissolves into a painted image, not a black frame. */
+  slides.slice(1).forEach(function (s) {
+    var url = getComputedStyle(s.querySelector('.hs-bg')).backgroundImage;
+    var m = /url\((['"]?)(.*?)\1\)/.exec(url);
+    if (m) { var i = new Image(); i.src = m[2]; }
+  });
+
+  /* ── BOOT ──
+     Slide 1 ships with is-active + is-in so it paints on the
+     first frame with no JS-induced flash. */
+  restartClock();
+}());
+</script>
+
+</body>
+</html>
