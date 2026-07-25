@@ -14,46 +14,131 @@
 <link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/07/1-1-1.webp">
 
 <style>
+/* ══════════════════════════════════════════════════════════════
+   HERO SHOWCASE — theme-proof build
+
+   Everything is scoped to the #hs id. That gives every rule a
+   specificity of at least 1,0,0, which outranks essentially any
+   theme selector (WordPress themes and page builders style bare
+   `button` / `a` through class-based wrappers like
+   `.entry-content button`, only 0,1,1). Without this, the theme's
+   global button styling paints the arrows and pills as grey boxes.
+
+   Same reasoning applies to the names below:
+     · custom properties are --hs-* and declared on #hs, not :root,
+       so a theme's own --gold or --fade can't reach in
+     · @keyframes are hs-prefixed, because keyframe names are global
+       and a later theme definition of `fadeUp` would silently
+       hijack ours
+══════════════════════════════════════════════════════════════ */
+
+/* Only rule outside the #hs scope. It exists so this file is
+   correct as a standalone page — without it the browser's default
+   body margin leaves an 8px gutter around the hero. Safe to delete
+   when pasting into a theme that already normalises body. */
+html, body { margin: 0; padding: 0; }
+
+#hs {
+  --hs-gold: #BF9B4D;
+  --hs-ink:  #07070A;
+
+  /* Timing — single source of truth. JS reads these off #hs at
+     boot, so changing a number here changes it everywhere. */
+  --hs-dwell: 5800ms;   /* how long each slide holds */
+  --hs-fade:  1100ms;   /* crossfade duration        */
+
+  --hs-ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
+  --hs-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 /* ────────────────────────────
-   BASE
+   SCOPED RESET
+   Neutralises inherited theme styling inside the hero only.
+   Sits above the component rules, all of which are #hs-scoped
+   and therefore more specific — so this never fights our own CSS.
 ──────────────────────────── */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-:root {
-  --gold: #BF9B4D;
-  --ink:  #07070A;
-
-  /* Timing — single source of truth. JS reads these at boot,
-     so changing a number here changes it everywhere. */
-  --dwell: 5800ms;   /* how long each slide holds  */
-  --fade:  1100ms;   /* crossfade duration         */
-
-  --ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+#hs, #hs *, #hs *::before, #hs *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  list-style: none;
 }
 
-body {
-  background: var(--ink);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Buttons and links are what themes hit hardest. The !important
+   flags are the minimum needed to win against theme declarations
+   that are themselves !important — specificity alone loses to
+   those, and `button { background: #e6e6e6 !important }` is
+   exactly what paints the controls as grey boxes. */
+#hs button,
+#hs a {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none !important;
+  text-align: inherit;
+  line-height: normal;
+  width: auto;
+  height: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
+
+/* Themes and icon plugins like to inject pseudo-element glyphs
+   into buttons. Only the pill hit-area below re-enables one. */
+#hs button::before,
+#hs button::after { content: none; display: none; }
 
 /* ────────────────────────────
    HERO — sits in page flow
 ──────────────────────────── */
-.hs {
+/* The container itself is a <section>, which themes love to pad
+   and colour (`body section { padding: 40px !important }` insets
+   the entire hero and exposes a page-coloured frame around it). */
+#hs {
   position: relative;
-  width: 100%;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
   height: 100vh;
   height: 100svh;          /* dodges mobile URL-bar jitter */
   max-height: 960px;
   min-height: 560px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
   overflow: hidden;
-  background: var(--ink);
+  background: var(--hs-ink) !important;
   isolation: isolate;
+  /* Base font for the subtree, so anything the reset sets to
+     `inherit` lands on ours rather than the theme's serif. */
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-.hs:focus { outline: none; }
-.hs:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+#hs:focus { outline: none; }
+#hs:focus-visible { outline: 2px solid var(--hs-gold); outline-offset: -2px; }
 
 /* ────────────────────────────
    SLIDES
@@ -66,28 +151,28 @@ body {
    final pose while it dissolves instead of snapping back to the
    pre-animation state mid-fade.
 ──────────────────────────── */
-.hs-slide {
+#hs .hs-slide {
   position: absolute;
   inset: 0;
   z-index: 1;
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--fade) var(--ease-quart),
-              visibility 0s linear var(--fade);
+  transition: opacity var(--hs-fade) var(--hs-ease-quart),
+              visibility 0s linear var(--hs-fade);
 }
 
-.hs-slide.is-active {
+#hs .hs-slide.is-active {
   opacity: 1;
   visibility: visible;
   z-index: 2;
-  transition: opacity var(--fade) var(--ease-quart),
+  transition: opacity var(--hs-fade) var(--hs-ease-quart),
               visibility 0s linear 0s;
 }
 
 /* Only the two slides in play get promoted — keeps the
    compositor from holding layers it doesn't need. */
-.hs-slide.is-active,
-.hs-slide.is-in { will-change: opacity; }
+#hs .hs-slide.is-active,
+#hs .hs-slide.is-in { will-change: opacity; }
 
 /* ────────────────────────────
    BACKGROUND + KEN BURNS
@@ -95,41 +180,46 @@ body {
    when the slide hands off. It never reaches its endpoint and
    never visibly parks.
 ──────────────────────────── */
-.hs-bg {
+#hs .hs-bg {
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   transform: scale(1.05);
   will-change: transform;
 }
 
-.hs-slide.is-in .hs-bg {
-  animation: kb calc(var(--dwell) + var(--fade)) linear both;
+#hs .hs-slide.is-in .hs-bg {
+  animation: hs-kb calc(var(--hs-dwell) + var(--hs-fade)) linear both;
 }
 
-@keyframes kb {
+@keyframes hs-kb {
   from { transform: scale(1.05); }
   to   { transform: scale(1.13); }
 }
 
-.hs-slide--a .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/SUNEHRI-1.webp'); }
-.hs-slide--b .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/2-1-1.webp'); }
-.hs-slide--c .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/1-1-1.webp'); }
+#hs .hs-slide--a .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/SUNEHRI-1.webp'); }
+#hs .hs-slide--b .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/2-1-1.webp'); }
+#hs .hs-slide--c .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/1-1-1.webp'); }
 
 /* ────────────────────────────
    CINEMATIC OVERLAY
+   Weighted a little heavier on the left than a pure vignette
+   would be — these product shots are bright and warm, and the
+   copy has to stay readable across all three.
 ──────────────────────────── */
-.hs-overlay {
+#hs .hs-overlay {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(108deg,
-      rgba(7,7,10,0.90) 0%,
-      rgba(7,7,10,0.52) 42%,
-      rgba(7,7,10,0.08) 100%),
+    linear-gradient(105deg,
+      rgba(7,7,10,0.93) 0%,
+      rgba(7,7,10,0.74) 26%,
+      rgba(7,7,10,0.38) 56%,
+      rgba(7,7,10,0.06) 100%),
     linear-gradient(to top,
-      rgba(7,7,10,0.84) 0%,
+      rgba(7,7,10,0.86) 0%,
       rgba(7,7,10,0.00) 48%);
   pointer-events: none;
 }
@@ -137,11 +227,12 @@ body {
 /* ────────────────────────────
    CONTENT
 ──────────────────────────── */
-.hs-content {
+#hs .hs-content {
   position: absolute;
   bottom: clamp(88px, 15.5vh, 148px);
   left:   clamp(32px, 8vw, 120px);
   max-width: min(600px, 80vw);
+  z-index: 3;
 }
 
 /* ────────────────────────────
@@ -149,36 +240,48 @@ body {
    Each .hs-line is a shutter (overflow:hidden); .hs-line-in
    starts beneath it and slides up into view.
 ──────────────────────────── */
-.hs-title {
-  font-family: 'Montserrat', sans-serif;
-  font-size: clamp(32px, 4.8vw, 68px);
-  font-weight: 800;
-  line-height: 1.05;
-  color: #fff;
-  text-transform: uppercase;
+/* Typography carries !important on the properties themes force on
+   bare h1/h2/p/a selectors — font stack, colour, and the vertical
+   rhythm margins. Everything else stays flag-free. */
+#hs .hs-title {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(32px, 4.8vw, 68px) !important;
+  font-weight: 800 !important;
+  line-height: 1.05 !important;
+  color: #fff !important;
+  text-transform: uppercase !important;
   letter-spacing: -0.5px;
-  margin-bottom: 20px;
+  margin: 0 0 20px !important;
 }
 
-.hs-line {
+/* line-height must be pinned to the title's own value. Themes
+   commonly set a loose `body span { line-height: 2.4 }`, which
+   otherwise lands on these two wrappers and tears the headline
+   lines apart. */
+#hs .hs-line {
   display: block;
   overflow: hidden;
+  line-height: inherit !important;
   padding-bottom: 0.06em;   /* descenders clear the shutter */
 }
 
-.hs-line-in {
+#hs .hs-line-in {
   display: block;
+  line-height: inherit !important;
   opacity: 0;
   transform: translateY(110%);
+  /* Carries the title over bright patches in the photography
+     without needing a heavier overlay. */
+  text-shadow: 0 2px 28px rgba(7,7,10,0.42);
 }
 
 /* Staggered 130ms apart */
-.hs-slide.is-in .hs-line:nth-child(1) .hs-line-in { animation: lineUp 0.9s var(--ease-expo) 0.26s both; }
-.hs-slide.is-in .hs-line:nth-child(2) .hs-line-in { animation: lineUp 0.9s var(--ease-expo) 0.39s both; }
-.hs-slide.is-in .hs-line:nth-child(3) .hs-line-in { animation: lineUp 0.9s var(--ease-expo) 0.52s both; }
-.hs-slide.is-in .hs-line:nth-child(4) .hs-line-in { animation: lineUp 0.9s var(--ease-expo) 0.65s both; }
+#hs .hs-slide.is-in .hs-line:nth-child(1) .hs-line-in { animation: hs-lineUp 0.9s var(--hs-ease-expo) 0.26s both; }
+#hs .hs-slide.is-in .hs-line:nth-child(2) .hs-line-in { animation: hs-lineUp 0.9s var(--hs-ease-expo) 0.39s both; }
+#hs .hs-slide.is-in .hs-line:nth-child(3) .hs-line-in { animation: hs-lineUp 0.9s var(--hs-ease-expo) 0.52s both; }
+#hs .hs-slide.is-in .hs-line:nth-child(4) .hs-line-in { animation: hs-lineUp 0.9s var(--hs-ease-expo) 0.65s both; }
 
-@keyframes lineUp {
+@keyframes hs-lineUp {
   from { opacity: 0; transform: translateY(110%); }
   to   { opacity: 1; transform: translateY(0);    }
 }
@@ -186,78 +289,78 @@ body {
 /* ────────────────────────────
    SUBTITLE
 ──────────────────────────── */
-.hs-sub {
-  font-family: 'Noto Sans Devanagari', 'Montserrat', sans-serif;
-  font-size: clamp(11px, 1.22vw, 14.5px);
-  font-weight: 300;
-  line-height: 1.95;
-  color: rgba(255,255,255,0.48);
-  margin-bottom: 36px;
+#hs .hs-sub {
+  font-family: 'Noto Sans Devanagari', 'Montserrat', sans-serif !important;
+  font-size: clamp(11px, 1.22vw, 14.5px) !important;
+  font-weight: 300 !important;
+  line-height: 1.95 !important;
+  color: rgba(255,255,255,0.56) !important;
+  margin: 0 0 36px !important;
   opacity: 0;
 }
 
-.hs-slide.is-in .hs-sub { animation: fadeUp 0.85s var(--ease-expo) 0.60s both; }
+#hs .hs-slide.is-in .hs-sub { animation: hs-fadeUp 0.85s var(--hs-ease-expo) 0.60s both; }
 
 /* ────────────────────────────
    CTA
 ──────────────────────────── */
-.hs-cta {
+#hs .hs-cta {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: rgba(255,255,255,0.55);
-  font-family: 'Montserrat', sans-serif;
-  font-size: 8.5px;
-  font-weight: 600;
+  color: rgba(255,255,255,0.62) !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 8.5px !important;
+  font-weight: 600 !important;
   letter-spacing: 3px;
   text-transform: uppercase;
-  text-decoration: none;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  padding-bottom: 6px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.18) !important;
   opacity: 0;
   transition: color 0.28s ease, border-color 0.28s ease;
 }
 
-.hs-slide.is-in .hs-cta { animation: fadeUp 0.75s var(--ease-expo) 0.76s both; }
+#hs .hs-slide.is-in .hs-cta { animation: hs-fadeUp 0.75s var(--hs-ease-expo) 0.76s both; }
 
-@keyframes fadeUp {
+@keyframes hs-fadeUp {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0);    }
 }
 
-.hs-cta:hover { color: var(--gold); border-color: var(--gold); }
-.hs-cta:focus-visible { outline: 1.5px solid var(--gold); outline-offset: 5px; }
+#hs .hs-cta:hover { color: var(--hs-gold) !important; border-color: var(--hs-gold) !important; }
+#hs .hs-cta:focus-visible { outline: 1.5px solid var(--hs-gold); outline-offset: 5px; }
 
-.hs-arr {
+#hs .hs-arr {
   display: inline-block;
-  font-size: 13px;
-  line-height: 1;
-  transition: transform 0.32s var(--ease-expo);
+  font-size: 13px !important;
+  line-height: 1 !important;
+  transition: transform 0.32s var(--hs-ease-expo);
 }
-.hs-cta:hover .hs-arr { transform: translateX(5px); }
+#hs .hs-cta:hover .hs-arr { transform: translateX(5px); }
 
-/* Inactive slides must never be tab-stops or click targets. */
-.hs-slide:not(.is-active) .hs-cta { pointer-events: none; }
+/* Belt-and-braces: visibility:hidden already drops inactive
+   slides out of the tab order, this stops stray clicks mid-fade. */
+#hs .hs-slide:not(.is-active) .hs-cta { pointer-events: none; }
 
 /* ────────────────────────────
    BRAND WATERMARK
 ──────────────────────────── */
-.hs-brand {
+#hs .hs-brand {
   position: absolute;
   top: 6%;
   right: 6%;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 8px;
-  font-weight: 600;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 8px !important;
+  font-weight: 600 !important;
   letter-spacing: 6px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.09);
+  color: rgba(255,255,255,0.09) !important;
   opacity: 0;
 }
 
-.hs-slide.is-in .hs-brand { animation: ghostIn 1.5s ease 0.15s both; }
+#hs .hs-slide.is-in .hs-brand { animation: hs-ghostIn 1.5s ease 0.15s both; }
 
-@keyframes ghostIn {
+@keyframes hs-ghostIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
@@ -265,7 +368,7 @@ body {
 /* ────────────────────────────
    NAV CLUSTER — bottom right
 ──────────────────────────── */
-.hs-nav {
+#hs .hs-nav {
   position: absolute;
   right: clamp(28px, 7.5vw, 108px);
   bottom: clamp(30px, 5.5vh, 52px);
@@ -276,129 +379,140 @@ body {
   z-index: 10;
 }
 
-.hs-counter {
+#hs .hs-counter {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 9px;
-  font-weight: 500;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
   letter-spacing: 1.5px;
-  color: rgba(255,255,255,0.24);
+  line-height: 1 !important;
+  color: rgba(255,255,255,0.28) !important;
   font-variant-numeric: tabular-nums;   /* digits don't jitter on change */
 }
-.hs-cur { color: var(--gold); font-weight: 700; font-size: 10.5px; }
-.hs-rule {
+#hs .hs-cur { color: var(--hs-gold) !important; font-weight: 700 !important; font-size: 10.5px !important; }
+#hs .hs-rule {
   display: inline-block;
   width: 14px;
   height: 1px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.22);
 }
 
 /* ────────────────────────────
    PILLS
-   The gold fill is a child element scaled by --p, which JS writes
-   from its own rAF clock. There is no CSS keyframe to fall out of
-   sync with, so pause/resume is exact and prefers-reduced-motion
-   can't shorten the progress bar out from under the timer.
+   The gold fill is a child element scaled by --hs-p, which JS
+   writes from its own rAF clock. There is no CSS keyframe to fall
+   out of sync with, so pause/resume is exact and
+   prefers-reduced-motion can't shorten the progress bar out from
+   under the timer.
 ──────────────────────────── */
-.hs-pills { display: flex; gap: 8px; align-items: center; }
+#hs .hs-pills { display: flex; gap: 8px; align-items: center; }
 
-.hs-pill {
+/* The !important flags here answer the reset above, which had to
+   use them to beat the theme. They are scoped to this one
+   component and never leave it. */
+#hs .hs-pill {
   position: relative;
-  width: 24px;
-  height: 2px;
-  background: rgba(255,255,255,0.16);
-  border: none;
-  cursor: pointer;
-  padding: 0;
+  display: block;
+  flex: 0 0 auto;
+  width: 24px !important;
+  height: 2px !important;
+  background: rgba(255,255,255,0.18) !important;
   overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
-  transition: width 0.45s var(--ease-expo), background 0.3s ease;
+  transition: width 0.45s var(--hs-ease-expo), background 0.3s ease;
 }
 
 /* Generous invisible hit area — no missed taps */
-.hs-pill::before {
+#hs .hs-pill::before {
   content: '';
+  display: block;
   position: absolute;
   inset: -12px -6px;
 }
 
-.hs-pill.is-active {
-  width: 48px;
-  background: rgba(255,255,255,0.1);
+#hs .hs-pill.is-active {
+  width: 48px !important;
+  background: rgba(255,255,255,0.12) !important;
   cursor: default;
 }
 
-.hs-pill__fill {
+#hs .hs-pill__fill {
+  display: block;
   position: absolute;
   inset: 0;
-  background: var(--gold);
-  transform: scaleX(var(--p, 0));
+  background: var(--hs-gold);
+  transform: scaleX(var(--hs-p, 0));
   transform-origin: left center;
   opacity: 0;
 }
-.hs-pill.is-active .hs-pill__fill { opacity: 1; }
+#hs .hs-pill.is-active .hs-pill__fill { opacity: 1; }
 
-.hs-pill:not(.is-active):hover { background: rgba(255,255,255,0.36); }
-.hs-pill:focus-visible { outline: 1.5px solid var(--gold); outline-offset: 4px; }
+#hs .hs-pill:not(.is-active):hover { background: rgba(255,255,255,0.38) !important; }
+#hs .hs-pill:focus-visible { outline: 1.5px solid var(--hs-gold); outline-offset: 4px; }
 
 /* ────────────────────────────
    PREV / NEXT
 ──────────────────────────── */
-.hs-arrow {
+#hs .hs-arrow {
   position: absolute;
   top: 50%;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(7,7,10,0.28);
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  background: rgba(7,7,10,0.28) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: rgba(255,255,255,0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   opacity: 0;
   z-index: 10;
   transform: translateY(-50%) scale(0.94);
   transition: opacity 0.4s ease,
-              transform 0.4s var(--ease-expo),
+              transform 0.4s var(--hs-ease-expo),
               border-color 0.28s ease,
               color 0.28s ease,
               background 0.28s ease;
 }
 
-.hs:hover .hs-arrow,
-.hs:focus-within .hs-arrow {
+#hs:hover .hs-arrow,
+#hs:focus-within .hs-arrow {
   opacity: 1;
   transform: translateY(-50%) scale(1);
 }
 
-.hs-arrow:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: rgba(7,7,10,0.52);
+#hs .hs-arrow:hover {
+  border-color: var(--hs-gold) !important;
+  color: var(--hs-gold);
+  background: rgba(7,7,10,0.52) !important;
   transform: translateY(-50%) scale(1.1);
 }
 
-.hs-arrow--prev { left:  clamp(16px, 3.5vw, 40px); }
-.hs-arrow--next { right: clamp(16px, 3.5vw, 40px); }
-.hs-arrow svg { width: 16px; height: 16px; }
+#hs .hs-arrow--prev { left:  clamp(16px, 3.5vw, 40px); }
+#hs .hs-arrow--next { right: clamp(16px, 3.5vw, 40px); }
 
-.hs-arrow:focus-visible {
+#hs .hs-arrow svg {
+  display: block;
+  width: 16px !important;
+  height: 16px !important;
+  fill: none;
+  stroke: currentColor;
+}
+
+#hs .hs-arrow:focus-visible {
   opacity: 1;
   transform: translateY(-50%) scale(1);
-  outline: 1.5px solid var(--gold);
+  outline: 1.5px solid var(--hs-gold);
   outline-offset: 2px;
 }
 
 /* ────────────────────────────
    BOTTOM RULE
 ──────────────────────────── */
-.hs::after {
+#hs::after {
   content: '';
   position: absolute;
   bottom: 0; left: 0;
@@ -416,42 +530,44 @@ body {
    is harsher than a quick dissolve.
 ──────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .hs-slide,
-  .hs-slide.is-active { transition-duration: 300ms; }
+  #hs .hs-slide,
+  #hs .hs-slide.is-active { transition-duration: 300ms; }
 
-  .hs-slide.is-in .hs-bg { animation: none; }
-  .hs-bg { transform: none; }
+  #hs .hs-slide.is-in .hs-bg { animation: none; }
+  #hs .hs-bg { transform: none; }
 
   /* !important is deliberate: the staggered title rules are
      nth-child-qualified and would otherwise out-specify this
      accessibility override, leaving the copy stuck at opacity 0. */
-  .hs-slide.is-in .hs-line .hs-line-in,
-  .hs-slide.is-in .hs-sub,
-  .hs-slide.is-in .hs-cta,
-  .hs-slide.is-in .hs-brand {
+  #hs .hs-slide.is-in .hs-line .hs-line-in,
+  #hs .hs-slide.is-in .hs-sub,
+  #hs .hs-slide.is-in .hs-cta,
+  #hs .hs-slide.is-in .hs-brand {
     animation: none !important;
     opacity: 1;
     transform: none;
   }
 
-  .hs-pill, .hs-arrow, .hs-arr { transition-duration: 0.01ms; }
+  #hs .hs-pill,
+  #hs .hs-arrow,
+  #hs .hs-arr { transition-duration: 0.01ms; }
 }
 
 /* ────────────────────────────
    MOBILE
 ──────────────────────────── */
 @media (max-width: 600px) {
-  .hs { height: 88vh; height: 88svh; min-height: 480px; }
-  .hs-title { font-size: clamp(28px, 9.5vw, 44px); letter-spacing: -0.2px; }
-  .hs-sub { font-size: 11.5px; }
-  .hs-arrow { display: none; }
-  .hs-nav { right: 20px; bottom: 22px; }
-  .hs-counter { display: none; }
+  #hs { height: 88vh; height: 88svh; min-height: 480px; }
+  #hs .hs-title { font-size: clamp(28px, 9.5vw, 44px); letter-spacing: -0.2px; }
+  #hs .hs-sub { font-size: 11.5px; }
+  #hs .hs-arrow { display: none; }
+  #hs .hs-nav { right: 20px; bottom: 22px; }
+  #hs .hs-counter { display: none; }
 }
 
 /* Coarse pointers get no hover-only affordances at any width. */
 @media (hover: none) {
-  .hs-arrow { display: none; }
+  #hs .hs-arrow { display: none; }
 }
 </style>
 </head>
@@ -512,12 +628,12 @@ body {
 
   <!-- ─ Arrows ─ -->
   <button class="hs-arrow hs-arrow--prev" id="hsPrev" type="button" aria-label="Previous slide">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
       <path d="M15 18l-6-6 6-6"/>
     </svg>
   </button>
   <button class="hs-arrow hs-arrow--next" id="hsNext" type="button" aria-label="Next slide">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
       <path d="M9 18l6-6-6-6"/>
     </svg>
   </button>
@@ -561,16 +677,19 @@ body {
   var TOTAL  = slides.length;
   if (TOTAL < 2) return;
 
-  /* ── TIMING: read from CSS so there is one source of truth ── */
+  /* ── TIMING ──
+     Read off #hs, where the custom properties are declared, so the
+     CSS stays the single source of truth and a theme's :root
+     variables can't be picked up by mistake. */
   function cssMs(name, fallback) {
-    var raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    var raw = getComputedStyle(hs).getPropertyValue(name).trim();
     if (!raw) return fallback;
     var n = parseFloat(raw);
     if (isNaN(n)) return fallback;
     return /ms\s*$/.test(raw) ? n : n * 1000;
   }
-  var DWELL = cssMs('--dwell', 5800);
-  var FADE  = cssMs('--fade', 1100);
+  var DWELL = cssMs('--hs-dwell', 5800);
+  var FADE  = cssMs('--hs-fade', 1100);
 
   /* ── STATE ── */
   var current  = 0;
@@ -595,7 +714,7 @@ body {
   ── */
   function paint() {
     pills[current].firstElementChild.style.setProperty(
-      '--p', (elapsed / DWELL).toFixed(4)
+      '--hs-p', (elapsed / DWELL).toFixed(4)
     );
   }
 
@@ -656,7 +775,7 @@ body {
     outgoing.classList.remove('is-active');
     pills[current].classList.remove('is-active');
     pills[current].removeAttribute('aria-current');
-    pills[current].firstElementChild.style.setProperty('--p', '0');
+    pills[current].firstElementChild.style.setProperty('--hs-p', '0');
 
     /* Strip `is-in` from every slide that is done fading, then let
        the one just retired keep it for FADE ms. Re-running this
