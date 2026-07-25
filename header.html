@@ -53,6 +53,15 @@
   - Promo image (Mayuri Rattan) is contained, not cropped, and
     centred in a padded well matching the brand cards.
   - Rebalanced padding and margins throughout both panels.
+
+  NOTE
+  This file is the header and nothing else — no demo hero, no
+  filler sections. Opened on its own it is therefore white labels
+  on a white page, because the transparent state is designed to sit
+  over your hero. Drop it above your own hero and it appears.
+  The hero must be the first element on the page with no top
+  margin: the header is position:fixed and floats over it rather
+  than pushing it down.
 =================================================================
 -->
 
@@ -674,22 +683,6 @@
   #saera-mega-nav *::before,
   #saera-mega-nav *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
-
-/* ==================================================================
-   DEMO PAGE ONLY — DELETE THIS BLOCK WHEN EMBEDDING
-   Exists so the transparent → solid transition is visible in a
-   standalone file. In WordPress your own hero replaces it.
-================================================================== */
-html, body { margin: 0; padding: 0; }
-.demo-hero {
-  min-height: 100vh;
-  background: linear-gradient(rgba(6,10,8,.30), rgba(6,10,8,.55)),
-              url('https://ddfintech.net/wp-content/uploads/2026/02/DSC_6464.jpg') center/cover no-repeat #123;
-  display: flex; align-items: center; padding: 0 clamp(24px,6vw,108px);
-}
-.demo-hero h1 { font-family: 'Montserrat', sans-serif; color: #fff; font-size: clamp(32px,5vw,64px); font-weight: 800; max-width: 640px; line-height: 1.08; text-transform: uppercase; }
-.demo-body { font-family: 'Montserrat', sans-serif; padding: 100px clamp(24px,6vw,108px); background: #fff; color: #6B716D; }
-.demo-body p { max-width: 620px; line-height: 1.9; margin: 0 0 20px; }
 </style>
 </head>
 <body>
@@ -1282,18 +1275,6 @@ html, body { margin: 0; padding: 0; }
 
 </div><!-- /.sh-drawer -->
 </div><!-- /#saera-mega-nav -->
-
-
-<!-- ==============================================================
-     DEMO PAGE ONLY — DELETE WHEN EMBEDDING
-============================================================== -->
-<section class="demo-hero">
-  <h1>Start your journey with Saera</h1>
-</section>
-<section class="demo-body">
-  <p>Scroll up and down to watch the header cross from its transparent state over the hero into the solid white bar. Open any menu while still at the top and the bar turns solid for as long as the panel is open.</p>
-  <p>Delete both of these demo sections — and the demo CSS block at the end of the stylesheet — when embedding into WordPress.</p>
-</section>
 
 
 <script>
