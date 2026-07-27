@@ -45,6 +45,21 @@ html, body { margin: 0; padding: 0; }
   --mrp-ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
   --mrp-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --mrp-swap: 480ms;       /* variant + angle crossfade */
+
+  /* STUDIO PLATE
+     The vehicle photography is white-background cut-outs, not
+     transparent PNGs, so a dark stage would frame every shot in a
+     white box. A light plate absorbs that background instead —
+     and dark page / light product stage is the configurator
+     convention buyers already read as "this is the vehicle".
+     If the shots are ever re-exported with real transparency,
+     these three values are the only edit needed:
+       --mrp-plate:     var(--mrp-ink-3)
+       --mrp-plate-ink: #fff
+       --mrp-plate-dim: rgba(255,255,255,0.55) */
+  --mrp-plate:     linear-gradient(168deg, #FAFBFA 0%, #EEF2EF 52%, #E3E9E4 100%);
+  --mrp-plate-ink: #12151A;
+  --mrp-plate-dim: rgba(18,21,26,0.52);
 }
 
 /* ────────────────────────────
@@ -311,15 +326,18 @@ html, body { margin: 0; padding: 0; }
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border: 1px solid var(--mrp-line) !important;
-  background: var(--mrp-ink-2) !important;
+  background: var(--mrp-plate) !important;
   opacity: 0.5;
   transition: opacity 0.35s var(--mrp-ease-quart),
               border-color 0.35s var(--mrp-ease-quart);
 }
+/* contain, not cover: these are whole-vehicle cut-outs, and
+   cropping one to fill a 4:3 tile slices the wheels off. */
 #mrp .mrp-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 5px !important;
   transition: transform 0.6s var(--mrp-ease-expo);
 }
 #mrp .mrp-thumb:hover { opacity: 0.85; }
@@ -337,9 +355,7 @@ html, body { margin: 0; padding: 0; }
   overflow: hidden;
   aspect-ratio: 16 / 10;
   border: 1px solid var(--mrp-line) !important;
-  background:
-    radial-gradient(70% 58% at 50% 44%, rgba(255,255,255,0.05), transparent 72%),
-    var(--mrp-ink-3) !important;
+  background: var(--mrp-plate) !important;
 }
 
 /* Every angle ships as a real <img> in the markup — no JS src
@@ -375,17 +391,19 @@ html, body { margin: 0; padding: 0; }
   content: '';
   position: absolute;
   left: 50%;
-  bottom: 11%;
-  width: 62%;
-  height: 26px;
+  bottom: 12%;
+  width: 58%;
+  height: 22px;
   transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0.55), transparent 70%);
-  filter: blur(9px);
+  background: radial-gradient(ellipse at center, rgba(18,21,26,0.30), transparent 70%);
+  filter: blur(11px);
   pointer-events: none;
   z-index: 0;
 }
 #mrp .mrp-shot { z-index: 1; }
 
+/* The plate is light, so the viewer's own chrome inverts. These
+   read against the studio background, not the section. */
 #mrp .mrp-viewer__tag {
   position: absolute;
   left: clamp(14px, 2vw, 26px);
@@ -395,7 +413,7 @@ html, body { margin: 0; padding: 0; }
   font-weight: 700 !important;
   letter-spacing: 2.6px;
   text-transform: uppercase;
-  color: var(--mrp-dim-2) !important;
+  color: var(--mrp-plate-dim) !important;
 }
 
 #mrp .mrp-viewer__angle {
@@ -410,10 +428,10 @@ html, body { margin: 0; padding: 0; }
   font-weight: 600 !important;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.62) !important;
+  color: var(--mrp-plate-dim) !important;
   font-variant-numeric: tabular-nums;
 }
-#mrp .mrp-viewer__angle b { color: var(--mrp-green) !important; font-weight: 700 !important; }
+#mrp .mrp-viewer__angle b { color: var(--mrp-green-d) !important; font-weight: 700 !important; }
 
 /* ── Viewer arrows ── */
 #mrp .mrp-vnav {
@@ -423,11 +441,11 @@ html, body { margin: 0; padding: 0; }
   width: 40px !important;
   height: 40px !important;
   border-radius: 50% !important;
-  border: 1px solid var(--mrp-line-2) !important;
-  background: rgba(7,7,10,0.42) !important;
+  border: 1px solid rgba(18,21,26,0.14) !important;
+  background: rgba(255,255,255,0.72) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: rgba(255,255,255,0.66);
+  color: rgba(18,21,26,0.60);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -439,9 +457,9 @@ html, body { margin: 0; padding: 0; }
 #mrp .mrp-viewer:hover .mrp-vnav,
 #mrp .mrp-viewer:focus-within .mrp-vnav { opacity: 1; transform: translateY(-50%) scale(1); }
 #mrp .mrp-vnav:hover {
-  color: var(--mrp-green);
+  color: #fff;
   border-color: var(--mrp-green) !important;
-  background: rgba(7,7,10,0.66) !important;
+  background: var(--mrp-green) !important;
   transform: translateY(-50%) scale(1.08);
 }
 #mrp .mrp-vnav--prev { left: clamp(10px, 1.6vw, 18px); }
@@ -477,6 +495,28 @@ html, body { margin: 0; padding: 0; }
     repeating-linear-gradient(-45deg,
       rgba(255,255,255,0.022) 0 10px,
       transparent 10px 20px) !important;
+}
+
+/* On the light plate the placeholder has to invert too, or it is
+   white-on-white and reads as an empty stage rather than a
+   missing file. */
+#mrp .mrp-viewer .mrp-slot,
+#mrp .mrp-thumb .mrp-slot {
+  color: rgba(18,21,26,0.34) !important;
+  background:
+    repeating-linear-gradient(-45deg,
+      rgba(18,21,26,0.030) 0 10px,
+      transparent 10px 20px) !important;
+}
+
+/* A detail card whose photo has not been supplied yet drops the
+   media box entirely and stands as a text tile with an accent
+   rule. An empty 16:11 hatch above every card would read as six
+   broken cards; this reads as a deliberate list. */
+#mrp .mrp-card.is-missing .mrp-card__media { display: none; }
+#mrp .mrp-card.is-missing .mrp-card__body {
+  border-left: 2px solid var(--mrp-green) !important;
+  padding-left: clamp(12px, 1.3vw, 18px) !important;
 }
 /* In the viewer all 14 shots are stacked, so the slot label must
    be gated on .is-shown too — otherwise every missing angle's
@@ -940,13 +980,13 @@ html, body { margin: 0; padding: 0; }
       </button>
       <button class="mrp-thumb" type="button" role="option" aria-selected="false"
               data-for="auto" data-angle="Front">
-        <img data-slot="rattan-auto-front" alt="Mayuri Rattan L5 Auto, front view"
+        <img data-slot="rattan-auto-front" alt="Mayuri Rattan L5 Auto, head-on front view"
              src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front.webp" loading="lazy" decoding="async">
         <span class="mrp-slot">Front</span>
       </button>
       <button class="mrp-thumb" type="button" role="option" aria-selected="false"
               data-for="auto" data-angle="Side">
-        <img data-slot="rattan-auto-side" alt="Mayuri Rattan L5 Auto, side profile"
+        <img data-slot="rattan-auto-side" alt="Mayuri Rattan L5 Auto, full side profile"
              src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-side.webp" loading="lazy" decoding="async">
         <span class="mrp-slot">Side</span>
       </button>
@@ -958,21 +998,9 @@ html, body { margin: 0; padding: 0; }
       </button>
       <button class="mrp-thumb" type="button" role="option" aria-selected="false"
               data-for="auto" data-angle="Rear">
-        <img data-slot="rattan-auto-rear" alt="Mayuri Rattan L5 Auto, rear view with passenger cabin"
+        <img data-slot="rattan-auto-rear" alt="Mayuri Rattan L5 Auto, rear view with spare wheel"
              src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear.webp" loading="lazy" decoding="async">
         <span class="mrp-slot">Rear</span>
-      </button>
-      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
-              data-for="auto" data-angle="Cabin">
-        <img data-slot="rattan-auto-cabin" alt="Mayuri Rattan L5 Auto passenger cabin and seating"
-             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-cabin.webp" loading="lazy" decoding="async">
-        <span class="mrp-slot">Cabin</span>
-      </button>
-      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
-              data-for="auto" data-angle="Dashboard">
-        <img data-slot="rattan-auto-dash" alt="Mayuri Rattan L5 Auto full dashboard with digital speedometer"
-             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-dash.webp" loading="lazy" decoding="async">
-        <span class="mrp-slot">Dashboard</span>
       </button>
 
       <!-- ══ CARGO ANGLES ══ -->
@@ -983,40 +1011,28 @@ html, body { margin: 0; padding: 0; }
         <span class="mrp-slot">Front 3/4</span>
       </button>
       <button class="mrp-thumb" type="button" role="option" aria-selected="false"
-              data-for="cargo" data-angle="Front" hidden>
-        <img data-slot="rattan-cargo-front" alt="Mayuri Rattan L5 Cargo, front view"
-             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-front.webp" loading="lazy" decoding="async">
-        <span class="mrp-slot">Front</span>
-      </button>
-      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
               data-for="cargo" data-angle="Side" hidden>
-        <img data-slot="rattan-cargo-side" alt="Mayuri Rattan L5 Cargo, side profile showing 4 by 6 foot deck"
+        <img data-slot="rattan-cargo-side" alt="Mayuri Rattan L5 Cargo, side profile showing the 4 by 6 foot deck"
              src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-side.webp" loading="lazy" decoding="async">
         <span class="mrp-slot">Side</span>
       </button>
       <button class="mrp-thumb" type="button" role="option" aria-selected="false"
               data-for="cargo" data-angle="Rear 3/4" hidden>
-        <img data-slot="rattan-cargo-rear34" alt="Mayuri Rattan L5 Cargo, rear three-quarter view"
+        <img data-slot="rattan-cargo-rear34" alt="Mayuri Rattan L5 Cargo, rear three-quarter view with tailgate down"
              src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-rear34.webp" loading="lazy" decoding="async">
         <span class="mrp-slot">Rear 3/4</span>
       </button>
       <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="cargo" data-angle="Deck" hidden>
+        <img data-slot="rattan-cargo-deck" alt="Mayuri Rattan L5 Cargo deck seen from the rear, sides closed"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-deck.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Deck</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
               data-for="cargo" data-angle="Deck open" hidden>
-        <img data-slot="rattan-cargo-deck-open" alt="Mayuri Rattan L5 Cargo with three-side opening deck dropped"
+        <img data-slot="rattan-cargo-deck-open" alt="Mayuri Rattan L5 Cargo with the three-side opening deck dropped"
              src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-deck-open.webp" loading="lazy" decoding="async">
         <span class="mrp-slot">Deck open</span>
-      </button>
-      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
-              data-for="cargo" data-angle="Loaded" hidden>
-        <img data-slot="rattan-cargo-loaded" alt="Mayuri Rattan L5 Cargo loaded with boxes"
-             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-loaded.webp" loading="lazy" decoding="async">
-        <span class="mrp-slot">Loaded</span>
-      </button>
-      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
-              data-for="cargo" data-angle="Dashboard" hidden>
-        <img data-slot="rattan-cargo-dash" alt="Mayuri Rattan L5 Cargo dashboard and hard top cabin"
-             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-dash.webp" loading="lazy" decoding="async">
-        <span class="mrp-slot">Dashboard</span>
       </button>
     </div>
 
@@ -1025,21 +1041,27 @@ html, body { margin: 0; padding: 0; }
     <div class="mrp-viewer" id="mrpViewer">
       <span class="mrp-viewer__tag" id="mrpTag">Rattan L5 Auto</span>
 
-      <img class="mrp-shot is-shown" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front34.webp" alt="Mayuri Rattan L5 Auto, front three-quarter view" data-slot="rattan-auto-front34" decoding="async"><span class="mrp-slot">Slot · rattan-auto-front34</span>
-      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front.webp" alt="Mayuri Rattan L5 Auto, front view" data-slot="rattan-auto-front" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-front</span>
-      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-side.webp" alt="Mayuri Rattan L5 Auto, side profile" data-slot="rattan-auto-side" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-side</span>
-      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear34.webp" alt="Mayuri Rattan L5 Auto, rear three-quarter view" data-slot="rattan-auto-rear34" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-rear34</span>
-      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear.webp" alt="Mayuri Rattan L5 Auto, rear view with passenger cabin" data-slot="rattan-auto-rear" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-rear</span>
-      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-cabin.webp" alt="Mayuri Rattan L5 Auto passenger cabin and seating" data-slot="rattan-auto-cabin" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-cabin</span>
-      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-dash.webp" alt="Mayuri Rattan L5 Auto full dashboard with digital speedometer" data-slot="rattan-auto-dash" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-dash</span>
+      <img class="mrp-shot is-shown" data-for="auto" data-slot="rattan-auto-front34"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front34.webp" alt="Mayuri Rattan L5 Auto, front three-quarter view" decoding="async"><span class="mrp-slot">Slot · rattan-auto-front34</span>
+      <img class="mrp-shot" data-for="auto" data-slot="rattan-auto-front"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front.webp" alt="Mayuri Rattan L5 Auto, head-on front view" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-front</span>
+      <img class="mrp-shot" data-for="auto" data-slot="rattan-auto-side"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-side.webp" alt="Mayuri Rattan L5 Auto, full side profile" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-side</span>
+      <img class="mrp-shot" data-for="auto" data-slot="rattan-auto-rear34"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear34.webp" alt="Mayuri Rattan L5 Auto, rear three-quarter view" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-rear34</span>
+      <img class="mrp-shot" data-for="auto" data-slot="rattan-auto-rear"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear.webp" alt="Mayuri Rattan L5 Auto, rear view with spare wheel" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-rear</span>
 
-      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-front34.webp" alt="Mayuri Rattan L5 Cargo, front three-quarter view" data-slot="rattan-cargo-front34" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-front34</span>
-      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-front.webp" alt="Mayuri Rattan L5 Cargo, front view" data-slot="rattan-cargo-front" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-front</span>
-      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-side.webp" alt="Mayuri Rattan L5 Cargo, side profile showing 4 by 6 foot deck" data-slot="rattan-cargo-side" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-side</span>
-      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-rear34.webp" alt="Mayuri Rattan L5 Cargo, rear three-quarter view" data-slot="rattan-cargo-rear34" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-rear34</span>
-      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-deck-open.webp" alt="Mayuri Rattan L5 Cargo with three-side opening deck dropped" data-slot="rattan-cargo-deck-open" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-deck-open</span>
-      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-loaded.webp" alt="Mayuri Rattan L5 Cargo loaded with boxes" data-slot="rattan-cargo-loaded" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-loaded</span>
-      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-dash.webp" alt="Mayuri Rattan L5 Cargo dashboard and hard top cabin" data-slot="rattan-cargo-dash" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-dash</span>
+      <img class="mrp-shot" data-for="cargo" data-slot="rattan-cargo-front34"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-front34.webp" alt="Mayuri Rattan L5 Cargo, front three-quarter view" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-front34</span>
+      <img class="mrp-shot" data-for="cargo" data-slot="rattan-cargo-side"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-side.webp" alt="Mayuri Rattan L5 Cargo, side profile showing the 4 by 6 foot deck" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-side</span>
+      <img class="mrp-shot" data-for="cargo" data-slot="rattan-cargo-rear34"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-rear34.webp" alt="Mayuri Rattan L5 Cargo, rear three-quarter view with tailgate down" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-rear34</span>
+      <img class="mrp-shot" data-for="cargo" data-slot="rattan-cargo-deck"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-deck.webp" alt="Mayuri Rattan L5 Cargo deck seen from the rear, sides closed" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-deck</span>
+      <img class="mrp-shot" data-for="cargo" data-slot="rattan-cargo-deck-open"
+           src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-deck-open.webp" alt="Mayuri Rattan L5 Cargo with the three-side opening deck dropped" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-deck-open</span>
 
       <button class="mrp-vnav mrp-vnav--prev" id="mrpPrev" type="button" aria-label="Previous angle">
         <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6"/></svg>
@@ -1320,11 +1342,17 @@ html, body { margin: 0; padding: 0; }
     if (p && p.classList && (p.classList.contains('mrp-thumb') || p.classList.contains('mrp-card__media'))) {
       p.classList.add('is-missing');
     }
+    /* The card itself, not just its media box — CSS can hide a
+       child but cannot reach back up to restyle the body. */
+    var card = img.closest && img.closest('.mrp-card');
+    if (card) card.classList.add('is-missing');
   }
   function unflag(img) {
     img.classList.remove('is-missing');
     var p = img.parentNode;
     if (p && p.classList) p.classList.remove('is-missing');
+    var card = img.closest && img.closest('.mrp-card');
+    if (card) card.classList.remove('is-missing');
   }
 
   Array.prototype.forEach.call(root.querySelectorAll('img[data-slot]'), function (img) {
