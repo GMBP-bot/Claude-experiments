@@ -408,12 +408,6 @@ html, body { margin: 0; padding: 0; }
 }
 #sgh .sgh-btn--primary:hover { background: #1ACC56 !important; box-shadow: 0 12px 32px rgba(22,178,74,0.40) !important; }
 
-#sgh .sgh-btn--ghost {
-  color: rgba(255,255,255,0.86) !important;
-  box-shadow: inset 0 0 0 1px var(--sgh-line) !important;
-}
-#sgh .sgh-btn--ghost:hover { color: #fff !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.42) !important; }
-
 #sgh .sgh-arr { display: inline-block; font-size: 13px !important; line-height: 1 !important; transition: transform 0.3s var(--sgh-ease-expo); }
 #sgh .sgh-btn:hover .sgh-arr { transform: translateX(4px); }
 
@@ -495,7 +489,6 @@ html, body { margin: 0; padding: 0; }
   #sgh { padding: clamp(44px, 11vw, 64px) 20px !important; }
   #sgh .sgh-h1 { letter-spacing: -0.6px; }
   #sgh .sgh-actions { gap: 10px; }
-  #sgh .sgh-btn { flex: 1 1 100%; justify-content: center; }
   #sgh .sgh-facts { gap: calc(var(--sgh-gap) * 1.75); }
   #sgh .sgh-meta { padding: var(--sgh-gap) calc(var(--sgh-gap) * 1.25) !important; }
   #sgh .sgh-meta__t { font-size: 9.5px !important; letter-spacing: 1.4px; }
@@ -548,10 +541,12 @@ html, body { margin: 0; padding: 0; }
       durability and finish of a road vehicle, on the course and beyond.</p>
 
     <div class="sgh-actions">
+      <!-- Separate domain, so this opens in a new tab. noopener is
+           not optional with target=_blank: without it the opened
+           page gets a handle on this one via window.opener. -->
       <a class="sgh-btn sgh-btn--primary" href="https://saeragolfcart.com/" target="_blank" rel="noopener">
         Explore Range <span class="sgh-arr" aria-hidden="true">→</span>
       </a>
-      <a class="sgh-btn sgh-btn--ghost" href="#dealer">Become a Dealer</a>
     </div>
 
     <div class="sgh-facts">
