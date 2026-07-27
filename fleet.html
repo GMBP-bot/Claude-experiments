@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Vehicle for Every Business — DDFintech</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   FLEET GRID — theme-proof build
+
+   Same scoping contract as the hero: everything hangs off the
+   #fleet id, which buys 1,0,0 of specificity — more than any
+   theme selector that reaches in through a content wrapper. The
+   !important flags are rationed to the handful of properties
+   WordPress themes and page builders set with !important of their
+   own (link decoration, button chrome, section padding). Winning
+   those needs a flag; everything else wins on specificity alone.
+
+   Names are fl-prefixed for the same reason keyframes are in the
+   hero — keyframe and custom-property names are effectively
+   global, so an unprefixed `fadeUp` or `--green` from the theme
+   would silently take over.
+══════════════════════════════════════════════════════════════ */
+
+/* Only rule outside the #fleet scope, so the file is correct as a
+   standalone page. Safe to delete when pasting into a theme. */
+html, body { margin: 0; padding: 0; background: #fff; }
+
+#fleet {
+  /* One accent, not three. The original ran #22c55e / #16a34a /
+     #15803d per card — three greens close enough that the grid
+     read as an inconsistent single colour rather than a system.
+     Category is carried by the badge icon instead, which is a
+     signal that actually survives a glance. */
+  --fl-green:      #16a34a;
+  --fl-green-lite: #22c55e;
+  --fl-green-deep: #15803d;
+  --fl-green-tint: rgba(22, 163, 74, 0.08);
+
+  --fl-ink:    #0b1220;   /* headings                */
+  --fl-body:   #5a6b80;   /* paragraph copy          */
+  --fl-muted:  #93a1b3;   /* labels, meta            */
+  --fl-line:   #e9edf3;   /* hairlines and borders   */
+  --fl-chip:   #f7f9fc;   /* spec-pill fill          */
+
+  --fl-r-card: 20px;
+  --fl-r-pill: 999px;
+
+  --fl-ease:  cubic-bezier(0.22, 1, 0.36, 1);
+  --fl-snap:  cubic-bezier(0.34, 1.28, 0.64, 1);
+}
+
+/* ────────────────────────────
+   SCOPED RESET
+   Neutralises inherited theme styling inside the section only.
+   Declared before the component rules, all of which are equally
+   or more specific, so it never fights our own CSS.
+──────────────────────────── */
+#fleet, #fleet *, #fleet *::before, #fleet *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  list-style: none;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+}
+
+/* Themes and icon plugins inject pseudo-element glyphs into
+   headings, links and list items. Blanket-kill them, then the few
+   decorative ones below opt back in by name. */
+#fleet *::before, #fleet *::after { content: none; }
+#fleet *::marker { content: none; }
+
+/* Links and buttons are what themes hit hardest — a stray
+   `.entry-content a { text-decoration: underline !important }`
+   is what puts a line under every card. */
+#fleet a,
+#fleet button {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: inherit;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+#fleet img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 0 !important;
+}
+
+/* ────────────────────────────
+   SECTION SHELL
+──────────────────────────── */
+#fleet {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 104px 0 116px !important;
+  overflow: hidden;
+  isolation: isolate;
+  background: #ffffff !important;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--fl-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dot grid, faded out top and bottom with a mask so the texture
+   dissolves into the page instead of stopping at a hard edge. */
+#fleet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(11, 18, 32, 0.045) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 72%, transparent);
+          mask-image: linear-gradient(180deg, transparent, #000 18%, #000 72%, transparent);
+}
+
+/* Ambient green wash behind the header. */
+#fleet::after {
+  content: '';
+  position: absolute;
+  top: -220px;
+  left: 50%;
+  z-index: 0;
+  width: min(1100px, 130%);
+  height: 620px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.10) 0%, rgba(34, 197, 94, 0.03) 45%, transparent 70%);
+}
+
+#fleet .fl-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ────────────────────────────
+   HEADER
+──────────────────────────── */
+/* The measure is capped on the text elements, not on the header
+   itself. Constraining the wrapper is the obvious move and the
+   wrong one — the stats row lives in here too, and at 720px the
+   fourth stat wraps to its own line on a wide desktop. */
+#fleet .fl-head {
+  margin: 0 auto 54px;
+  text-align: center;
+}
+
+#fleet .fl-title {
+  max-width: 760px;
+  margin: 0 auto;
+  font-size: clamp(38px, 5.4vw, 64px);
+  font-weight: 900;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  color: var(--fl-ink);
+}
+
+/* Gradient runs across the whole line rather than per-word, so
+   the ramp reads as one sweep at every viewport width. */
+#fleet .fl-title .fl-grad {
+  display: block;
+  background: linear-gradient(96deg, var(--fl-green-deep) 0%, var(--fl-green) 42%, var(--fl-green-lite) 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+#fleet .fl-lede {
+  max-width: 500px;
+  margin: 18px auto 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.72;
+  color: var(--fl-body);
+  text-wrap: pretty;
+}
+
+/* ── Stats ──
+   A definition list, because that is what it is: four term/value
+   pairs. Screen readers announce the pairing; the original's
+   nested divs announced eight loose strings. */
+#fleet .fl-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin-top: 42px;
+}
+
+#fleet .fl-stat {
+  padding: 0 34px;
+  text-align: center;
+}
+
+#fleet .fl-stat dt {
+  font-size: clamp(24px, 2.4vw, 28px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  color: var(--fl-green);
+  /* Tabular figures stop the count-up from reflowing the label
+     underneath as digits swap width mid-tween. */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+#fleet .fl-stat dd {
+  margin-top: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--fl-muted);
+}
+
+#fleet .fl-stat + .fl-stat {
+  border-left: 1px solid var(--fl-line);
+}
+
+/* ────────────────────────────
+   FILTER RAIL
+──────────────────────────── */
+#fleet .fl-filter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 46px;
+}
+
+/* Horizontal scroll container. The negative margin + matching
+   padding let the rail's shadow breathe on mobile instead of
+   being clipped by overflow:auto. */
+#fleet .fl-rail-scroll {
+  max-width: 100%;
+  margin: 0 -28px;
+  padding: 6px 28px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+#fleet .fl-rail-scroll::-webkit-scrollbar { display: none; }
+
+#fleet .fl-rail {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px;
+  white-space: nowrap;
+  background: #0d1117 !important;
+  border-radius: var(--fl-r-pill) !important;
+  box-shadow: 0 10px 30px -12px rgba(11, 18, 32, 0.55);
+}
+
+/* Sliding pill. Sized and placed by JS after fonts settle — see
+   the note in the script; measuring earlier lands it under the
+   fallback font's metrics and it sits visibly off. */
+#fleet .fl-pill {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: 0;
+  width: 0;
+  height: 0;
+  border-radius: var(--fl-r-pill);
+  background: linear-gradient(118deg, var(--fl-green-lite) 0%, var(--fl-green) 100%);
+  box-shadow: 0 4px 16px -2px rgba(34, 197, 94, 0.55);
+  transition: transform 0.42s var(--fl-ease), width 0.42s var(--fl-ease), height 0.42s var(--fl-ease);
+  pointer-events: none;
+}
+/* Suppressed until JS measures it, so it never flashes at 0×0 in
+   the corner on a slow first paint. */
+#fleet .fl-pill:not(.is-set) { opacity: 0; }
+
+#fleet .fl-tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px !important;
+  border-radius: var(--fl-r-pill) !important;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 0.25s var(--fl-ease);
+}
+
+#fleet .fl-tab:hover { color: rgba(255, 255, 255, 0.92); }
+
+#fleet .fl-tab[aria-pressed="true"] {
+  color: #06180d;
+  font-weight: 700;
+}
+
+#fleet .fl-tab:focus-visible {
+  outline: 2px solid var(--fl-green-lite);
+  outline-offset: 3px;
+}
+
+#fleet .fl-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 21px;
+  padding: 3px 7px;
+  border-radius: var(--fl-r-pill);
+  background: rgba(255, 255, 255, 0.13);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.25s var(--fl-ease), color 0.25s var(--fl-ease);
+}
+
+#fleet .fl-tab[aria-pressed="true"] .fl-tab-count {
+  background: rgba(6, 24, 13, 0.17);
+  color: #06180d;
+}
+
+#fleet .fl-result {
+  margin-top: 16px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fl-muted);
+}
+
+#fleet .fl-result b {
+  font-weight: 700;
+  color: var(--fl-green);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ────────────────────────────
+   GRID
+──────────────────────────── */
+#fleet .fl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+#fleet .fl-card[hidden] { display: none; }
+
+/* ────────────────────────────
+   CARD
+
+   Two independent state classes, so entrance and filtering never
+   overwrite each other:
+     .is-in   → owns the scroll-entrance pose
+     inline   → owns nothing; the FLIP pass in JS uses the Web
+                Animations API precisely so it does not have to
+                write to .style.transform and stomp :hover
+──────────────────────────── */
+#fleet .fl-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--fl-line) !important;
+  border-radius: var(--fl-r-card) !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(11, 18, 32, 0.04), 0 8px 24px -16px rgba(11, 18, 32, 0.18) !important;
+  color: var(--fl-ink);
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.5s var(--fl-ease),
+    transform 0.5s var(--fl-ease),
+    border-color 0.3s var(--fl-ease),
+    box-shadow 0.4s var(--fl-ease);
+}
+
+#fleet .fl-card.is-in {
+  opacity: 1;
+  transform: none;
+  /* Staggered by index, set as --i in JS. Only the entrance is
+     delayed — the transition itself stays uniform. */
+  transition-delay: calc(var(--i, 0) * 70ms), calc(var(--i, 0) * 70ms), 0s, 0s;
+}
+
+#fleet .fl-card:hover,
+#fleet .fl-card:focus-visible {
+  z-index: 2;
+  border-color: rgba(34, 197, 94, 0.55) !important;
+  box-shadow:
+    0 2px 4px rgba(11, 18, 32, 0.04),
+    0 24px 48px -24px rgba(11, 18, 32, 0.30),
+    0 0 0 4px rgba(34, 197, 94, 0.09) !important;
+  transform: translateY(-6px);
+  transition-delay: 0s;
+}
+
+#fleet .fl-card:focus-visible {
+  outline: 2px solid var(--fl-green);
+  outline-offset: 3px;
+}
+
+/* Top accent hairline — reveals on hover by scaling from the
+   centre, which reads as the card "switching on". */
+#fleet .fl-card .fl-edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--fl-green-deep), var(--fl-green-lite), var(--fl-green-deep));
+  transform: scaleX(0);
+  transition: transform 0.45s var(--fl-ease);
+}
+
+#fleet .fl-card:hover .fl-edge,
+#fleet .fl-card:focus-visible .fl-edge { transform: scaleX(1); }
+
+/* ── Media ── */
+#fleet .fl-media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 208px;
+  margin: 14px 14px 0;
+  padding: 12px 18px 16px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fbfdfc 0%, #ffffff 100%);
+}
+
+/* Pointer-tracked glow. --mx/--my are written by JS on mousemove;
+   they default to the centre so the card looks right before the
+   pointer ever arrives, and on touch, where they are never set. */
+#fleet .fl-media .fl-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(34, 197, 94, 0.14) 0%,
+    transparent 65%
+  );
+  transition: opacity 0.45s var(--fl-ease);
+  pointer-events: none;
+}
+
+#fleet .fl-card:hover .fl-media .fl-glow { opacity: 1; }
+
+/* Contact shadow. The original faked depth with a blurred blob
+   behind the vehicle; an ellipse pinned to the wheel line does
+   the same job and actually sits the vehicle on a surface. */
+#fleet .fl-media .fl-ground {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  width: 62%;
+  height: 16px;
+  transform: translateX(-50%) scaleX(0.92);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(11, 18, 32, 0.20) 0%, transparent 72%);
+  filter: blur(7px);
+  opacity: 0.55;
+  transition: transform 0.5s var(--fl-ease), opacity 0.5s var(--fl-ease);
+  pointer-events: none;
+}
+
+#fleet .fl-card:hover .fl-media .fl-ground {
+  transform: translateX(-50%) scaleX(1.04);
+  opacity: 0.34;
+}
+
+#fleet .fl-media img {
+  position: relative;
+  z-index: 1;
+  width: auto;
+  max-width: 100%;
+  max-height: 172px;
+  object-fit: contain;
+  transition: transform 0.55s var(--fl-snap);
+}
+
+#fleet .fl-card:hover .fl-media img { transform: scale(1.07) translateY(-6px); }
+
+/* ── Badge ── */
+#fleet .fl-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 9px;
+  border: 1px solid rgba(22, 163, 74, 0.22);
+  border-radius: var(--fl-r-pill);
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(6px);
+          backdrop-filter: blur(6px);
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+  color: var(--fl-green-deep);
+}
+
+#fleet .fl-badge svg {
+  width: 12px;
+  height: 12px;
+  fill: var(--fl-green);
+  flex: 0 0 auto;
+}
+
+/* ── Body ── */
+#fleet .fl-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 18px 20px 0;
+}
+
+#fleet .fl-name {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: var(--fl-ink);
+}
+
+#fleet .fl-tag {
+  margin-top: 7px;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.62;
+  color: var(--fl-body);
+  /* Clamped so uneven copy lengths cannot desynchronise the spec
+     rows across a grid row. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#fleet .fl-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  /* margin-top:auto pins the specs to the bottom of the body, so
+     they line up across a row regardless of name wrapping. */
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+#fleet .fl-spec {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: 1px solid var(--fl-line);
+  border-radius: var(--fl-r-pill);
+  background: var(--fl-chip);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  color: #46566b;
+  transition: background 0.28s var(--fl-ease), border-color 0.28s var(--fl-ease), color 0.28s var(--fl-ease);
+}
+
+#fleet .fl-spec svg {
+  width: 11px;
+  height: 11px;
+  fill: var(--fl-green);
+  flex: 0 0 auto;
+}
+
+#fleet .fl-card:hover .fl-spec {
+  border-color: rgba(34, 197, 94, 0.28);
+  background: var(--fl-green-tint);
+  color: #1d2b3a;
+}
+
+/* ── Footer ──
+   The original hid the only affordance in a 32px corner glyph.
+   A labelled footer row states the action outright and gives the
+   whole card a base line to sit on. */
+#fleet .fl-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 15px 20px;
+  border-top: 1px solid var(--fl-line);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--fl-muted);
+  transition: background 0.3s var(--fl-ease), color 0.3s var(--fl-ease);
+}
+
+#fleet .fl-card:hover .fl-foot {
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.04), rgba(34, 197, 94, 0.07));
+  color: var(--fl-green-deep);
+}
+
+#fleet .fl-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 1px solid var(--fl-line);
+  border-radius: 50%;
+  background: #fff;
+  transition: background 0.3s var(--fl-ease), border-color 0.3s var(--fl-ease), transform 0.4s var(--fl-snap);
+}
+
+#fleet .fl-arrow svg {
+  width: 13px;
+  height: 13px;
+  fill: var(--fl-muted);
+  transition: fill 0.3s var(--fl-ease);
+}
+
+#fleet .fl-card:hover .fl-arrow {
+  border-color: var(--fl-green);
+  background: var(--fl-green);
+  transform: translateX(3px);
+}
+
+#fleet .fl-card:hover .fl-arrow svg { fill: #fff; }
+
+/* ── Empty state ──
+   Unreachable with the current six vehicles, but the filter is
+   data-driven; the day a category empties this is the difference
+   between a considered message and a blank hole. */
+#fleet .fl-empty {
+  grid-column: 1 / -1;
+  padding: 64px 20px;
+  text-align: center;
+  border: 1px dashed var(--fl-line);
+  border-radius: var(--fl-r-card);
+  color: var(--fl-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#fleet .fl-empty[hidden] { display: none; }
+
+/* ────────────────────────────
+   CTA
+──────────────────────────── */
+#fleet .fl-cta {
+  margin-top: 58px;
+  text-align: center;
+}
+
+#fleet .fl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 16px 34px !important;
+  border-radius: var(--fl-r-pill) !important;
+  background: #0d1117 !important;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 12px 28px -14px rgba(11, 18, 32, 0.75) !important;
+  transition: transform 0.3s var(--fl-ease), box-shadow 0.3s var(--fl-ease), background 0.3s var(--fl-ease);
+}
+
+#fleet .fl-btn:hover {
+  background: #000 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 20px 36px -16px rgba(11, 18, 32, 0.8) !important;
+}
+
+#fleet .fl-btn:focus-visible {
+  outline: 2px solid var(--fl-green);
+  outline-offset: 4px;
+}
+
+#fleet .fl-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: #fff;
+  transition: transform 0.3s var(--fl-ease);
+}
+
+#fleet .fl-btn:hover svg { transform: translateX(4px); }
+
+#fleet .fl-cta-sub {
+  margin-top: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fl-muted);
+}
+
+/* ────────────────────────────
+   RESPONSIVE
+──────────────────────────── */
+@media (max-width: 1080px) {
+  #fleet .fl-grid { gap: 20px; }
+  #fleet .fl-stat { padding: 0 24px; }
+}
+
+@media (max-width: 860px) {
+  #fleet { padding: 84px 0 92px !important; }
+  #fleet .fl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  #fleet { padding: 68px 0 76px !important; }
+  #fleet .fl-shell { padding: 0 18px; }
+  #fleet .fl-rail-scroll { margin: 0 -18px; padding: 6px 18px; }
+  #fleet .fl-grid { grid-template-columns: minmax(0, 1fr); }
+  #fleet .fl-head { margin-bottom: 42px; }
+
+  /* Two-up stat grid beats a four-across squeeze — the divider
+     borders are re-drawn so the seams follow the new layout. */
+  #fleet .fl-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 0;
+    margin-top: 34px;
+  }
+  #fleet .fl-stat { padding: 0 8px; }
+  #fleet .fl-stat + .fl-stat { border-left: 0; }
+  #fleet .fl-stat:nth-child(even) { border-left: 1px solid var(--fl-line); }
+
+  #fleet .fl-tab { padding: 10px 15px !important; font-size: 12px; }
+  #fleet .fl-media { height: 190px; }
+}
+
+/* ────────────────────────────
+   REDUCED MOTION
+   Entrance and hover poses collapse to their resting state; the
+   script reads the same query and skips its FLIP and count-up
+   passes, so the two never disagree.
+──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #fleet *,
+  #fleet *::before,
+  #fleet *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  #fleet .fl-card { opacity: 1; transform: none; }
+  #fleet .fl-card:hover { transform: none; }
+  #fleet .fl-card:hover .fl-media img { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION · paste from <section> through the closing </script>
+═══════════════════════════════════════════════════════════ -->
+<section id="fleet" aria-labelledby="fl-title">
+  <div class="fl-shell">
+
+    <!-- ── HEADER ── -->
+    <div class="fl-head">
+      <h2 class="fl-title" id="fl-title">
+        A Vehicle for
+        <span class="fl-grad">Every Business</span>
+      </h2>
+      <p class="fl-lede">
+        From passenger transport to heavy cargo — discover the complete
+        Mayuri lineup engineered for India's commercial future.
+      </p>
+
+      <dl class="fl-stats">
+        <div class="fl-stat">
+          <dt data-count-to="40" data-suffix="+">40+</dt>
+          <dd>Years of Innovation</dd>
+        </div>
+        <div class="fl-stat">
+          <dt>Zero</dt>
+          <dd>Carbon Emissions</dd>
+        </div>
+        <div class="fl-stat">
+          <dt data-count-to="1200" data-suffix="W">1200W</dt>
+          <dd>Peak Motor Power</dd>
+        </div>
+        <div class="fl-stat">
+          <dt data-count-to="48" data-suffix="V">48V</dt>
+          <dd>Motor Technology</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- ── FILTER ──
+         aria-pressed rather than tab semantics: real tabs promise a
+         matching tabpanel per tab, and this is one grid that filters
+         in place. Pressed toggles describe that honestly. -->
+    <div class="fl-filter">
+      <div class="fl-rail-scroll">
+        <div class="fl-rail" role="group" aria-label="Filter vehicles by category">
+          <span class="fl-pill" aria-hidden="true"></span>
+          <button type="button" class="fl-tab" data-filter="all" aria-pressed="true">
+            All <span class="fl-tab-count">6</span>
+          </button>
+          <button type="button" class="fl-tab" data-filter="passenger" aria-pressed="false">
+            Passenger E-Rickshaw <span class="fl-tab-count">3</span>
+          </button>
+          <button type="button" class="fl-tab" data-filter="cargo" aria-pressed="false">
+            Cargo Loader <span class="fl-tab-count">1</span>
+          </button>
+          <button type="button" class="fl-tab" data-filter="utility" aria-pressed="false">
+            Utility Vehicle <span class="fl-tab-count">1</span>
+          </button>
+          <button type="button" class="fl-tab" data-filter="enclosed" aria-pressed="false">
+            Enclosed Cargo <span class="fl-tab-count">1</span>
+          </button>
+        </div>
+      </div>
+      <p class="fl-result" role="status" aria-live="polite">
+        Showing <b data-result-count>6</b> of 6 vehicles
+      </p>
+    </div>
+
+    <!-- ── GRID ── -->
+    <div class="fl-grid" id="fl-grid">
+
+      <!-- 1 · Mayuri Grand -->
+      <a class="fl-card" data-cat="passenger"
+         href="https://saeraauto.com/product/mayuri-grand/" target="_blank" rel="noopener"
+         aria-label="Mayuri Grand passenger e-rickshaw — view details on saeraauto.com">
+        <span class="fl-edge" aria-hidden="true"></span>
+        <div class="fl-media">
+          <span class="fl-glow" aria-hidden="true"></span>
+          <span class="fl-ground" aria-hidden="true"></span>
+          <span class="fl-badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-8 0A3 3 0 1 0 5 8a3 3 0 0 0 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05A4.78 4.78 0 0 1 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></svg>
+            Passenger E-Rickshaw
+          </span>
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/1-2.webp"
+               alt="Mayuri Grand electric rickshaw" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='https://saeraauto.com/wp-content/uploads/2022/07/mayuri-g-n.png'">
+        </div>
+        <div class="fl-body">
+          <h3 class="fl-name">Mayuri Grand</h3>
+          <p class="fl-tag">Four-seater electric rickshaw with rear-view camera, alloy wheels and premium interiors</p>
+          <div class="fl-specs">
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4.09 12.84A1 1 0 0 0 5 14.5h6L8 22l12.91-10.84A1 1 0 0 0 20 9.5h-6Z"/></svg>1200W Motor</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.67 4H14V2h-4v2H8.33A1.33 1.33 0 0 0 7 5.33V22h10V5.33A1.33 1.33 0 0 0 15.67 4Z"/></svg>130AH Battery</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-8 0A3 3 0 1 0 5 8a3 3 0 0 0 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05A4.78 4.78 0 0 1 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></svg>4 Seater</span>
+          </div>
+        </div>
+        <div class="fl-foot">
+          <span>View details</span>
+          <span class="fl-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8Z"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- 2 · Mayuri Star -->
+      <a class="fl-card" data-cat="passenger"
+         href="https://saeraauto.com/product/mayuri-star/" target="_blank" rel="noopener"
+         aria-label="Mayuri Star passenger e-rickshaw — view details on saeraauto.com">
+        <span class="fl-edge" aria-hidden="true"></span>
+        <div class="fl-media">
+          <span class="fl-glow" aria-hidden="true"></span>
+          <span class="fl-ground" aria-hidden="true"></span>
+          <span class="fl-badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-8 0A3 3 0 1 0 5 8a3 3 0 0 0 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05A4.78 4.78 0 0 1 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></svg>
+            Passenger E-Rickshaw
+          </span>
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/2-2.webp"
+               alt="Mayuri Star electric rickshaw" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='https://saeraauto.com/wp-content/uploads/2022/06/mayrui-p-st.png'">
+        </div>
+        <div class="fl-body">
+          <h3 class="fl-name">Mayuri Star</h3>
+          <p class="fl-tag">Stylish electric rickshaw with alloy wheels, LED DRL headlamps and four-hour fast charging</p>
+          <div class="fl-specs">
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4.09 12.84A1 1 0 0 0 5 14.5h6L8 22l12.91-10.84A1 1 0 0 0 20 9.5h-6Z"/></svg>1000W Motor</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67Z"/></svg>4 Hr Charge</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5Z"/></svg>Steel Roof</span>
+          </div>
+        </div>
+        <div class="fl-foot">
+          <span>View details</span>
+          <span class="fl-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8Z"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- 3 · Mayuri PRO 1000 -->
+      <a class="fl-card" data-cat="passenger"
+         href="https://saeraauto.com/product/mayuri-pro-1000/" target="_blank" rel="noopener"
+         aria-label="Mayuri PRO 1000 passenger e-rickshaw — view details on saeraauto.com">
+        <span class="fl-edge" aria-hidden="true"></span>
+        <div class="fl-media">
+          <span class="fl-glow" aria-hidden="true"></span>
+          <span class="fl-ground" aria-hidden="true"></span>
+          <span class="fl-badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-8 0A3 3 0 1 0 5 8a3 3 0 0 0 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05A4.78 4.78 0 0 1 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></svg>
+            Passenger E-Rickshaw
+          </span>
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/3-1.webp"
+               alt="Mayuri PRO 1000 electric rickshaw" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='https://saeraauto.com/wp-content/uploads/2022/07/mayrui-pro1000.png'">
+        </div>
+        <div class="fl-body">
+          <h3 class="fl-name">Mayuri PRO 1000</h3>
+          <p class="fl-tag">Sturdy daily transport with hydraulic suspension and reliable zero-emission performance</p>
+          <div class="fl-specs">
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4.09 12.84A1 1 0 0 0 5 14.5h6L8 22l12.91-10.84A1 1 0 0 0 20 9.5h-6Z"/></svg>1000W Motor</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.67 4H14V2h-4v2H8.33A1.33 1.33 0 0 0 7 5.33V22h10V5.33A1.33 1.33 0 0 0 15.67 4Z"/></svg>130AH Battery</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 14.5 9 2.5 2.5 0 0 1 12 11.5Z"/></svg>200mm Clearance</span>
+          </div>
+        </div>
+        <div class="fl-foot">
+          <span>View details</span>
+          <span class="fl-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8Z"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- 4 · Mayuri Dustbin Cart -->
+      <a class="fl-card" data-cat="utility"
+         href="https://saeraauto.com/product/mayuri-dustbin-cart/" target="_blank" rel="noopener"
+         aria-label="Mayuri Dustbin Cart utility vehicle — view details on saeraauto.com">
+        <span class="fl-edge" aria-hidden="true"></span>
+        <div class="fl-media">
+          <span class="fl-glow" aria-hidden="true"></span>
+          <span class="fl-ground" aria-hidden="true"></span>
+          <span class="fl-badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6Zm3.46-7.12 1.41-1.41L12 11.59l1.12-1.12 1.41 1.41L13.41 13l1.12 1.12-1.41 1.41L12 14.41l-1.12 1.12-1.41-1.41L10.59 13ZM15.5 4l-1-1h-5l-1 1H5v2h14V4Z"/></svg>
+            Utility Vehicle
+          </span>
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/4-1.webp"
+               alt="Mayuri Dustbin Cart electric waste collection vehicle" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='https://saeraauto.com/wp-content/uploads/2022/07/dustbin-banner-1-1-1024x448.jpg'">
+        </div>
+        <div class="fl-body">
+          <h3 class="fl-name">Mayuri Dustbin Cart</h3>
+          <p class="fl-tag">Eco-friendly electric waste collection vehicle with hydraulic tilting and large capacity</p>
+          <div class="fl-specs">
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4.09 12.84A1 1 0 0 0 5 14.5h6L8 22l12.91-10.84A1 1 0 0 0 20 9.5h-6Z"/></svg>1200W Motor</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8c-9 2-11.1 8.17-13.18 11.5.8.6 1.62 1.14 2.43 1.62.18-.85.35-1.55.71-2.33C7.5 17 10 13.5 17 11.5V14l4-4-4-4Z"/></svg>Hydraulic Tilt</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-9 9 9 9 0 0 0 9 9 9 9 0 0 0 9-9 9 9 0 0 0-9-9Zm-1 13.5-4-4 1.41-1.41L11 13.67l4.59-4.58L17 10.5Z"/></svg>Zero Emission</span>
+          </div>
+        </div>
+        <div class="fl-foot">
+          <span>View details</span>
+          <span class="fl-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8Z"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- 5 · Mayuri Close Loader -->
+      <a class="fl-card" data-cat="enclosed"
+         href="https://saeraauto.com/product/mayuri-close-loader/" target="_blank" rel="noopener"
+         aria-label="Mayuri Close Loader enclosed cargo vehicle — view details on saeraauto.com">
+        <span class="fl-edge" aria-hidden="true"></span>
+        <div class="fl-media">
+          <span class="fl-glow" aria-hidden="true"></span>
+          <span class="fl-ground" aria-hidden="true"></span>
+          <span class="fl-badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 8h-3V4H3a2 2 0 0 0-2 2v11h2a3 3 0 0 0 6 0h6a3 3 0 0 0 6 0h2v-5Zm-14 10.5A1.5 1.5 0 1 1 7.5 17 1.5 1.5 0 0 1 6 18.5Zm13.5-9.5 1.96 2.5H17V9ZM18 18.5A1.5 1.5 0 1 1 19.5 17 1.5 1.5 0 0 1 18 18.5Z"/></svg>
+            Enclosed Cargo
+          </span>
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-93.webp"
+               alt="Mayuri Close Loader enclosed cargo vehicle" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='https://saeraauto.com/wp-content/uploads/2022/07/mayuri-close.png'">
+        </div>
+        <div class="fl-body">
+          <h3 class="fl-name">Mayuri Close Loader</h3>
+          <p class="fl-tag">Enclosed cargo vehicle with 350 kg payload capacity and a heavy-duty monocoque chassis</p>
+          <div class="fl-specs">
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4.09 12.84A1 1 0 0 0 5 14.5h6L8 22l12.91-10.84A1 1 0 0 0 20 9.5h-6Z"/></svg>1200W Motor</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v5.09c0 4.72 3.41 9.13 8 10.24 4.59-1.11 8-5.52 8-10.24V6Zm0 4 5 2v2.09c0 3.2-2.13 6.24-5 7.24-2.87-1-5-4.04-5-7.24V9Z"/></svg>350 kg Payload</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h-1V6A5 5 0 0 0 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2Zm-6 9a2 2 0 1 1 2-2 2 2 0 0 1-2 2Zm3.1-9H8.9V6a3.1 3.1 0 0 1 6.2 0Z"/></svg>Secure Box</span>
+          </div>
+        </div>
+        <div class="fl-foot">
+          <span>View details</span>
+          <span class="fl-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8Z"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- 6 · Mayuri E-Cart Loader -->
+      <a class="fl-card" data-cat="cargo"
+         href="https://saeraauto.com/product/mayuri-e-cart-loader/" target="_blank" rel="noopener"
+         aria-label="Mayuri E-Cart Loader cargo loader — view details on saeraauto.com">
+        <span class="fl-edge" aria-hidden="true"></span>
+        <div class="fl-media">
+          <span class="fl-glow" aria-hidden="true"></span>
+          <span class="fl-ground" aria-hidden="true"></span>
+          <span class="fl-badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10V6H3v11h1.5a2.5 2.5 0 0 0 5 0h5a2.5 2.5 0 0 0 5 0H21v-5ZM7 18.75A1.25 1.25 0 1 1 8.25 17.5 1.25 1.25 0 0 1 7 18.75Zm10 0a1.25 1.25 0 1 1 1.25-1.25A1.25 1.25 0 0 1 17 18.75ZM9 3h6v2H9Z"/></svg>
+            Cargo Loader
+          </span>
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/5-1.webp"
+               alt="Mayuri E-Cart Loader open-deck electric loader" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='https://saeraauto.com/wp-content/uploads/2022/07/mayuri-cart.png'">
+        </div>
+        <div class="fl-body">
+          <h3 class="fl-name">Mayuri E-Cart Loader</h3>
+          <p class="fl-tag">Heavy-duty open-deck electric loader with massive capacity for urban freight</p>
+          <div class="fl-specs">
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4.09 12.84A1 1 0 0 0 5 14.5h6L8 22l12.91-10.84A1 1 0 0 0 20 9.5h-6Z"/></svg>1200W Motor</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.67 4H14V2h-4v2H8.33A1.33 1.33 0 0 0 7 5.33V22h10V5.33A1.33 1.33 0 0 0 15.67 4Z"/></svg>130AH Battery</span>
+            <span class="fl-spec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v5.09c0 4.72 3.41 9.13 8 10.24 4.59-1.11 8-5.52 8-10.24V6Zm0 4 5 2v2.09c0 3.2-2.13 6.24-5 7.24-2.87-1-5-4.04-5-7.24V9Z"/></svg>Heavy Duty</span>
+          </div>
+        </div>
+        <div class="fl-foot">
+          <span>View details</span>
+          <span class="fl-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8Z"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <p class="fl-empty" data-empty hidden>No vehicles in this category yet.</p>
+    </div>
+
+    <!-- ── CTA ── -->
+    <div class="fl-cta">
+      <a class="fl-btn" href="https://saeraauto.com/product-category/mayuri/" target="_blank" rel="noopener">
+        Explore All Vehicles
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8Z"/></svg>
+      </a>
+      <p class="fl-cta-sub">Powered by Mayuri Electric · A Saera Group Brand</p>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  var root = document.getElementById('fleet');
+  if (!root) return;
+
+  var grid    = root.querySelector('.fl-grid');
+  var rail    = root.querySelector('.fl-rail');
+  var pill    = root.querySelector('.fl-pill');
+  var tabs    = [].slice.call(root.querySelectorAll('.fl-tab'));
+  var cards   = [].slice.call(root.querySelectorAll('.fl-card'));
+  var empty   = root.querySelector('[data-empty]');
+  var counter = root.querySelector('[data-result-count]');
+  var total   = cards.length;
+
+  var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function calm() { return motionQuery.matches; }
+
+  var EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+  /* ── Tween helper ──────────────────────────────────────────
+     Shared by the stat count-up and the result counter so both
+     land on the same easing curve and both cancel cleanly when a
+     second call arrives mid-flight. */
+  function tween(el, from, to, ms, suffix) {
+    if (el._raf) cancelAnimationFrame(el._raf);
+    if (calm() || from === to) { el.textContent = to + (suffix || ''); return; }
+    var t0 = performance.now();
+    (function step(now) {
+      var p = Math.min((now - t0) / ms, 1);
+      var e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(from + (to - from) * e) + (suffix || '');
+      if (p < 1) el._raf = requestAnimationFrame(step);
+    })(t0);
+  }
+
+  /* ── Sliding pill ──────────────────────────────────────────
+     Measured only once document.fonts has settled. Montserrat
+     arrives after first paint, and every tab is wider under it
+     than under the fallback stack — measuring early parks the
+     pill short of the label it is meant to sit behind, which is
+     exactly the misalignment the previous build shipped with. */
+  function placePill(btn, animate) {
+    if (!pill || !btn) return;
+    if (!animate) pill.style.transition = 'none';
+    pill.style.width     = btn.offsetWidth + 'px';
+    pill.style.height    = btn.offsetHeight + 'px';
+    /* translate rather than top/left: it stays on the compositor
+       and never triggers layout while sliding. */
+    pill.style.transform = 'translate(' + (btn.offsetLeft - 5) + 'px,' + (btn.offsetTop - 5) + 'px)';
+    pill.classList.add('is-set');
+    if (!animate) {
+      // Force a reflow so the suppressed transition does not
+      // swallow the *next*, intentional move.
+      void pill.offsetWidth;
+      pill.style.transition = '';
+    }
+  }
+
+  function currentTab() {
+    return root.querySelector('.fl-tab[aria-pressed="true"]') || tabs[0];
+  }
+
+  function initPill() { placePill(currentTab(), false); }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(initPill);
+  } else {
+    window.addEventListener('load', initPill);
+  }
+  initPill(); // first pass so it is never absent, corrected above
+
+  var resizeRaf;
+  window.addEventListener('resize', function () {
+    cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(function () { placePill(currentTab(), false); });
+  });
+
+  /* ── Filtering ─────────────────────────────────────────────
+     FLIP: measure every visible card, mutate the DOM, then play
+     each survivor back from its old position. Cards that stay on
+     screen glide to their new slot instead of teleporting, and
+     newcomers fade up on a stagger.
+
+     Deliberately driven through element.animate() rather than
+     inline styles — a WAAPI animation composites over the CSS
+     :hover transform and then releases it, so hover keeps working
+     the moment the filter settles. Writing .style.transform (the
+     previous approach) permanently outranks the stylesheet and
+     leaves every card stuck in its last scripted pose. */
+  function applyFilter(cat) {
+    var before = new Map();
+    cards.forEach(function (c) {
+      if (!c.hidden) before.set(c, c.getBoundingClientRect());
+    });
+
+    var shown = 0;
+    cards.forEach(function (c) {
+      var show = cat === 'all' || c.getAttribute('data-cat') === cat;
+      c.hidden = !show;
+      if (show) shown++;
+    });
+
+    if (empty) empty.hidden = shown !== 0;
+
+    tween(counter, parseInt(counter.textContent, 10) || 0, shown, 340);
+
+    if (calm() || !grid.animate) return;
+
+    requestAnimationFrame(function () {
+      var i = 0;
+      cards.forEach(function (c) {
+        if (c.hidden) return;
+        var was = before.get(c);
+        var now = c.getBoundingClientRect();
+
+        if (was) {
+          var dx = was.left - now.left;
+          var dy = was.top - now.top;
+          if (dx || dy) {
+            c.animate(
+              [{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],
+              { duration: 460, easing: EASE }
+            );
+          }
+        } else {
+          c.animate(
+            [{ opacity: 0, transform: 'translateY(14px) scale(0.96)' }, { opacity: 1, transform: 'none' }],
+            { duration: 440, delay: i * 55, easing: EASE, fill: 'backwards' }
+          );
+        }
+        i++;
+      });
+    });
+  }
+
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.getAttribute('aria-pressed') === 'true') return;
+      tabs.forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+      placePill(btn, true);
+      applyFilter(btn.getAttribute('data-filter'));
+      // Keep the chosen tab in view when the rail is scrolled on mobile.
+      if (btn.scrollIntoView) {
+        btn.scrollIntoView({ behavior: calm() ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+      }
+    });
+  });
+
+  /* Left/Right arrows walk the rail, matching how a toolbar of
+     toggles is expected to behave. */
+  if (rail) {
+    rail.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var at = tabs.indexOf(document.activeElement);
+      if (at === -1) return;
+      e.preventDefault();
+      var next = tabs[(at + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+      next.focus();
+      next.click();
+    });
+  }
+
+  /* ── Pointer glow ──────────────────────────────────────────
+     Replaces the old 3-D tilt, which fought the hover transform
+     and rewrote .style.transform on every mousemove. This only
+     touches two custom properties the compositor already owns. */
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    cards.forEach(function (card) {
+      var media = card.querySelector('.fl-media');
+      if (!media) return;
+      card.addEventListener('mousemove', function (e) {
+        var r = media.getBoundingClientRect();
+        media.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+        media.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+      card.addEventListener('mouseleave', function () {
+        media.style.removeProperty('--mx');
+        media.style.removeProperty('--my');
+      });
+    });
+  }
+
+  /* ── Scroll entrance ───────────────────────────────────────
+     Cards animate individually rather than as one grid block, so
+     a tall grid does not fire its bottom row while it is still
+     below the fold. */
+  function reveal(el, index) {
+    el.style.setProperty('--i', index % 3);
+    el.classList.add('is-in');
+  }
+
+  if (window.IntersectionObserver && !calm()) {
+    var io = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        reveal(entry.target, cards.indexOf(entry.target));
+        obs.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    cards.forEach(function (c) { io.observe(c); });
+  } else {
+    cards.forEach(function (c) { c.classList.add('is-in'); });
+  }
+
+  /* ── Stat count-up ─────────────────────────────────────────
+     Fires once, when the stats row is actually on screen. */
+  var stats = root.querySelector('.fl-stats');
+  if (stats && window.IntersectionObserver && !calm()) {
+    var statIo = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll('[data-count-to]').forEach(function (el) {
+          var to = parseInt(el.getAttribute('data-count-to'), 10);
+          tween(el, 0, to, 1100, el.getAttribute('data-suffix') || '');
+        });
+        obs.unobserve(entry.target);
+      });
+    }, { threshold: 0.5 });
+    statIo.observe(stats);
+  }
+
+  /* Result line seeded from the markup so the "of N" total stays
+     correct if vehicles are added or removed. */
+  if (counter && counter.parentNode) {
+    counter.parentNode.lastChild.textContent = ' of ' + total + ' vehicles';
+  }
+})();
+</script>
+
+</body>
+</html>
