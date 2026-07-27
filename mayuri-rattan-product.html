@@ -265,47 +265,95 @@ html, body { margin: 0; padding: 0; }
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  isolation: isolate;
   border-radius: 8px !important;
-  background: var(--mrp-surface) !important;
-  box-shadow: inset 0 0 0 1px var(--mrp-line) !important;
-  transition: box-shadow 0.3s var(--mrp-ease-quart);
+  background: #fff !important;
+  box-shadow:
+    inset 0 0 0 1px var(--mrp-line),
+    0 1px 3px rgba(14,17,22,0.06) !important;
+  transition: box-shadow 0.3s var(--mrp-ease-quart), transform 0.3s var(--mrp-ease-expo);
 }
 /* contain, not cover: these are whole-vehicle cut-outs, and
-   cropping one to fill a 4:3 tile slices the wheels off. */
+   cropping one to fill a 4:3 tile slices the wheels off.
+   multiply for the same reason as the viewer. */
 #mrp .mrp-thumb img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  mix-blend-mode: multiply;
   padding: 6px !important;
   transition: transform 0.5s var(--mrp-ease-expo);
 }
-#mrp .mrp-thumb:hover { box-shadow: inset 0 0 0 1px var(--mrp-line-2) !important; }
+#mrp .mrp-thumb:hover {
+  box-shadow:
+    inset 0 0 0 1px var(--mrp-line-2),
+    0 4px 12px rgba(14,17,22,0.10) !important;
+  transform: translateY(-1px);
+}
 #mrp .mrp-thumb:hover img { transform: scale(1.06); }
 #mrp .mrp-thumb.is-active {
-  box-shadow: inset 0 0 0 2px var(--mrp-ink) !important;
+  box-shadow:
+    inset 0 0 0 2px var(--mrp-ink),
+    0 4px 12px rgba(14,17,22,0.10) !important;
   cursor: default;
 }
 #mrp .mrp-thumb:focus-visible { outline: 2px solid var(--mrp-green); outline-offset: 2px; }
 
-/* ── Viewer ── */
+/* ── Viewer ──
+   Pure white, not the grey surface, because the shots blend onto
+   it with multiply below. isolation:isolate keeps that blending
+   inside the viewer — without it the images would multiply
+   against whatever the host page puts behind the section. */
 #mrp .mrp-viewer {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   aspect-ratio: 16 / 10;
   border-radius: var(--mrp-r) !important;
-  background: var(--mrp-surface) !important;
+  background: #fff !important;
+  box-shadow:
+    0 1px 2px rgba(14,17,22,0.05),
+    0 8px 24px rgba(14,17,22,0.07),
+    0 24px 56px rgba(14,17,22,0.05) !important;
+}
+
+/* GROUND SHADOW
+   Sits under the vehicle, above the plate. Because the shots
+   multiply, it reads through their white background and the
+   vehicle picks up a contact shadow it never had in the file.
+   Kept low and wide so it lands under the wheels rather than
+   under the bodywork. */
+#mrp .mrp-viewer::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 13%;
+  z-index: 0;
+  width: 56%;
+  height: 20px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(14,17,22,0.24), transparent 72%);
+  filter: blur(10px);
+  pointer-events: none;
 }
 
 /* Every angle ships as a real <img> in the markup — no JS src
    swapping. That keeps all angles in the page for crawlers, and a
    JS failure degrades to "first angle visible", not an empty
    box. */
+/* multiply drops the photos' white background out optically —
+   white multiplied against the white plate is the plate, so the
+   hard rectangle around each cut-out disappears without anyone
+   having to re-export with real transparency. Everything darker
+   than white is unaffected. */
 #mrp .mrp-shot {
   position: absolute;
   inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  mix-blend-mode: multiply;
   padding: clamp(14px, 3vw, 40px) !important;
   opacity: 0;
   visibility: hidden;
@@ -614,15 +662,6 @@ html, body { margin: 0; padding: 0; }
 #mrp .mrp-btn .mrp-arr { display: inline-block; font-size: 13px !important; line-height: 1 !important; transition: transform 0.3s var(--mrp-ease-expo); }
 #mrp .mrp-btn:hover .mrp-arr { transform: translateX(3px); }
 
-#mrp .mrp-phone {
-  margin-left: auto !important;
-  display: flex;
-  gap: clamp(16px, 2vw, 28px);
-  font-size: 11px !important;
-  color: var(--mrp-meta) !important;
-}
-#mrp .mrp-phone a { color: var(--mrp-ink) !important; font-weight: 600 !important; transition: color 0.25s ease; }
-#mrp .mrp-phone a:hover { color: var(--mrp-green) !important; }
 
 /* ────────────────────────────
    ENTRANCE
@@ -693,7 +732,6 @@ html, body { margin: 0; padding: 0; }
   #mrp .mrp-viewer { aspect-ratio: 4 / 3; }
   #mrp .mrp-cta { flex-direction: column; align-items: stretch; }
   #mrp .mrp-btn { justify-content: center; }
-  #mrp .mrp-phone { margin-left: 0 !important; margin-top: 6px !important; justify-content: space-between; }
   #mrp .mrp-feat td.mrp-mark { width: 54px; }
   #mrp .mrp-spec th { width: 54%; }
 }
@@ -949,13 +987,16 @@ html, body { margin: 0; padding: 0; }
 
   <!-- ─────────── CTA ─────────── -->
   <div class="mrp-cta mrp-rise">
-    <a class="mrp-btn mrp-btn--primary" href="#enquiry">Book a Test Ride <span class="mrp-arr" aria-hidden="true">→</span></a>
+    <!-- Dials the sales line directly. The number stays in the href
+         rather than on screen, so it is one tap on a phone and
+         still copyable on desktop — and there is only one place to
+         update it when the line changes. aria-label spells out
+         that this places a call, which "Book Now" alone does
+         not. -->
+    <a class="mrp-btn mrp-btn--primary" href="tel:+919220508868"
+       aria-label="Book now — call the Mayuri sales team">Book Now <span class="mrp-arr" aria-hidden="true">→</span></a>
     <a class="mrp-btn mrp-btn--ghost" href="#brochure">Brochure</a>
     <a class="mrp-btn mrp-btn--ghost" href="#dealers">Find a Dealer</a>
-    <div class="mrp-phone">
-      <span>Sales <a href="tel:+919220508868">+91 922-050-8868</a></span>
-      <span>Service <a href="tel:+919319696898">+91 931-9696-898</a></span>
-    </div>
   </div>
 
 </div>
