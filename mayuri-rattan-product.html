@@ -314,7 +314,7 @@ html, body { margin: 0; padding: 0; }
 
 /* [hidden] is how JS parks the off-variant thumbs, and the UA
    sheet implements it as `display: none` — which `display: block`
-   below silently overrides, leaving all 14 angles in the rail.
+   below silently overrides, leaving every angle from both variants in the rail.
    This has to win against our own rule, hence the flag. */
 #mrp .mrp-thumb[hidden] { display: none !important; }
 
@@ -518,7 +518,7 @@ html, body { margin: 0; padding: 0; }
   border-left: 2px solid var(--mrp-green) !important;
   padding-left: clamp(12px, 1.3vw, 18px) !important;
 }
-/* In the viewer all 14 shots are stacked, so the slot label must
+/* In the viewer every shot is stacked, so the slot label must
    be gated on .is-shown too — otherwise every missing angle's
    placeholder paints on top of the one you are looking at. */
 #mrp .is-missing > .mrp-slot,
@@ -1070,7 +1070,7 @@ html, body { margin: 0; padding: 0; }
         <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 18l6-6-6-6"/></svg>
       </button>
 
-      <span class="mrp-viewer__angle"><b id="mrpAngle">Front 3/4</b> · <span id="mrpCount">1 / 7</span></span>
+      <span class="mrp-viewer__angle"><b id="mrpAngle">Front 3/4</b> · <span id="mrpCount">1 / 5</span></span>
     </div>
   </div>
 
@@ -1426,8 +1426,8 @@ html, body { margin: 0; padding: 0; }
             .setAttribute('aria-labelledby', v === 'auto' ? 'mrpTabAuto' : 'mrpTabCargo');
 
     /* Reset to the hero angle. Carrying the index across would
-       land on "Deck open" when switching from the auto's
-       "Cabin" — same slot, unrelated shot. */
+       land on the cargo's "Deck open" when switching from the
+       auto's "Rear" — same position, unrelated shot. */
     showAngle(0, false);
 
     if (announce) live.textContent = LABEL[v] + ' selected';
