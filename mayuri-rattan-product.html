@@ -224,6 +224,24 @@ html, body { margin: 0; padding: 0; }
 #mrp .mrp-switch__btn:focus-visible { outline: 2px solid var(--mrp-green); outline-offset: 2px; }
 
 /* ────────────────────────────
+   MAIN — stats beside the imagery
+   The stage sits first in the source because it is the thing
+   worth loading and seeing first, on mobile and for LCP alike.
+   Desktop then places it in column 2 explicitly, so the numbers
+   read on the left without the markup having to fight the
+   reading order.
+──────────────────────────── */
+#mrp .mrp-main {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(20px, 3vw, 44px);
+  align-items: stretch;
+  margin-top: clamp(30px, 4vw, 48px) !important;
+}
+#mrp .mrp-main .mrp-stats { grid-column: 1; grid-row: 1; }
+#mrp .mrp-main .mrp-stage { grid-column: 2; grid-row: 1; }
+
+/* ────────────────────────────
    STAGE
    Grid, not flex: the rail must keep a fixed track width while
    the viewer takes the remainder, and `1fr` on a flex child would
@@ -231,19 +249,19 @@ html, body { margin: 0; padding: 0; }
 ──────────────────────────── */
 #mrp .mrp-stage {
   display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
-  gap: clamp(14px, 1.8vw, 22px);
-  margin-top: clamp(30px, 4vw, 48px) !important;
+  grid-template-columns: 74px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: clamp(12px, 1.4vw, 16px);
 }
 
 /* ── Angle rail ── */
 #mrp .mrp-rail {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   /* Caps the rail at viewer height and scrolls internally, so
      adding a sixth angle never stretches the section. */
-  max-height: clamp(340px, 44vw, 580px);
+  max-height: clamp(260px, 30vw, 420px);
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
@@ -448,19 +466,31 @@ html, body { margin: 0; padding: 0; }
    STAT STRIP
    The headline numbers, straight off the brochure's front panel.
 ──────────────────────────── */
+/* One column beside the imagery, five equal rows. `1fr` rows
+   rather than auto means the strip matches the viewer's height
+   exactly instead of ending short of it and leaving the column
+   looking unfinished. */
 #mrp .mrp-stats {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(5, minmax(0, 1fr));
   gap: 1px;
-  margin-top: clamp(22px, 2.6vw, 34px) !important;
   border-radius: var(--mrp-r) !important;
   overflow: hidden;
   background: var(--mrp-line) !important;   /* the 1px gaps become hairlines */
   box-shadow: 0 0 0 1px var(--mrp-line) !important;
 }
 
+/* Vertical padding is deliberately tight. It keeps the strip's
+   min-content height below the viewer's, which is what lets the
+   1fr rows stretch up to meet it — pad these more and the stats
+   column becomes the taller of the two and strands a gap under
+   the imagery instead. */
 #mrp .mrp-stat {
-  padding: clamp(18px, 2.1vw, 26px) clamp(12px, 1.5vw, 20px) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(10px, 1.1vw, 14px) clamp(16px, 1.8vw, 24px) !important;
   background: var(--mrp-bg) !important;
 }
 
@@ -699,7 +729,19 @@ html, body { margin: 0; padding: 0; }
 ──────────────────────────── */
 @media (max-width: 1040px) {
   #mrp .mrp-panels { grid-template-columns: minmax(0, 1fr); }
-  #mrp .mrp-stats  { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* Below this the two-column split starves both halves, so the
+     stats go back under the imagery as a horizontal strip. The
+     explicit row/column placement has to be undone too, or the
+     stage stays pinned to a column that no longer exists. */
+  #mrp .mrp-main { grid-template-columns: minmax(0, 1fr); gap: clamp(22px, 3vw, 32px); }
+  #mrp .mrp-main .mrp-stage { grid-column: 1; grid-row: 1; }
+  #mrp .mrp-main .mrp-stats { grid-column: 1; grid-row: 2; }
+
+  #mrp .mrp-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: none;
+  }
   /* A 5-into-3 grid leaves two cells on the last row; let them
      share the width instead of stranding a gap. */
   #mrp .mrp-stat:nth-child(4) { grid-column: span 2; }
@@ -712,8 +754,9 @@ html, body { margin: 0; padding: 0; }
   /* Rail goes horizontal beneath the viewer — a vertical strip of
      thumbnails is unusable at phone widths. */
   #mrp .mrp-stage { grid-template-columns: minmax(0, 1fr); }
-  #mrp .mrp-viewer { grid-row: 1; }
+  #mrp .mrp-viewer { grid-column: 1; grid-row: 1; }
   #mrp .mrp-rail {
+    grid-column: 1;
     grid-row: 2;
     flex-direction: row;
     max-height: none;
@@ -734,6 +777,20 @@ html, body { margin: 0; padding: 0; }
   #mrp .mrp-btn { justify-content: center; }
   #mrp .mrp-feat td.mrp-mark { width: 54px; }
   #mrp .mrp-spec th { width: 54%; }
+}
+
+/* ────────────────────────────
+   TWO-COLUMN HEIGHT LOCK
+   Only while the stats sit beside the imagery. The stats strip
+   has a natural floor height; the viewer's aspect ratio does not,
+   so below about 1280px the viewer shrank faster than the stats
+   could and left the columns ragged. Here the stats set the row
+   height and the viewer fills it, which matches at every width
+   instead of at one.
+──────────────────────────── */
+@media (min-width: 1041px) {
+  #mrp .mrp-main .mrp-viewer { aspect-ratio: auto; height: 100%; }
+  #mrp .mrp-main .mrp-rail   { max-height: 100%; }
 }
 
 /* Coarse pointers get no hover-only affordances at any width. */
@@ -784,7 +841,11 @@ html, body { margin: 0; padding: 0; }
     </div>
   </header>
 
-  <!-- ─────────── STAGE ─────────── -->
+  <!-- ─────────── MAIN — imagery + headline numbers ───────────
+       Stage first in the source; CSS places it right of the
+       stats on desktop. -->
+  <div class="mrp-main">
+
   <div class="mrp-stage mrp-rise" id="mrpStage" role="tabpanel" aria-labelledby="mrpTabAuto">
 
     <!-- Both variants' thumbs live here; JS shows the matching set. -->
@@ -855,8 +916,7 @@ html, body { margin: 0; padding: 0; }
     </div>
   </div>
 
-  <!-- ─────────── STATS ───────────
-       Each element's text is already the finished value, so the
+  <!-- Each element's text is already the finished value, so the
        figures are correct before JS runs and correct if it never
        does. The count-up is decoration on top. -->
   <div class="mrp-stats mrp-rise" id="mrpStats">
@@ -889,6 +949,8 @@ html, body { margin: 0; padding: 0; }
       </span>
     </div>
   </div>
+
+  </div><!-- /.mrp-main -->
 
   <!-- ─────────── PANELS ─────────── -->
   <div class="mrp-panels">
