@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mayuri Rattan L5 — Product Section</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   MAYURI RATTAN L5 — PRODUCT SECTION
+
+   Same defensive contract as the hero (#hs): everything is scoped
+   to #mrp, custom properties are --mrp-* and declared on #mrp
+   rather than :root, and every @keyframes name is mrp-prefixed.
+   Keyframe names and custom properties are global namespaces —
+   a theme that also defines `fadeUp` or `--green` would otherwise
+   silently hijack ours.
+
+   Palette ties back to the hero: gold (--mrp-gold) carries the
+   eyebrow and hairline details exactly as it does up there, while
+   Mayuri's leaf green is the product accent. One accent per role,
+   never two competing.
+══════════════════════════════════════════════════════════════ */
+
+html, body { margin: 0; padding: 0; }
+
+#mrp {
+  --mrp-ink:    #07070A;
+  --mrp-ink-2:  #0C0C11;   /* card fill, one step off the canvas */
+  --mrp-ink-3:  #121219;   /* stage well                        */
+  --mrp-green:  #1EA84C;
+  --mrp-green-d:#15833B;
+  --mrp-gold:   #BF9B4D;
+  --mrp-red:    #C0483F;   /* the ✗ column — muted, never alarming */
+
+  --mrp-line:   rgba(255,255,255,0.08);
+  --mrp-line-2: rgba(255,255,255,0.14);
+  --mrp-dim:    rgba(255,255,255,0.52);
+  --mrp-dim-2:  rgba(255,255,255,0.34);
+
+  --mrp-ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
+  --mrp-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --mrp-swap: 480ms;       /* variant + angle crossfade */
+}
+
+/* ────────────────────────────
+   SCOPED RESET
+   Sits above every component rule, all of which are #mrp-scoped
+   and therefore at least as specific — so this never fights our
+   own CSS, only the theme's.
+──────────────────────────── */
+#mrp, #mrp *, #mrp *::before, #mrp *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  list-style: none;
+}
+
+/* Buttons and links are where themes hit hardest, and the
+   !important flags are the minimum needed to beat theme rules
+   that are themselves !important — specificity alone loses to
+   those. `button { background: #e6e6e6 !important }` is exactly
+   what would paint the variant switch as two grey boxes. */
+#mrp button,
+#mrp a {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none !important;
+  text-align: inherit;
+  line-height: normal;
+  width: auto;
+  height: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#mrp button::before,
+#mrp button::after { content: none; display: none; }
+
+/* Tables are the other big target: themes ship zebra striping,
+   borders and cell padding on bare `table`/`td` selectors. */
+#mrp table { border-collapse: collapse; border-spacing: 0; width: 100%; }
+#mrp th, #mrp td { background: none !important; border: 0; text-align: left; vertical-align: middle; }
+#mrp img { display: block; max-width: 100%; height: auto; }
+
+/* ────────────────────────────
+   SECTION SHELL
+──────────────────────────── */
+#mrp {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: clamp(64px, 9vw, 132px) clamp(20px, 6vw, 96px) clamp(56px, 7vw, 104px) !important;
+  border: 0 !important;
+  overflow: hidden;
+  background: var(--mrp-ink) !important;
+  isolation: isolate;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Two soft radial washes keep a full-black section from reading
+   flat. pointer-events:none so they never eat a click. */
+#mrp::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1100px 620px at 78% 12%, rgba(30,168,76,0.10), transparent 62%),
+    radial-gradient(900px 520px at 6% 82%, rgba(191,155,77,0.06), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+#mrp > * { position: relative; z-index: 1; }
+
+#mrp .mrp-wrap { max-width: 1320px; margin: 0 auto !important; }
+
+/* ────────────────────────────
+   HEADER
+──────────────────────────── */
+#mrp .mrp-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: clamp(24px, 4vw, 64px);
+  padding-bottom: clamp(28px, 3.6vw, 44px) !important;
+  border-bottom: 1px solid var(--mrp-line) !important;
+}
+
+#mrp .mrp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 3.4px;
+  text-transform: uppercase;
+  color: var(--mrp-gold) !important;
+  margin: 0 0 18px !important;
+}
+#mrp .mrp-eyebrow::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 1px;
+  background: var(--mrp-gold);
+  flex: 0 0 auto;
+}
+
+#mrp .mrp-h2 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(30px, 4.1vw, 58px) !important;
+  font-weight: 800 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.6px;
+  text-transform: uppercase !important;
+  color: #fff !important;
+  margin: 0 0 16px !important;
+}
+#mrp .mrp-h2 em {
+  font-style: normal;
+  color: var(--mrp-green) !important;
+}
+
+#mrp .mrp-lede {
+  font-family: 'Noto Sans Devanagari', 'Montserrat', sans-serif !important;
+  font-size: clamp(12px, 1.15vw, 14.5px) !important;
+  font-weight: 300 !important;
+  line-height: 1.9 !important;
+  color: var(--mrp-dim) !important;
+  max-width: 46ch;
+  margin: 0 !important;
+}
+
+/* ────────────────────────────
+   VARIANT SWITCH
+   A two-up segmented control. The moving highlight is its own
+   absolutely-positioned element rather than a background on the
+   active button, so it can slide between the two rather than
+   cutting — and JS only has to write one transform.
+──────────────────────────── */
+#mrp .mrp-switch {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 4px !important;
+  border: 1px solid var(--mrp-line-2) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.03) !important;
+  flex: 0 0 auto;
+}
+
+#mrp .mrp-switch__thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--mrp-green), var(--mrp-green-d));
+  transform: translateX(0);
+  transition: transform 0.5s var(--mrp-ease-expo);
+  pointer-events: none;
+  z-index: 0;
+}
+#mrp .mrp-switch[data-active="cargo"] .mrp-switch__thumb { transform: translateX(100%); }
+
+#mrp .mrp-switch__btn {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 11px clamp(18px, 2.4vw, 34px) !important;
+  border-radius: 999px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--mrp-dim) !important;
+  transition: color 0.4s var(--mrp-ease-quart);
+}
+#mrp .mrp-switch__btn[aria-selected="true"] { color: #fff !important; }
+#mrp .mrp-switch__btn:not([aria-selected="true"]):hover { color: rgba(255,255,255,0.82) !important; }
+#mrp .mrp-switch__btn:focus-visible { outline: 1.5px solid var(--mrp-gold); outline-offset: 3px; }
+
+#mrp .mrp-switch__hi {
+  display: block;
+  font-family: 'Noto Sans Devanagari', sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.4px;
+  opacity: 0.62;
+}
+
+/* ────────────────────────────
+   STAGE — vehicle imagery
+   Grid, not flex: the angle rail must keep a fixed track width
+   while the stage takes the remainder, and `1fr` on a flex child
+   would let a wide image push the rail off-canvas.
+──────────────────────────── */
+#mrp .mrp-stage {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 28px);
+  margin-top: clamp(32px, 4.4vw, 56px) !important;
+}
+
+/* ── Angle rail ── */
+#mrp .mrp-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Caps the rail at stage height and scrolls internally, so
+     adding a 12th angle never stretches the section. */
+  max-height: clamp(360px, 46vw, 620px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.18) transparent;
+  padding-right: 2px !important;
+}
+#mrp .mrp-rail::-webkit-scrollbar { width: 3px; }
+#mrp .mrp-rail::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); }
+
+/* [hidden] is how JS parks the off-variant thumbs, and the UA
+   sheet implements it as `display: none` — which `display: block`
+   below silently overrides, leaving all 14 angles in the rail.
+   This has to win against our own rule, hence the flag. */
+#mrp .mrp-thumb[hidden] { display: none !important; }
+
+#mrp .mrp-thumb {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--mrp-line) !important;
+  background: var(--mrp-ink-2) !important;
+  opacity: 0.5;
+  transition: opacity 0.35s var(--mrp-ease-quart),
+              border-color 0.35s var(--mrp-ease-quart);
+}
+#mrp .mrp-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--mrp-ease-expo);
+}
+#mrp .mrp-thumb:hover { opacity: 0.85; }
+#mrp .mrp-thumb:hover img { transform: scale(1.07); }
+#mrp .mrp-thumb.is-active {
+  opacity: 1;
+  border-color: var(--mrp-green) !important;
+  cursor: default;
+}
+#mrp .mrp-thumb:focus-visible { outline: 1.5px solid var(--mrp-gold); outline-offset: 2px; }
+
+/* ── Main viewer ── */
+#mrp .mrp-viewer {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--mrp-line) !important;
+  background:
+    radial-gradient(70% 58% at 50% 44%, rgba(255,255,255,0.05), transparent 72%),
+    var(--mrp-ink-3) !important;
+}
+
+/* Every angle ships as a real <img> in the markup — no JS src
+   swapping. That keeps all angles in the page for crawlers and
+   means a JS failure degrades to "first angle visible", not an
+   empty box. */
+#mrp .mrp-shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: clamp(16px, 3vw, 44px) !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.015);
+  transition: opacity var(--mrp-swap) var(--mrp-ease-quart),
+              transform 0.7s var(--mrp-ease-expo),
+              visibility 0s linear var(--mrp-swap);
+}
+#mrp .mrp-shot.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  transition: opacity var(--mrp-swap) var(--mrp-ease-quart),
+              transform 0.7s var(--mrp-ease-expo),
+              visibility 0s linear 0s;
+}
+
+/* Contact shadow. Grounds a cut-out PNG so the vehicle doesn't
+   float; harmless behind a photographic background. */
+#mrp .mrp-viewer::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 11%;
+  width: 62%;
+  height: 26px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.55), transparent 70%);
+  filter: blur(9px);
+  pointer-events: none;
+  z-index: 0;
+}
+#mrp .mrp-shot { z-index: 1; }
+
+#mrp .mrp-viewer__tag {
+  position: absolute;
+  left: clamp(14px, 2vw, 26px);
+  top: clamp(14px, 2vw, 26px);
+  z-index: 3;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: var(--mrp-dim-2) !important;
+}
+
+#mrp .mrp-viewer__angle {
+  position: absolute;
+  right: clamp(14px, 2vw, 26px);
+  bottom: clamp(14px, 2vw, 26px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62) !important;
+  font-variant-numeric: tabular-nums;
+}
+#mrp .mrp-viewer__angle b { color: var(--mrp-green) !important; font-weight: 700 !important; }
+
+/* ── Viewer arrows ── */
+#mrp .mrp-vnav {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--mrp-line-2) !important;
+  background: rgba(7,7,10,0.42) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(255,255,255,0.66);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(-50%) scale(0.94);
+  transition: opacity 0.35s ease, transform 0.35s var(--mrp-ease-expo),
+              color 0.28s ease, border-color 0.28s ease, background 0.28s ease;
+}
+#mrp .mrp-viewer:hover .mrp-vnav,
+#mrp .mrp-viewer:focus-within .mrp-vnav { opacity: 1; transform: translateY(-50%) scale(1); }
+#mrp .mrp-vnav:hover {
+  color: var(--mrp-green);
+  border-color: var(--mrp-green) !important;
+  background: rgba(7,7,10,0.66) !important;
+  transform: translateY(-50%) scale(1.08);
+}
+#mrp .mrp-vnav--prev { left: clamp(10px, 1.6vw, 18px); }
+#mrp .mrp-vnav--next { right: clamp(10px, 1.6vw, 18px); }
+#mrp .mrp-vnav svg { width: 15px !important; height: 15px !important; fill: none; stroke: currentColor; }
+#mrp .mrp-vnav:focus-visible { opacity: 1; transform: translateY(-50%) scale(1); outline: 1.5px solid var(--mrp-gold); outline-offset: 2px; }
+
+/* ── Missing-image state ──
+   An onerror hook flips this on. During handover a slot that has
+   no photo yet reads as a labelled placeholder instead of the
+   browser's broken-image glyph — the difference between "which
+   file is missing?" and knowing on sight. */
+#mrp .mrp-shot.is-missing,
+#mrp .mrp-thumb.is-missing img,
+#mrp .mrp-card__media img.is-missing { opacity: 0 !important; }
+
+#mrp .mrp-slot {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 12px !important;
+  text-align: center;
+  font-size: 8.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  line-height: 1.7 !important;
+  color: rgba(255,255,255,0.30) !important;
+  background:
+    repeating-linear-gradient(-45deg,
+      rgba(255,255,255,0.022) 0 10px,
+      transparent 10px 20px) !important;
+}
+/* In the viewer all 14 shots are stacked, so the slot label must
+   be gated on .is-shown too — otherwise every missing angle's
+   placeholder paints on top of the one you are looking at. */
+#mrp .is-missing > .mrp-slot,
+#mrp .mrp-shot.is-missing.is-shown + .mrp-slot { display: flex; }
+
+/* ────────────────────────────
+   STAT STRIP
+   The headline numbers, straight off the brochure's front panel.
+──────────────────────────── */
+#mrp .mrp-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: clamp(24px, 3vw, 40px) !important;
+  background: var(--mrp-line) !important;   /* the 1px gaps become hairlines */
+  border: 1px solid var(--mrp-line) !important;
+}
+
+#mrp .mrp-stat {
+  padding: clamp(18px, 2.2vw, 28px) clamp(12px, 1.6vw, 22px) !important;
+  background: var(--mrp-ink-2) !important;
+  transition: background 0.4s var(--mrp-ease-quart);
+}
+#mrp .mrp-stat:hover { background: #14141B !important; }
+
+#mrp .mrp-stat__v {
+  display: block;
+  font-size: clamp(21px, 2.5vw, 33px) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.8px;
+  color: #fff !important;
+  font-variant-numeric: tabular-nums;   /* count-up must not jitter */
+  margin-bottom: 9px !important;
+}
+#mrp .mrp-stat__v i {
+  font-style: normal;
+  font-size: 0.44em;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--mrp-green) !important;
+  margin-left: 3px;
+}
+#mrp .mrp-stat__k {
+  display: block;
+  font-size: 8.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  line-height: 1.6 !important;
+  color: var(--mrp-dim-2) !important;
+}
+
+/* ────────────────────────────
+   HIGHLIGHT CARDS
+──────────────────────────── */
+/* Explicit 3-up rather than auto-fit: there are six cards, and
+   auto-fit resolves to five at desktop width, stranding a lone
+   orphan on the second row. Three gives two full rows and lets
+   each detail photo run large enough to actually read. */
+#mrp .mrp-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.4vw, 18px);
+  margin-top: clamp(48px, 6vw, 84px) !important;
+}
+
+#mrp .mrp-card {
+  overflow: hidden;
+  border: 1px solid var(--mrp-line) !important;
+  background: var(--mrp-ink-2) !important;
+  transition: border-color 0.4s var(--mrp-ease-quart),
+              transform 0.5s var(--mrp-ease-expo);
+}
+#mrp .mrp-card:hover { border-color: var(--mrp-line-2) !important; transform: translateY(-4px); }
+
+#mrp .mrp-card__media {
+  position: relative;
+  aspect-ratio: 16 / 11;
+  overflow: hidden;
+  background: var(--mrp-ink-3) !important;
+}
+#mrp .mrp-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--mrp-ease-expo);
+}
+#mrp .mrp-card:hover .mrp-card__media img { transform: scale(1.06); }
+
+#mrp .mrp-card__body { padding: clamp(14px, 1.5vw, 20px) !important; }
+#mrp .mrp-card__t {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  color: #fff !important;
+  margin: 0 0 6px !important;
+}
+#mrp .mrp-card__s {
+  font-family: 'Noto Sans Devanagari', 'Montserrat', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 300 !important;
+  line-height: 1.75 !important;
+  color: var(--mrp-dim-2) !important;
+  margin: 0 !important;
+}
+
+/* ────────────────────────────
+   SPEC + FEATURE PANELS
+──────────────────────────── */
+#mrp .mrp-panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 48px);
+  margin-top: clamp(48px, 6vw, 84px) !important;
+}
+
+#mrp .mrp-panel__h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px !important;
+  margin-bottom: 4px !important;
+  border-bottom: 1px solid var(--mrp-line-2) !important;
+}
+#mrp .mrp-panel__t {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.8px;
+  text-transform: uppercase;
+  color: #fff !important;
+  margin: 0 !important;
+}
+#mrp .mrp-panel__n {
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--mrp-gold) !important;
+  white-space: nowrap;
+}
+
+/* ── Spec table ──
+   Rows animate in on scroll, staggered by an index the JS writes
+   as --mrp-i. Doing the stagger with a variable rather than 15
+   nth-child rules means adding a spec row needs no CSS change. */
+#mrp .mrp-spec tr {
+  border-bottom: 1px solid var(--mrp-line) !important;
+  opacity: 0;
+  transform: translateY(14px);
+}
+#mrp .mrp-panel.is-in .mrp-spec tr {
+  animation: mrp-rowIn 0.6s var(--mrp-ease-expo) both;
+  animation-delay: calc(var(--mrp-i, 0) * 38ms);
+}
+
+@keyframes mrp-rowIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+#mrp .mrp-spec th,
+#mrp .mrp-spec td { padding: 13px 4px !important; }
+
+#mrp .mrp-spec th {
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.3px;
+  color: var(--mrp-dim) !important;
+  width: 46%;
+}
+
+/* The Hindi gloss sits under the English label, not beside it —
+   inline it reads as one run-on string ("Motor power मोटर पावर")
+   and the eye can't find the row it wants. */
+#mrp .mrp-spec th [lang="hi"] {
+  display: block;
+  font-family: 'Noto Sans Devanagari', sans-serif !important;
+  font-size: 9.5px !important;
+  font-weight: 300 !important;
+  line-height: 1.6 !important;
+  color: rgba(255,255,255,0.30) !important;
+  margin-top: 1px !important;
+}
+#mrp .mrp-spec td {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  text-align: right;
+}
+#mrp .mrp-spec .mrp-na { color: rgba(255,255,255,0.22) !important; font-weight: 400 !important; }
+
+/* Values that differ per variant. Both are in the markup; the
+   inactive one is display:none, so the table has no layout shift
+   on switch and both variants are readable without JS. */
+#mrp .mrp-v { display: none; }
+#mrp[data-variant="auto"]  .mrp-v--auto,
+#mrp[data-variant="cargo"] .mrp-v--cargo { display: inline; }
+
+/* ── Feature matrix ── */
+#mrp .mrp-feat thead th {
+  padding: 0 4px 12px !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--mrp-dim-2) !important;
+  text-align: center;
+  white-space: nowrap;
+}
+#mrp .mrp-feat thead th:first-child { text-align: left; }
+
+/* The live column is picked out so the eye lands on it without
+   the other column having to disappear — buyers cross-shop. */
+#mrp[data-variant="auto"]  .mrp-feat .mrp-col--auto,
+#mrp[data-variant="cargo"] .mrp-feat .mrp-col--cargo { color: #fff !important; }
+
+#mrp .mrp-feat tbody tr { border-bottom: 1px solid var(--mrp-line) !important; }
+#mrp .mrp-feat tbody tr:hover { background: rgba(255,255,255,0.02) !important; }
+
+#mrp .mrp-feat td { padding: 11px 4px !important; font-size: 11.5px !important; }
+#mrp .mrp-feat td:first-child { color: rgba(255,255,255,0.86) !important; }
+#mrp .mrp-feat td.mrp-mark { text-align: center; width: 76px; }
+
+#mrp .mrp-mark span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+}
+#mrp .mrp-yes span { color: var(--mrp-green); border: 1px solid rgba(30,168,76,0.42); }
+#mrp .mrp-no  span { color: var(--mrp-red);   border: 1px solid rgba(192,72,63,0.34); }
+
+/* Marks in the inactive column recede rather than vanish. */
+#mrp[data-variant="auto"]  .mrp-feat td.mrp-mark--cargo span,
+#mrp[data-variant="cargo"] .mrp-feat td.mrp-mark--auto  span { opacity: 0.34; }
+
+/* ────────────────────────────
+   FOOTNOTE + CTA
+──────────────────────────── */
+#mrp .mrp-note {
+  margin-top: clamp(28px, 3vw, 40px) !important;
+  font-family: 'Noto Sans Devanagari', 'Montserrat', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 300 !important;
+  line-height: 1.9 !important;
+  color: rgba(255,255,255,0.28) !important;
+}
+
+#mrp .mrp-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(10px, 1.4vw, 18px);
+  margin-top: clamp(36px, 4.4vw, 60px) !important;
+  padding-top: clamp(30px, 3.6vw, 44px) !important;
+  border-top: 1px solid var(--mrp-line) !important;
+}
+
+#mrp .mrp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px clamp(22px, 2.6vw, 34px) !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 0.34s var(--mrp-ease-quart),
+              color 0.34s var(--mrp-ease-quart),
+              border-color 0.34s var(--mrp-ease-quart),
+              transform 0.34s var(--mrp-ease-expo);
+}
+#mrp .mrp-btn:hover { transform: translateY(-2px); }
+#mrp .mrp-btn:focus-visible { outline: 1.5px solid var(--mrp-gold); outline-offset: 3px; }
+
+#mrp .mrp-btn--primary {
+  color: #fff !important;
+  background: linear-gradient(135deg, var(--mrp-green), var(--mrp-green-d)) !important;
+}
+#mrp .mrp-btn--primary:hover { background: linear-gradient(135deg, #23BE58, var(--mrp-green)) !important; }
+
+#mrp .mrp-btn--ghost {
+  color: rgba(255,255,255,0.78) !important;
+  border: 1px solid var(--mrp-line-2) !important;
+}
+#mrp .mrp-btn--ghost:hover { color: #fff !important; border-color: var(--mrp-green) !important; }
+
+#mrp .mrp-btn .mrp-arr { display: inline-block; font-size: 12px !important; line-height: 1 !important; transition: transform 0.32s var(--mrp-ease-expo); }
+#mrp .mrp-btn:hover .mrp-arr { transform: translateX(4px); }
+
+#mrp .mrp-phone {
+  margin-left: auto !important;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: right;
+  font-size: 10px !important;
+  color: var(--mrp-dim-2) !important;
+}
+#mrp .mrp-phone a { color: #fff !important; font-weight: 600 !important; letter-spacing: 0.4px; transition: color 0.28s ease; }
+#mrp .mrp-phone a:hover { color: var(--mrp-green) !important; }
+#mrp .mrp-phone b { color: var(--mrp-dim-2) !important; font-weight: 500 !important; letter-spacing: 1.4px; text-transform: uppercase; font-size: 8.5px !important; }
+
+/* ────────────────────────────
+   ENTRANCE
+──────────────────────────── */
+#mrp .mrp-rise { opacity: 0; transform: translateY(26px); }
+#mrp .mrp-rise.is-in { animation: mrp-rise 0.9s var(--mrp-ease-expo) both; }
+
+@keyframes mrp-rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ────────────────────────────
+   REDUCED MOTION
+   Movement goes, state stays. !important is deliberate on the
+   reveal overrides: .mrp-panel.is-in .mrp-spec tr out-specifies a
+   bare selector, and losing that fight would leave the spec table
+   permanently at opacity 0 for exactly the users who can least
+   afford a blank panel.
+──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #mrp .mrp-rise,
+  #mrp .mrp-panel.is-in .mrp-spec tr,
+  #mrp .mrp-spec tr {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  #mrp .mrp-shot { transition-duration: 200ms, 0ms, 0ms; transform: none !important; }
+  #mrp .mrp-card:hover,
+  #mrp .mrp-btn:hover { transform: none; }
+  #mrp .mrp-card:hover .mrp-card__media img,
+  #mrp .mrp-thumb:hover img { transform: none; }
+  #mrp .mrp-switch__thumb { transition-duration: 0.01ms; }
+}
+
+/* ────────────────────────────
+   RESPONSIVE
+──────────────────────────── */
+@media (max-width: 1080px) {
+  #mrp .mrp-panels { grid-template-columns: minmax(0, 1fr); }
+  #mrp .mrp-stats  { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* The last row of a 5-into-3 grid leaves two cells; let them
+     share the width instead of stranding a gap. */
+  #mrp .mrp-stat:nth-child(4) { grid-column: span 2; }
+}
+
+@media (max-width: 860px) {
+  #mrp .mrp-head { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  #mrp .mrp-switch { width: 100%; }
+
+  /* Rail goes horizontal beneath the viewer — a vertical strip
+     of thumbnails is unusable at phone widths. */
+  #mrp .mrp-stage { grid-template-columns: minmax(0, 1fr); }
+  #mrp .mrp-viewer { grid-row: 1; }
+  #mrp .mrp-rail {
+    grid-row: 2;
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 6px !important;
+    scroll-snap-type: x mandatory;
+  }
+  #mrp .mrp-thumb { width: 84px; scroll-snap-align: start; }
+}
+
+@media (max-width: 860px) {
+  #mrp .mrp-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  #mrp .mrp-cards { grid-template-columns: minmax(0, 1fr); }
+  #mrp .mrp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #mrp .mrp-stat:nth-child(4) { grid-column: auto; }
+  #mrp .mrp-stat:nth-child(5) { grid-column: span 2; }
+  #mrp .mrp-viewer { aspect-ratio: 4 / 3; }
+  #mrp .mrp-cta { flex-direction: column; align-items: stretch; }
+  #mrp .mrp-btn { justify-content: center; }
+  #mrp .mrp-phone { margin-left: 0 !important; text-align: left; margin-top: 8px !important; }
+  #mrp .mrp-feat td.mrp-mark { width: 56px; }
+  #mrp .mrp-spec th { width: 52%; }
+}
+
+/* Coarse pointers get no hover-only affordances at any width. */
+@media (hover: none) {
+  #mrp .mrp-vnav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAYURI RATTAN L5 — PRODUCT SECTION
+
+     IMAGE SLOTS
+     Every <img> below carries a data-slot name. Replace the src
+     with your uploaded file and keep the alt text. Slots with no
+     file yet render as a labelled placeholder showing the slot
+     name, so nothing ever appears as a broken image.
+     Naming convention used here:
+       rattan-{auto|cargo}-{angle}.webp
+══════════════════════════════════════════════════════════════ -->
+<section id="mrp" data-variant="auto" aria-labelledby="mrpTitle">
+<div class="mrp-wrap">
+
+  <!-- ─────────── HEADER ─────────── -->
+  <header class="mrp-head mrp-rise">
+    <div>
+      <p class="mrp-eyebrow">Mayuri · L5 Electric Three-Wheeler</p>
+      <h2 class="mrp-h2" id="mrpTitle">Rattan <em>L5</em><br>Auto &amp; Cargo</h2>
+      <p class="mrp-lede">
+        भारत की पहली, आज भी सबसे बेहतर — साएरा की 40+ वर्षों की ऑटोमोबाइल विशेषज्ञता से निर्मित।<br>
+        One platform, two bodies: a 3+1 passenger auto and a 450&nbsp;kg-class cargo carrier,
+        both on the same 10.75&nbsp;kWh lithium driveline.
+      </p>
+    </div>
+
+    <!-- Variant switch. role=tablist so screen readers get the
+         "2 of 2" positional context for free. -->
+    <div class="mrp-switch" id="mrpSwitch" data-active="auto" role="tablist" aria-label="Choose variant">
+      <span class="mrp-switch__thumb" aria-hidden="true"></span>
+      <button class="mrp-switch__btn" type="button" role="tab" id="mrpTabAuto"
+              data-variant="auto" aria-selected="true" aria-controls="mrpStage">
+        Rattan L5 Auto
+        <span class="mrp-switch__hi">मयूरी रतन L5 ऑटो</span>
+      </button>
+      <button class="mrp-switch__btn" type="button" role="tab" id="mrpTabCargo"
+              data-variant="cargo" aria-selected="false" aria-controls="mrpStage" tabindex="-1">
+        Rattan L5 Cargo
+        <span class="mrp-switch__hi">मयूरी रतन L5 कार्गो</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─────────── STAGE ─────────── -->
+  <div class="mrp-stage mrp-rise" id="mrpStage" role="tabpanel" aria-labelledby="mrpTabAuto">
+
+    <!-- Angle rail. Both variants' thumbs live here; JS shows the
+         set matching the active variant. -->
+    <div class="mrp-rail" id="mrpRail" role="listbox" aria-label="Vehicle angles">
+
+      <!-- ══ AUTO ANGLES ══ -->
+      <button class="mrp-thumb is-active" type="button" role="option" aria-selected="true"
+              data-for="auto" data-angle="Front 3/4">
+        <img data-slot="rattan-auto-front34" alt="Mayuri Rattan L5 Auto, front three-quarter view"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front34.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Front 3/4</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="auto" data-angle="Front">
+        <img data-slot="rattan-auto-front" alt="Mayuri Rattan L5 Auto, front view"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Front</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="auto" data-angle="Side">
+        <img data-slot="rattan-auto-side" alt="Mayuri Rattan L5 Auto, side profile"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-side.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Side</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="auto" data-angle="Rear 3/4">
+        <img data-slot="rattan-auto-rear34" alt="Mayuri Rattan L5 Auto, rear three-quarter view"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear34.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Rear 3/4</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="auto" data-angle="Rear">
+        <img data-slot="rattan-auto-rear" alt="Mayuri Rattan L5 Auto, rear view with passenger cabin"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Rear</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="auto" data-angle="Cabin">
+        <img data-slot="rattan-auto-cabin" alt="Mayuri Rattan L5 Auto passenger cabin and seating"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-cabin.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Cabin</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="auto" data-angle="Dashboard">
+        <img data-slot="rattan-auto-dash" alt="Mayuri Rattan L5 Auto full dashboard with digital speedometer"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-dash.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Dashboard</span>
+      </button>
+
+      <!-- ══ CARGO ANGLES ══ -->
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="cargo" data-angle="Front 3/4" hidden>
+        <img data-slot="rattan-cargo-front34" alt="Mayuri Rattan L5 Cargo, front three-quarter view"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-front34.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Front 3/4</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="cargo" data-angle="Front" hidden>
+        <img data-slot="rattan-cargo-front" alt="Mayuri Rattan L5 Cargo, front view"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-front.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Front</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="cargo" data-angle="Side" hidden>
+        <img data-slot="rattan-cargo-side" alt="Mayuri Rattan L5 Cargo, side profile showing 4 by 6 foot deck"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-side.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Side</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="cargo" data-angle="Rear 3/4" hidden>
+        <img data-slot="rattan-cargo-rear34" alt="Mayuri Rattan L5 Cargo, rear three-quarter view"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-rear34.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Rear 3/4</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="cargo" data-angle="Deck open" hidden>
+        <img data-slot="rattan-cargo-deck-open" alt="Mayuri Rattan L5 Cargo with three-side opening deck dropped"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-deck-open.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Deck open</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="cargo" data-angle="Loaded" hidden>
+        <img data-slot="rattan-cargo-loaded" alt="Mayuri Rattan L5 Cargo loaded with boxes"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-loaded.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Loaded</span>
+      </button>
+      <button class="mrp-thumb" type="button" role="option" aria-selected="false"
+              data-for="cargo" data-angle="Dashboard" hidden>
+        <img data-slot="rattan-cargo-dash" alt="Mayuri Rattan L5 Cargo dashboard and hard top cabin"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-dash.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Dashboard</span>
+      </button>
+    </div>
+
+    <!-- Main viewer. Every angle is a real <img> in the DOM; JS
+         only toggles .is-shown, so no-JS shows the first angle. -->
+    <div class="mrp-viewer" id="mrpViewer">
+      <span class="mrp-viewer__tag" id="mrpTag">Rattan L5 Auto</span>
+
+      <img class="mrp-shot is-shown" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front34.webp" alt="Mayuri Rattan L5 Auto, front three-quarter view" data-slot="rattan-auto-front34" decoding="async"><span class="mrp-slot">Slot · rattan-auto-front34</span>
+      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-front.webp" alt="Mayuri Rattan L5 Auto, front view" data-slot="rattan-auto-front" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-front</span>
+      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-side.webp" alt="Mayuri Rattan L5 Auto, side profile" data-slot="rattan-auto-side" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-side</span>
+      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear34.webp" alt="Mayuri Rattan L5 Auto, rear three-quarter view" data-slot="rattan-auto-rear34" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-rear34</span>
+      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-rear.webp" alt="Mayuri Rattan L5 Auto, rear view with passenger cabin" data-slot="rattan-auto-rear" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-rear</span>
+      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-cabin.webp" alt="Mayuri Rattan L5 Auto passenger cabin and seating" data-slot="rattan-auto-cabin" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-cabin</span>
+      <img class="mrp-shot" data-for="auto" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-auto-dash.webp" alt="Mayuri Rattan L5 Auto full dashboard with digital speedometer" data-slot="rattan-auto-dash" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-auto-dash</span>
+
+      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-front34.webp" alt="Mayuri Rattan L5 Cargo, front three-quarter view" data-slot="rattan-cargo-front34" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-front34</span>
+      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-front.webp" alt="Mayuri Rattan L5 Cargo, front view" data-slot="rattan-cargo-front" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-front</span>
+      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-side.webp" alt="Mayuri Rattan L5 Cargo, side profile showing 4 by 6 foot deck" data-slot="rattan-cargo-side" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-side</span>
+      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-rear34.webp" alt="Mayuri Rattan L5 Cargo, rear three-quarter view" data-slot="rattan-cargo-rear34" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-rear34</span>
+      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-deck-open.webp" alt="Mayuri Rattan L5 Cargo with three-side opening deck dropped" data-slot="rattan-cargo-deck-open" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-deck-open</span>
+      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-loaded.webp" alt="Mayuri Rattan L5 Cargo loaded with boxes" data-slot="rattan-cargo-loaded" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-loaded</span>
+      <img class="mrp-shot" data-for="cargo" src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-cargo-dash.webp" alt="Mayuri Rattan L5 Cargo dashboard and hard top cabin" data-slot="rattan-cargo-dash" loading="lazy" decoding="async"><span class="mrp-slot">Slot · rattan-cargo-dash</span>
+
+      <button class="mrp-vnav mrp-vnav--prev" id="mrpPrev" type="button" aria-label="Previous angle">
+        <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="mrp-vnav mrp-vnav--next" id="mrpNext" type="button" aria-label="Next angle">
+        <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <span class="mrp-viewer__angle"><b id="mrpAngle">Front 3/4</b> · <span id="mrpCount">1 / 7</span></span>
+    </div>
+  </div>
+
+  <!-- ─────────── STAT STRIP ───────────
+       data-to / data-suffix drive the scroll-triggered count-up.
+       The element's text is the finished value, so it is correct
+       before JS runs and correct if JS never runs. -->
+  <div class="mrp-stats mrp-rise" id="mrpStats">
+    <div class="mrp-stat">
+      <span class="mrp-stat__v"><span data-to="180">180</span><i>km</i></span>
+      <span class="mrp-stat__k">Range per charge<br>160–180 किमी</span>
+    </div>
+    <div class="mrp-stat">
+      <span class="mrp-stat__v"><span data-to="3.5" data-dec="1">3.5</span><i>kW</i></span>
+      <span class="mrp-stat__k">Peak motor power<br>पीक पावर</span>
+    </div>
+    <div class="mrp-stat">
+      <span class="mrp-stat__v"><span data-to="10.75" data-dec="2">10.75</span><i>kWh</i></span>
+      <span class="mrp-stat__k">Lithium-ion pack<br>लिथियम बैटरी</span>
+    </div>
+    <div class="mrp-stat">
+      <span class="mrp-stat__v"><span data-to="40">40</span><i>+ km/h</i></span>
+      <span class="mrp-stat__k">Top speed<br>टॉप स्पीड</span>
+    </div>
+    <!-- The one stat that genuinely differs between the two
+         bodies. Both spans are in the markup; CSS shows one. -->
+    <div class="mrp-stat">
+      <span class="mrp-stat__v">
+        <span class="mrp-v mrp-v--auto"><span data-to="3">3</span><i>+ driver</i></span>
+        <span class="mrp-v mrp-v--cargo"><span data-to="450">450</span><i>+ kg</i></span>
+      </span>
+      <span class="mrp-stat__k">
+        <span class="mrp-v mrp-v--auto">Seating capacity<br>सीटिंग कैपेसिटी</span>
+        <span class="mrp-v mrp-v--cargo">Load capacity<br>लोड क्षमता</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ─────────── HIGHLIGHT CARDS ─────────── -->
+  <div class="mrp-cards mrp-rise">
+    <article class="mrp-card">
+      <div class="mrp-card__media">
+        <img data-slot="rattan-detail-motor" alt="3.5 kW peak BLDC motor"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-detail-motor.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Slot · rattan-detail-motor</span>
+      </div>
+      <div class="mrp-card__body">
+        <h3 class="mrp-card__t">3.5 kW Peak Power</h3>
+        <p class="mrp-card__s">3.5 किलोवाट पीक पावर — भरे लोड पर भी ढाल चढ़ने की ताकत।</p>
+      </div>
+    </article>
+
+    <article class="mrp-card">
+      <div class="mrp-card__media">
+        <img data-slot="rattan-detail-battery" alt="10.75 kWh lithium-ion prismatic cell battery pack"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-detail-battery.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Slot · rattan-detail-battery</span>
+      </div>
+      <div class="mrp-card__body">
+        <h3 class="mrp-card__t">10.75 kWh Lithium Pack</h3>
+        <p class="mrp-card__s">प्रिज़मैटिक सेल बैटरी पैक — 160–180 किमी प्रति चार्ज।</p>
+      </div>
+    </article>
+
+    <article class="mrp-card">
+      <div class="mrp-card__media">
+        <img data-slot="rattan-detail-cluster" alt="Digital speedometer instrument cluster"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-detail-cluster.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Slot · rattan-detail-cluster</span>
+      </div>
+      <div class="mrp-card__body">
+        <h3 class="mrp-card__t">Digital Speedometer</h3>
+        <p class="mrp-card__s">डिजिटल स्पीडोमीटर के साथ ऑटो-स्टाइल फुल डैशबोर्ड।</p>
+      </div>
+    </article>
+
+    <article class="mrp-card">
+      <div class="mrp-card__media">
+        <img data-slot="rattan-detail-deck" alt="Three-side opening cargo deck"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-detail-deck.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Slot · rattan-detail-deck</span>
+      </div>
+      <div class="mrp-card__body">
+        <h3 class="mrp-card__t">Three-Side Opening Deck</h3>
+        <p class="mrp-card__s">तीन तरफ से खुलने वाला 4 × 6 फीट कार्गो बॉडी — तेज़ लोडिंग।</p>
+      </div>
+    </article>
+
+    <article class="mrp-card">
+      <div class="mrp-card__media">
+        <img data-slot="rattan-detail-suspension" alt="Heavy-duty telescopic front and leaf spring rear suspension"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-detail-suspension.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Slot · rattan-detail-suspension</span>
+      </div>
+      <div class="mrp-card__body">
+        <h3 class="mrp-card__t">Heavy-Duty Suspension</h3>
+        <p class="mrp-card__s">हेवी-ड्यूटी फ्रंट और रियर सस्पेंशन — 200 मिमी ग्राउंड क्लीयरेंस।</p>
+      </div>
+    </article>
+
+    <article class="mrp-card">
+      <div class="mrp-card__media">
+        <img data-slot="rattan-detail-lights" alt="LED headlights with daytime running lamps"
+             src="https://ddfintech.net/wp-content/uploads/2026/07/rattan-detail-lights.webp" loading="lazy" decoding="async">
+        <span class="mrp-slot">Slot · rattan-detail-lights</span>
+      </div>
+      <div class="mrp-card__body">
+        <h3 class="mrp-card__t">LED Headlights with DRL</h3>
+        <p class="mrp-card__s">डीआरएल सहित एलईडी हेडलाइट्स और मोटराइज्ड वाइपर।</p>
+      </div>
+    </article>
+  </div>
+
+  <!-- ─────────── SPEC + FEATURE PANELS ─────────── -->
+  <div class="mrp-panels">
+
+    <!-- ══ SPECIFICATIONS ══ -->
+    <section class="mrp-panel mrp-rise" aria-labelledby="mrpSpecT">
+      <div class="mrp-panel__h">
+        <h3 class="mrp-panel__t" id="mrpSpecT">Specifications</h3>
+        <span class="mrp-panel__n">
+          <span class="mrp-v mrp-v--auto">Rattan L5 Auto</span>
+          <span class="mrp-v mrp-v--cargo">Rattan L5 Cargo</span>
+        </span>
+      </div>
+      <table class="mrp-spec">
+        <tbody>
+          <tr><th scope="row">Motor power <span lang="hi">मोटर पावर</span></th><td>3.5 kW (peak)</td></tr>
+          <tr><th scope="row">Top speed <span lang="hi">टॉप स्पीड</span></th><td>40+ km/h</td></tr>
+          <tr><th scope="row">Battery <span lang="hi">बैटरी</span></th><td>10.75 kWh Lithium-ion</td></tr>
+          <tr><th scope="row">Range <span lang="hi">रेंज</span></th><td>160–180 km per charge*</td></tr>
+          <tr><th scope="row">Front suspension <span lang="hi">फ्रंट सस्पेंशन</span></th><td>Telescopic</td></tr>
+          <tr><th scope="row">Rear suspension <span lang="hi">रियर सस्पेंशन</span></th><td>Leaf spring</td></tr>
+          <tr><th scope="row">Brakes (front &amp; rear) <span lang="hi">ब्रेक</span></th><td>Hydraulic</td></tr>
+          <tr>
+            <th scope="row">L × W × H <span lang="hi">लंबाई × चौड़ाई × ऊँचाई</span></th>
+            <td>
+              <span class="mrp-v mrp-v--auto">2880 × 1210 × 1860 mm</span>
+              <span class="mrp-v mrp-v--cargo">3620 × 1270 × 1720 mm</span>
+            </td>
+          </tr>
+          <tr><th scope="row">Ground clearance <span lang="hi">ग्राउंड क्लीयरेंस</span></th><td>200 mm</td></tr>
+          <tr>
+            <th scope="row">Chassis &amp; roof <span lang="hi">चेसिस व रूफ</span></th>
+            <td>
+              <span class="mrp-v mrp-v--auto">Mild steel &amp; chequered plate</span>
+              <span class="mrp-v mrp-v--cargo">Mild steel</span>
+            </td>
+          </tr>
+          <tr><th scope="row">Frame <span lang="hi">फ्रेम</span></th><td>Mild steel</td></tr>
+          <tr><th scope="row">Tyre size <span lang="hi">टायर साइज</span></th><td>4.00-12 inch</td></tr>
+          <tr><th scope="row">Rim size <span lang="hi">रिम साइज</span></th><td>12 inch</td></tr>
+          <tr>
+            <th scope="row">Cargo box size <span lang="hi">कार्गो बॉक्स साइज</span></th>
+            <td>
+              <span class="mrp-v mrp-v--auto mrp-na">Not applicable</span>
+              <span class="mrp-v mrp-v--cargo">4 × 6 feet</span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Seating capacity <span lang="hi">सीटिंग कैपेसिटी</span></th>
+            <td>
+              <span class="mrp-v mrp-v--auto">3 + driver</span>
+              <span class="mrp-v mrp-v--cargo">Driver only</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ══ FEATURES ══
+         Both columns stay visible: buyers cross-shop the two
+         bodies, and hiding the other column is what forces the
+         back-and-forth this table exists to prevent. -->
+    <section class="mrp-panel mrp-rise" aria-labelledby="mrpFeatT">
+      <div class="mrp-panel__h">
+        <h3 class="mrp-panel__t" id="mrpFeatT">Features</h3>
+        <span class="mrp-panel__n">Auto vs Cargo</span>
+      </div>
+      <table class="mrp-feat">
+        <thead>
+          <tr>
+            <th scope="col">Feature · फीचर्स</th>
+            <th scope="col" class="mrp-col--auto">Auto</th>
+            <th scope="col" class="mrp-col--cargo">Cargo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Prismatic cell battery pack</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+          <tr><td>Auto-style full dashboard</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+          <tr><td>Auto-style front fascia</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+          <tr><td>Passenger half-doors</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-no"><span aria-label="No">✕</span></td></tr>
+          <tr><td>Central locking system</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+          <tr><td>Driver &amp; passenger floor mat</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-no"><span aria-label="No">✕</span></td></tr>
+          <tr><td>LED headlights with DRL</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+          <tr><td>Lockable driver glove box</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+          <tr><td>Passenger cabin light</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-no"><span aria-label="No">✕</span></td></tr>
+          <tr><td>Passenger curtains</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-no"><span aria-label="No">✕</span></td></tr>
+          <tr><td>Passenger grab handle</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-no"><span aria-label="No">✕</span></td></tr>
+          <tr><td>Reverse buzzer</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+          <tr><td>Motorised wiper</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+          <tr><td>Soft top roof</td><td class="mrp-mark mrp-mark--auto mrp-yes"><span aria-label="Yes">✓</span></td><td class="mrp-mark mrp-mark--cargo mrp-no"><span aria-label="No">✕</span></td></tr>
+          <tr><td>Hard top roof</td><td class="mrp-mark mrp-mark--auto mrp-no"><span aria-label="No">✕</span></td><td class="mrp-mark mrp-mark--cargo mrp-yes"><span aria-label="Yes">✓</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <p class="mrp-note">* रेंज सड़क पर स्थित परिस्थितियों के अधीन। — Range is subject to road and load conditions.</p>
+
+  <!-- ─────────── CTA ─────────── -->
+  <div class="mrp-cta mrp-rise">
+    <a class="mrp-btn mrp-btn--primary" href="#enquiry">Book a Test Ride <span class="mrp-arr" aria-hidden="true">→</span></a>
+    <a class="mrp-btn mrp-btn--ghost" href="#brochure">Download Brochure</a>
+    <a class="mrp-btn mrp-btn--ghost" href="#dealers">Find a Dealer</a>
+    <div class="mrp-phone">
+      <span><b>Sales</b> <a href="tel:+919220508868">+91 922-050-8868</a></span>
+      <span><b>Service</b> <a href="tel:+919319696898">+91 931-9696-898</a></span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Screen-reader announcement channel, kept out of the visual design. -->
+<p id="mrpLive" aria-live="polite" aria-atomic="true"
+   style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"></p>
+</section>
+
+
+<script>
+(function () {
+  'use strict';
+
+  var root = document.getElementById('mrp');
+  if (!root) return;
+
+  var viewer  = document.getElementById('mrpViewer');
+  var rail    = document.getElementById('mrpRail');
+  var sw      = document.getElementById('mrpSwitch');
+  var tagEl   = document.getElementById('mrpTag');
+  var angleEl = document.getElementById('mrpAngle');
+  var countEl = document.getElementById('mrpCount');
+  var live    = document.getElementById('mrpLive');
+
+  var thumbs = Array.prototype.slice.call(rail.querySelectorAll('.mrp-thumb'));
+  var shots  = Array.prototype.slice.call(viewer.querySelectorAll('.mrp-shot'));
+  var tabs   = Array.prototype.slice.call(sw.querySelectorAll('.mrp-switch__btn'));
+
+  var LABEL = { auto: 'Rattan L5 Auto', cargo: 'Rattan L5 Cargo' };
+
+  var variant = root.getAttribute('data-variant') || 'auto';
+  var angle   = 0;   /* index within the active variant's set */
+
+  function setOf(v) {
+    return thumbs.filter(function (t) { return t.getAttribute('data-for') === v; });
+  }
+  function shotsOf(v) {
+    return shots.filter(function (s) { return s.getAttribute('data-for') === v; });
+  }
+
+  /* ── MISSING IMAGES ────────────────────────────────────────
+     A slot with no uploaded photo yet gets flagged rather than
+     left as a broken-image glyph. `complete && !naturalWidth`
+     catches images that already failed before this script ran —
+     an error listener alone misses those entirely. */
+  function flag(img) {
+    img.classList.add('is-missing');
+    var p = img.parentNode;
+    if (p && p.classList && (p.classList.contains('mrp-thumb') || p.classList.contains('mrp-card__media'))) {
+      p.classList.add('is-missing');
+    }
+  }
+  function unflag(img) {
+    img.classList.remove('is-missing');
+    var p = img.parentNode;
+    if (p && p.classList) p.classList.remove('is-missing');
+  }
+
+  Array.prototype.forEach.call(root.querySelectorAll('img[data-slot]'), function (img) {
+    if (img.complete && !img.naturalWidth) flag(img);
+    img.addEventListener('error', function () { flag(img); });
+    /* Clearing on load matters for lazy slots and for any later
+       src swap: without it a slot that failed once keeps its
+       placeholder even after the real photo arrives. */
+    img.addEventListener('load', function () { if (img.naturalWidth) unflag(img); });
+  });
+
+  /* ── ANGLE ─────────────────────────────────────────────────
+     Nothing is created or destroyed: every angle for both
+     variants is already in the DOM, so this only moves classes
+     around and the crossfade is a pure opacity transition. */
+  function showAngle(i, announce) {
+    var set = setOf(variant);
+    var sSet = shotsOf(variant);
+    if (!set.length) return;
+
+    i = ((i % set.length) + set.length) % set.length;
+    angle = i;
+
+    set.forEach(function (t, n) {
+      var on = n === i;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    sSet.forEach(function (s, n) { s.classList.toggle('is-shown', n === i); });
+
+    var name = set[i].getAttribute('data-angle') || '';
+    angleEl.textContent = name;
+    countEl.textContent = (i + 1) + ' / ' + set.length;
+
+    /* Keep the active thumb in view when the rail scrolls — on
+       mobile it is a horizontal strip and the active one can sit
+       well off-screen after a keyboard or arrow step. */
+    if (set[i].scrollIntoView) {
+      try { set[i].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); }
+      catch (e) { set[i].scrollIntoView(false); }
+    }
+
+    if (announce) live.textContent = LABEL[variant] + ', ' + name + ', ' + (i + 1) + ' of ' + set.length;
+  }
+
+  /* ── VARIANT ───────────────────────────────────────────────
+     `hidden` on the off-variant thumbs rather than a class: it
+     takes them out of the accessibility tree and the tab order
+     in one attribute, which display:none alone would not
+     guarantee against a theme that resets it. */
+  function setVariant(v, announce) {
+    if (v === variant) return;
+    variant = v;
+
+    root.setAttribute('data-variant', v);
+    sw.setAttribute('data-active', v);
+
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('data-variant') === v;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+    });
+
+    thumbs.forEach(function (t) { t.hidden = t.getAttribute('data-for') !== v; });
+    shots.forEach(function (s) {
+      if (s.getAttribute('data-for') !== v) s.classList.remove('is-shown');
+    });
+
+    tagEl.textContent = LABEL[v];
+    document.getElementById('mrpStage')
+            .setAttribute('aria-labelledby', v === 'auto' ? 'mrpTabAuto' : 'mrpTabCargo');
+
+    /* Reset to the hero angle. Carrying the index across would
+       land on "Deck open" when switching from the auto's
+       "Cabin" — same slot, unrelated shot. */
+    showAngle(0, false);
+
+    if (announce) live.textContent = LABEL[v] + ' selected';
+  }
+
+  /* ── CONTROLS ── */
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { setVariant(t.getAttribute('data-variant'), true); });
+  });
+
+  /* Roving tabindex — the pattern screen-reader users expect
+     from role=tablist. */
+  sw.addEventListener('keydown', function (e) {
+    var i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    var n = null;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = (i + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (i - 1 + tabs.length) % tabs.length;
+    else if (e.key === 'Home') n = 0;
+    else if (e.key === 'End') n = tabs.length - 1;
+    if (n === null) return;
+    e.preventDefault();
+    tabs[n].focus();
+    setVariant(tabs[n].getAttribute('data-variant'), true);
+  });
+
+  thumbs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      showAngle(setOf(variant).indexOf(t), true);
+    });
+  });
+
+  document.getElementById('mrpPrev').addEventListener('click', function () { showAngle(angle - 1, true); });
+  document.getElementById('mrpNext').addEventListener('click', function () { showAngle(angle + 1, true); });
+
+  /* Left/Right only. Up/Down must stay with the page — stealing
+     them breaks scrolling while the rail has focus. */
+  rail.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); showAngle(angle + 1, true); setOf(variant)[angle].focus(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); showAngle(angle - 1, true); setOf(variant)[angle].focus(); }
+  });
+
+  /* ── SWIPE ──
+     Bails on a vertical gesture so page scrolling is never
+     hijacked. */
+  var tx = 0, ty = 0, tid = null;
+
+  viewer.addEventListener('touchstart', function (e) {
+    if (tid !== null) return;
+    var t = e.changedTouches[0];
+    tid = t.identifier; tx = t.clientX; ty = t.clientY;
+  }, { passive: true });
+
+  viewer.addEventListener('touchend', function (e) {
+    var t = null, i;
+    for (i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === tid) { t = e.changedTouches[i]; break; }
+    }
+    tid = null;
+    if (!t) return;
+    var dx = t.clientX - tx, dy = t.clientY - ty;
+    if (Math.abs(dx) > Math.abs(dy) * 1.6 && Math.abs(dx) > 44) showAngle(angle + (dx < 0 ? 1 : -1), true);
+  }, { passive: true });
+
+  viewer.addEventListener('touchcancel', function () { tid = null; }, { passive: true });
+
+  /* ── SCROLL REVEAL ─────────────────────────────────────────
+     Spec rows get their stagger index as a custom property, so
+     adding a row needs no CSS change. */
+  Array.prototype.forEach.call(root.querySelectorAll('.mrp-spec tr'), function (tr, i) {
+    tr.style.setProperty('--mrp-i', i);
+  });
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('is-in');
+        if (en.target.id === 'mrpStats') countUp(en.target);
+        io.unobserve(en.target);           /* fire once, then stop */
+      });
+    }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
+
+    Array.prototype.forEach.call(root.querySelectorAll('.mrp-rise, .mrp-panel'), function (el) { io.observe(el); });
+  } else {
+    /* No IO, or reduced motion: everything is simply present. */
+    Array.prototype.forEach.call(root.querySelectorAll('.mrp-rise, .mrp-panel'), function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ── COUNT-UP ──
+     Decorative only — the markup already holds the final value,
+     so this never invents a number and a JS failure leaves the
+     correct figure on screen. */
+  function countUp(scope) {
+    Array.prototype.forEach.call(scope.querySelectorAll('[data-to]'), function (el) {
+      var to  = parseFloat(el.getAttribute('data-to'));
+      var dec = parseInt(el.getAttribute('data-dec') || '0', 10);
+      if (isNaN(to)) return;
+
+      var dur = 1150, t0 = null;
+      function step(ts) {
+        if (t0 === null) t0 = ts;
+        var p = Math.min((ts - t0) / dur, 1);
+        var e = 1 - Math.pow(1 - p, 3);          /* easeOutCubic */
+        el.textContent = (to * e).toFixed(dec);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = to.toFixed(dec);   /* land exact, never 179.98 */
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  /* ── BOOT ──
+     Hide the off-variant thumbs and sync the counter. The first
+     auto angle already ships with is-shown/is-active, so this
+     causes no flash. */
+  thumbs.forEach(function (t) { t.hidden = t.getAttribute('data-for') !== variant; });
+  showAngle(0, false);
+}());
+</script>
+
+</body>
+</html>
