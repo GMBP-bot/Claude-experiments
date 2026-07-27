@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAERA Golf Carts — Video Hero</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Poster comes from YouTube's image CDN, so warm that connection
+     early. The player origins are only reached if someone actually
+     presses play, which is the whole point of the facade below. -->
+<link rel="preconnect" href="https://i.ytimg.com" crossorigin>
+<link rel="preload" as="image" href="https://i.ytimg.com/vi/KRH5OZfSsGA/maxresdefault.jpg">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   SAERA GOLF CARTS — VIDEO HERO
+
+   Scoped to #sgh. Custom properties are --sgh-* and declared on
+   #sgh rather than :root, and every @keyframes name is
+   sgh-prefixed. Both are global namespaces — a host theme that
+   also defines `pulse` or `--green` would otherwise silently
+   hijack ours.
+
+   THE VIDEO IS A FACADE.
+   A raw YouTube embed pulls roughly a megabyte of third-party
+   JavaScript on page load and paints its own title bar, logo and
+   share buttons over your design. Here the section ships a poster
+   image and a real <button>; the iframe is built only when
+   somebody presses play. The page loads faster, the card looks
+   designed rather than embedded, and nothing is requested from
+   Google until there is intent.
+
+   SPACING
+   One scale, used everywhere: --sgh-gap and its multiples. Every
+   vertical rhythm in the section is a multiple of it, which is
+   what stops padding from drifting between blocks.
+══════════════════════════════════════════════════════════════ */
+
+html, body { margin: 0; padding: 0; }
+
+#sgh {
+  --sgh-ink:    #08090B;
+  --sgh-ink-2:  #101216;
+  --sgh-green:  #16B24A;
+  --sgh-green-d:#0C7F33;
+
+  --sgh-white:  #FFFFFF;
+  --sgh-body:   rgba(255,255,255,0.62);
+  --sgh-meta:   rgba(255,255,255,0.38);
+  --sgh-line:   rgba(255,255,255,0.12);
+
+  --sgh-gap:    12px;   /* the whole spacing scale derives from this */
+  --sgh-r:      16px;
+
+  --sgh-ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
+  --sgh-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ────────────────────────────
+   SCOPED RESET
+   Sits above every component rule, all of which are #sgh-scoped
+   and therefore at least as specific — so this never fights our
+   own CSS, only the host theme's.
+──────────────────────────── */
+#sgh, #sgh *, #sgh *::before, #sgh *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  list-style: none;
+}
+
+/* Buttons and links are where themes hit hardest, and these
+   !important flags are the minimum needed to beat theme rules
+   that are themselves !important — specificity alone loses to
+   those. `button { background: #e6e6e6 !important }` is exactly
+   what would paint the play button as a grey box. */
+#sgh button,
+#sgh a {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none !important;
+  text-align: inherit;
+  line-height: normal;
+  width: auto;
+  height: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#sgh button::before,
+#sgh button::after { content: none; display: none; }
+
+#sgh img,
+#sgh iframe { display: block; max-width: 100%; }
+
+/* ────────────────────────────
+   SECTION SHELL
+   Vertical padding is 8× and 7× the scale; horizontal clamps
+   between a comfortable phone gutter and a desktop margin that
+   keeps the content off the viewport edge at any width.
+──────────────────────────── */
+#sgh {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: clamp(56px, 7vw, 96px) clamp(20px, 5vw, 72px) !important;
+  border: 0 !important;
+  overflow: hidden;
+  background: var(--sgh-ink) !important;
+  isolation: isolate;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--sgh-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Two soft washes keep a near-black section from reading flat.
+   pointer-events:none so they never intercept a click. */
+#sgh::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(1000px 560px at 82% 8%,  rgba(22,178,74,0.16), transparent 62%),
+    radial-gradient(760px  480px at 4%  96%, rgba(22,178,74,0.07), transparent 60%);
+  pointer-events: none;
+}
+
+#sgh .sgh-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto !important;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  align-items: center;
+  gap: clamp(32px, 4.5vw, 72px);
+}
+
+/* ════════════════════════════
+   VIDEO CARD
+════════════════════════════ */
+#sgh .sgh-video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--sgh-r) !important;
+  background: var(--sgh-ink-2) !important;
+  /* Layered rather than one big blur: the tight shadow defines
+     the edge, the wide one gives the card its lift. A single
+     shadow can do one or the other, not both. */
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.34),
+    0 24px 60px rgba(0,0,0,0.46),
+    0 0 0 1px rgba(255,255,255,0.06) !important;
+}
+
+#sgh .sgh-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 0.9s var(--sgh-ease-expo), filter 0.6s ease;
+}
+#sgh .sgh-facade:hover .sgh-poster { transform: scale(1.06); }
+
+/* Scrim. Weighted to the bottom so the meta row stays legible
+   over a bright frame without dulling the whole poster. */
+#sgh .sgh-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(8,9,11,0.82) 0%, rgba(8,9,11,0.10) 46%, rgba(8,9,11,0.22) 100%);
+  pointer-events: none;
+  transition: opacity 0.5s var(--sgh-ease-quart);
+}
+#sgh .sgh-facade:hover .sgh-scrim { opacity: 0.86; }
+
+/* The facade button covers the whole card, so the entire poster
+   is the hit area rather than just the glyph. */
+#sgh .sgh-facade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+#sgh .sgh-facade:focus-visible { outline: 3px solid var(--sgh-green); outline-offset: -3px; }
+
+/* ── Play glyph ── */
+#sgh .sgh-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(64px, 6.5vw, 88px);
+  height: clamp(64px, 6.5vw, 88px);
+  border-radius: 50%;
+  background: var(--sgh-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 34px rgba(22,178,74,0.42);
+  transition: transform 0.45s var(--sgh-ease-expo), background 0.35s ease;
+}
+#sgh .sgh-facade:hover .sgh-play { transform: translate(-50%, -50%) scale(1.09); background: #1ACC56; }
+#sgh .sgh-facade:active .sgh-play { transform: translate(-50%, -50%) scale(1.02); }
+
+/* Optical centring: a triangle's visual centre sits left of its
+   bounding box, so nudge it right or it reads off-centre. */
+#sgh .sgh-play svg {
+  width: 34%;
+  height: 34%;
+  fill: #fff;
+  margin-left: 8%;
+}
+
+/* Expanding ring. Purely decorative, so it is the first thing
+   reduced-motion drops. */
+#sgh .sgh-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(64px, 6.5vw, 88px);
+  height: clamp(64px, 6.5vw, 88px);
+  border-radius: 50%;
+  border: 1.5px solid rgba(22,178,74,0.55) !important;
+  transform: translate(-50%, -50%);
+  animation: sgh-ring 2.6s var(--sgh-ease-quart) infinite;
+  pointer-events: none;
+}
+
+@keyframes sgh-ring {
+  0%   { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  70%  { opacity: 0;   transform: translate(-50%, -50%) scale(1.7); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scale(1.7); }
+}
+
+/* ── Card meta row ── */
+#sgh .sgh-meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sgh-gap);
+  padding: calc(var(--sgh-gap) * 1.75) calc(var(--sgh-gap) * 2) !important;
+  pointer-events: none;
+}
+
+#sgh .sgh-meta__t {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.88) !important;
+}
+
+#sgh .sgh-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.12) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px;
+  color: #fff !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+#sgh .sgh-chip::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sgh-green);
+  flex: 0 0 auto;
+}
+
+/* ── The real player, injected on click ── */
+#sgh .sgh-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ════════════════════════════
+   COPY
+   Every gap here is a multiple of --sgh-gap, so the rhythm holds
+   together when any one block's text length changes.
+════════════════════════════ */
+#sgh .sgh-copy { max-width: 30rem; }
+
+#sgh .sgh-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--sgh-gap) * 1.25);
+  margin: 0 0 calc(var(--sgh-gap) * 2.5) !important;
+}
+#sgh .sgh-brand__rule {
+  display: block;
+  width: 34px;
+  height: 2px;
+  background: var(--sgh-green);
+  flex: 0 0 auto;
+}
+#sgh .sgh-brand__t {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 3.6px;
+  text-transform: uppercase;
+  color: var(--sgh-green) !important;
+}
+
+#sgh .sgh-h1 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(32px, 3.9vw, 58px) !important;
+  font-weight: 800 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -1.4px;
+  text-transform: uppercase !important;
+  color: var(--sgh-white) !important;
+  margin: 0 0 calc(var(--sgh-gap) * 1.75) !important;
+}
+#sgh .sgh-h1 em { font-style: normal; color: var(--sgh-green) !important; }
+
+#sgh .sgh-sub {
+  font-size: clamp(14px, 1.15vw, 16px) !important;
+  font-weight: 400 !important;
+  line-height: 1.7 !important;
+  color: var(--sgh-body) !important;
+  margin: 0 0 calc(var(--sgh-gap) * 3) !important;
+}
+
+/* ── Buttons ── */
+#sgh .sgh-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sgh-gap);
+  margin-bottom: calc(var(--sgh-gap) * 3.5) !important;
+}
+
+#sgh .sgh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 30px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 0.32s var(--sgh-ease-quart),
+              color 0.32s var(--sgh-ease-quart),
+              box-shadow 0.32s var(--sgh-ease-quart),
+              transform 0.32s var(--sgh-ease-expo);
+}
+#sgh .sgh-btn:hover { transform: translateY(-2px); }
+#sgh .sgh-btn:focus-visible { outline: 2px solid var(--sgh-green); outline-offset: 3px; }
+
+#sgh .sgh-btn--primary {
+  color: #fff !important;
+  background: var(--sgh-green) !important;
+  box-shadow: 0 8px 26px rgba(22,178,74,0.30) !important;
+}
+#sgh .sgh-btn--primary:hover { background: #1ACC56 !important; box-shadow: 0 12px 32px rgba(22,178,74,0.40) !important; }
+
+#sgh .sgh-btn--ghost {
+  color: rgba(255,255,255,0.86) !important;
+  box-shadow: inset 0 0 0 1px var(--sgh-line) !important;
+}
+#sgh .sgh-btn--ghost:hover { color: #fff !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.42) !important; }
+
+#sgh .sgh-arr { display: inline-block; font-size: 13px !important; line-height: 1 !important; transition: transform 0.3s var(--sgh-ease-expo); }
+#sgh .sgh-btn:hover .sgh-arr { transform: translateX(4px); }
+
+/* ── Trust row ── */
+#sgh .sgh-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--sgh-gap) * 2.5);
+  padding-top: calc(var(--sgh-gap) * 2.5) !important;
+  border-top: 1px solid var(--sgh-line) !important;
+}
+
+#sgh .sgh-fact__v {
+  display: block;
+  font-size: 21px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.6px;
+  color: #fff !important;
+  margin-bottom: 6px !important;
+}
+#sgh .sgh-fact__v i { font-style: normal; color: var(--sgh-green) !important; }
+#sgh .sgh-fact__k {
+  display: block;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--sgh-meta) !important;
+}
+
+/* ────────────────────────────
+   ENTRANCE
+──────────────────────────── */
+#sgh .sgh-rise { opacity: 0; }
+#sgh .sgh-rise.is-in { animation: sgh-rise 0.85s var(--sgh-ease-expo) both; }
+#sgh .sgh-rise--b.is-in { animation-delay: 0.12s; }
+
+@keyframes sgh-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ────────────────────────────
+   REDUCED MOTION
+   Movement goes, state stays. The ring is decoration and simply
+   disappears; the entrance animations must resolve to opacity 1
+   with !important, because losing that fight would leave the
+   whole hero invisible for exactly the users who can least
+   afford a blank screen.
+──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #sgh .sgh-rise,
+  #sgh .sgh-rise--b {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  #sgh .sgh-ring { display: none; }
+  #sgh .sgh-poster,
+  #sgh .sgh-facade:hover .sgh-poster { transform: none; }
+  #sgh .sgh-btn:hover,
+  #sgh .sgh-facade:hover .sgh-play { transform: translate(0); }
+  #sgh .sgh-facade:hover .sgh-play { transform: translate(-50%, -50%); }
+}
+
+/* ────────────────────────────
+   RESPONSIVE
+──────────────────────────── */
+@media (max-width: 960px) {
+  /* Video leads on narrow screens — it is the reason the section
+     exists, and a stacked headline above it pushes it below the
+     fold on most phones. */
+  #sgh .sgh-wrap { grid-template-columns: minmax(0, 1fr); gap: clamp(28px, 5vw, 40px); }
+  #sgh .sgh-copy { max-width: none; }
+}
+
+@media (max-width: 560px) {
+  #sgh { padding: clamp(44px, 11vw, 64px) 20px !important; }
+  #sgh .sgh-h1 { letter-spacing: -0.6px; }
+  #sgh .sgh-actions { gap: 10px; }
+  #sgh .sgh-btn { flex: 1 1 100%; justify-content: center; }
+  #sgh .sgh-facts { gap: calc(var(--sgh-gap) * 1.75); }
+  #sgh .sgh-meta { padding: var(--sgh-gap) calc(var(--sgh-gap) * 1.25) !important; }
+  #sgh .sgh-meta__t { font-size: 9.5px !important; letter-spacing: 1.4px; }
+}
+</style>
+</head>
+<body>
+
+<section id="sgh" aria-labelledby="sghTitle">
+<div class="sgh-wrap">
+
+  <!-- ═══════════ VIDEO ═══════════
+       The button is the poster. Nothing from YouTube's player
+       domain is requested until it is pressed. -->
+  <div class="sgh-video sgh-rise" id="sghVideo">
+    <img class="sgh-poster" id="sghPoster"
+         src="https://i.ytimg.com/vi/KRH5OZfSsGA/maxresdefault.jpg"
+         alt="A SAERA golf cart driving over rocky ground"
+         width="1280" height="720" fetchpriority="high" decoding="async">
+    <span class="sgh-scrim" aria-hidden="true"></span>
+
+    <button class="sgh-facade" id="sghPlay" type="button"
+            aria-label="Play the SAERA Golf Carts film, 1 minute 57 seconds">
+      <span class="sgh-ring" aria-hidden="true"></span>
+      <span class="sgh-play" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+    </button>
+
+    <div class="sgh-meta" aria-hidden="true">
+      <span class="sgh-meta__t">Watch the film</span>
+      <span class="sgh-chip">1:57</span>
+    </div>
+  </div>
+
+  <!-- ═══════════ COPY ═══════════ -->
+  <div class="sgh-copy sgh-rise sgh-rise--b">
+    <p class="sgh-brand">
+      <span class="sgh-brand__rule" aria-hidden="true"></span>
+      <span class="sgh-brand__t">Saera Golf Carts</span>
+    </p>
+
+    <!-- Breaks are explicit rather than left to the column width.
+         Allowed to wrap on its own, "PREMIUM GOLF CARTS" splits
+         after "GOLF" and strands "CARTS" as an orphan line; these
+         three lines stay balanced at every width the hero uses. -->
+    <h1 class="sgh-h1" id="sghTitle">Premium<br>Golf Carts<br>by <em>Saera</em></h1>
+
+    <p class="sgh-sub">Built on four decades of Saera Auto engineering — the ride quality,
+      durability and finish of a road vehicle, on the course and beyond.</p>
+
+    <div class="sgh-actions">
+      <a class="sgh-btn sgh-btn--primary" href="https://saeragolfcart.com/" target="_blank" rel="noopener">
+        Explore Range <span class="sgh-arr" aria-hidden="true">→</span>
+      </a>
+      <a class="sgh-btn sgh-btn--ghost" href="#dealer">Become a Dealer</a>
+    </div>
+
+    <div class="sgh-facts">
+      <div class="sgh-fact">
+        <span class="sgh-fact__v">40<i>+</i></span>
+        <span class="sgh-fact__k">Years of<br>engineering</span>
+      </div>
+      <div class="sgh-fact">
+        <span class="sgh-fact__v">2–14</span>
+        <span class="sgh-fact__k">Seater<br>configurations</span>
+      </div>
+      <div class="sgh-fact">
+        <span class="sgh-fact__v">100<i>%</i></span>
+        <span class="sgh-fact__k">Electric<br>drivetrain</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+
+<script>
+(function () {
+  'use strict';
+
+  var root = document.getElementById('sgh');
+  if (!root) return;
+
+  var VIDEO_ID = 'KRH5OZfSsGA';
+  var START_AT = 50;               /* the t=50s in the source link */
+
+  var card   = document.getElementById('sghVideo');
+  var btn    = document.getElementById('sghPlay');
+  var poster = document.getElementById('sghPoster');
+
+  /* ── POSTER FALLBACK ──
+     maxresdefault only exists for videos uploaded at 720p or
+     better. When it is missing YouTube serves a 120×90 grey
+     placeholder rather than a 404, so checking naturalWidth is
+     the only reliable test — an error listener never fires. */
+  var swapped = false;
+
+  function swapPoster() {
+    if (swapped) return;           /* hqdefault always exists; one try is enough */
+    swapped = true;
+    poster.src = 'https://i.ytimg.com/vi/' + VIDEO_ID + '/hqdefault.jpg';
+  }
+
+  /* naturalWidth 0 means it failed outright, under 200 means the
+     grey placeholder came back. Both want the fallback. */
+  function checkPoster() {
+    if (!poster.naturalWidth || poster.naturalWidth < 200) swapPoster();
+  }
+
+  poster.addEventListener('load', checkPoster);
+  poster.addEventListener('error', swapPoster);
+  /* An image that already finished — or already failed — before
+     this script ran fires neither event, so test it directly. */
+  if (poster.complete) checkPoster();
+
+  /* ── PLAY ──
+     Builds the iframe on demand. nocookie keeps YouTube from
+     setting tracking cookies for people who never press play,
+     and autoplay is legitimate here because the click *is* the
+     user gesture browsers require. */
+  var loaded = false;
+
+  btn.addEventListener('click', function () {
+    if (loaded) return;
+    loaded = true;
+
+    var f = document.createElement('iframe');
+    f.className = 'sgh-frame';
+    f.src = 'https://www.youtube-nocookie.com/embed/' + VIDEO_ID +
+            '?autoplay=1&start=' + START_AT +
+            '&rel=0&modestbranding=1&playsinline=1';
+    f.title = 'SAERA Golf Carts film';
+    f.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';
+    f.setAttribute('allowfullscreen', '');
+    f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+
+    card.appendChild(f);
+
+    /* The facade is gone from the accessibility tree the moment
+       the player exists, so nothing behind the iframe stays
+       focusable. */
+    btn.remove();
+    var meta = card.querySelector('.sgh-meta');
+    if (meta) meta.remove();
+
+    /* Focus the player so keyboard users land on the thing they
+       just asked for rather than back at the top of the page. */
+    f.addEventListener('load', function () {
+      try { f.focus(); } catch (e) {}
+    });
+  });
+
+  /* ── ENTRANCE ── */
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('is-in');
+        io.unobserve(en.target);        /* fire once, then stop */
+      });
+    }, { threshold: 0.16 });
+    Array.prototype.forEach.call(root.querySelectorAll('.sgh-rise'), function (el) { io.observe(el); });
+  } else {
+    /* No IO, or reduced motion: everything is simply present. */
+    Array.prototype.forEach.call(root.querySelectorAll('.sgh-rise'), function (el) { el.classList.add('is-in'); });
+  }
+}());
+</script>
+
+</body>
+</html>
