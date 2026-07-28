@@ -9,6 +9,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+<!-- Zapier Interfaces loader — hydrates the
+     <zapier-interfaces-page-embed> element in the form panel. -->
+<script type="module" src="https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js"></script>
+
 <style>
 /* ══════════════════════════════════════════════════════════════
    CONTACT — theme-proof build
@@ -20,16 +24,10 @@
    which outranks any class-based theme selector, and custom
    properties are --cf-* on #cf rather than :root.
 
-   THE ONE EXCEPTION is .cf-formslot, which is a *class*. The
-   form is rendered by a plugin, so its markup is not ours to
-   write, and in Elementor it may not even live inside our HTML
-   widget (that widget does not run shortcodes — see the note by
-   the slot in the markup below). Making the form styles hang off
-   a class means they apply whether the form sits inside #cf or
-   in a separate Elementor Shortcode widget you tag with
-   cf-formslot. Those rules carry !important for the same reason
-   the buttons do: plugin stylesheets ship their own !important
-   declarations, and specificity alone loses to those.
+   The form itself is a Zapier Interfaces embed — an iframe this
+   page's CSS cannot reach into. Fields, colours and submission
+   handling live in the Zapier editor; here we only control the
+   frame it occupies.
 ══════════════════════════════════════════════════════════════ */
 
 html, body { margin: 0; padding: 0; }
@@ -73,20 +71,11 @@ html, body { margin: 0; padding: 0; }
 }
 
 /* ── SCOPED RESET ──
-   Deliberately does NOT reach inside .cf-formslot. Plugin form
-   markup relies on its own padding and borders for layout, and
-   flattening all of it just to rebuild it below is how you end
-   up fighting a checkbox row you never styled. The form gets
-   targeted rules instead.
-
-   The :not() filters are wrapped in :where(), which contributes
-   zero specificity — without it each :not(.cf-formslot) would
-   add a class worth of weight and the reset would outrank the
-   component rules below it (painting the ink panel white, for
-   one). */
-#cf, #cf :where(*:not(.cf-formslot):not(.cf-formslot *)),
-#cf :where(*:not(.cf-formslot):not(.cf-formslot *))::before,
-#cf :where(*:not(.cf-formslot):not(.cf-formslot *))::after {
+   Neutralises inherited theme styling inside the section. The
+   Zapier embed is an iframe, so nothing here can leak into the
+   form itself — only the custom element's own box is affected,
+   and the .cf-embed rules below re-establish that. */
+#cf, #cf *, #cf *::before, #cf *::after {
   margin: 0;
   padding: 0;
   border: 0;
@@ -99,9 +88,6 @@ html, body { margin: 0; padding: 0; }
   max-width: none;
   list-style: none;
 }
-
-/* The form subtree still needs a predictable box model. */
-.cf-formslot, .cf-formslot * { box-sizing: border-box; }
 
 #cf a {
   font: inherit;
@@ -412,211 +398,56 @@ html, body { margin: 0; padding: 0; }
   margin: 10px 0 0 !important;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   FORM CONTROLS
-   Scoped to the .cf-formslot class, not #cf — see the note at the
-   top. Selectors are written by *element* wherever possible so
-   they land on whatever the plugin emits; the plugin-specific
-   ones below only handle the wrappers, which is the one thing
-   element selectors cannot reach.
-══════════════════════════════════════════════════════════════ */
-
-/* Labels — every plugin names its own, so they are listed
-   together rather than styled generically; a bare `label` rule
-   would also catch checkbox and radio captions and shrink them
-   to unreadable micro-caps. */
-.cf-formslot > label,
-.cf-formslot p > label,
-.cf-formslot .wpforms-field-label,
-.cf-formslot .gfield_label,
-.cf-formslot .elementor-field-label,
-.cf-formslot .cf-label {
-  display: block !important;
-  font-family: 'Montserrat', sans-serif !important;
+/* ── ZAPIER EMBED FRAME ──
+   The embed is a web component that renders an iframe once
+   Zapier's script loads. The wrapper owns the footprint: full
+   panel width and a viewport-scaled height, with a quiet themed
+   loading state underneath so the panel never sits empty while
+   the script fetches. */
+#cf .cf-embed {
+  position: relative;
+  width: 100%;
+  min-height: clamp(460px, 62vh, 640px);
+  background:
+    /* spinner-free loading hint: hairline frame + label */
+    var(--cf-paper-2);
+  border: 1px solid var(--cf-hair);
+  border-radius: 2px;
+  overflow: hidden;
+}
+#cf .cf-embed::before {
+  content: 'Loading form…';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 10.5px !important;
   font-weight: 700 !important;
-  line-height: 1.4 !important;
-  letter-spacing: 1.8px !important;
-  text-transform: uppercase !important;
-  color: var(--cf-head, #121419) !important;
-  margin: 0 0 9px !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--cf-muted) !important;
 }
 
-/* Required marks stay red but stop shouting. */
-.cf-formslot .wpforms-required-label,
-.cf-formslot .gfield_required,
-.cf-formslot .required,
-.cf-formslot abbr[title="required"] {
-  color: #D64545 !important;
-  border: 0 !important;
-  text-decoration: none !important;
-  font-weight: 700 !important;
-}
-
-/* The controls themselves. 52px is the smallest height that
-   still reads as generous at this type size, and the flat 2px
-   radius replaces the pill shape — pills fought the square
-   geometry of everything else on the page. */
-.cf-formslot input[type="text"],
-.cf-formslot input[type="email"],
-.cf-formslot input[type="tel"],
-.cf-formslot input[type="url"],
-.cf-formslot input[type="number"],
-.cf-formslot input[type="search"],
-.cf-formslot input[type="date"],
-.cf-formslot select,
-.cf-formslot textarea {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  display: block !important;
+/* The custom element and its iframe fill the wrapper. These are
+   element-level rules on our own wrapper, so no !important war —
+   Zapier's inline sizing is on the internal iframe, which these
+   width/height rules override at the container level. */
+#cf .cf-embed zapier-interfaces-page-embed {
+  position: relative;
+  z-index: 1;               /* covers the loading label once painted */
+  display: block;
   width: 100% !important;
-  max-width: 100% !important;
-  min-height: 52px !important;
-  padding: 14px 16px !important;
-  font-family: 'Montserrat', sans-serif !important;
-  font-size: 14.5px !important;
-  font-weight: 400 !important;
-  line-height: 1.5 !important;
-  color: var(--cf-head, #121419) !important;
-  background: var(--cf-paper-2, #F5F6F4) !important;
-  border: 1px solid var(--cf-hair, rgba(18,20,25,0.10)) !important;
-  border-radius: 2px !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  max-width: none !important;
+  height: 100% !important;
+  min-height: inherit;
 }
-
-.cf-formslot textarea {
-  min-height: 156px !important;
-  resize: vertical !important;
-  line-height: 1.7 !important;
-}
-
-/* Focus is the one place colour is spent: the field goes white,
-   the border turns green, and a 3px tinted ring separates it
-   from its neighbours. */
-.cf-formslot input:focus,
-.cf-formslot select:focus,
-.cf-formslot textarea:focus {
-  background: #fff !important;
-  border-color: var(--cf-green, #35B44A) !important;
-  box-shadow: 0 0 0 3px rgba(53,180,74,0.14) !important;
-}
-
-.cf-formslot input::placeholder,
-.cf-formslot textarea::placeholder {
-  color: #A9ABB1 !important;
-  opacity: 1 !important;    /* Firefox dims placeholders by default */
-}
-
-/* Native select needs its own chevron once appearance is off. */
-.cf-formslot select {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355575E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 14px center !important;
-  background-size: 16px 16px !important;
-  padding-right: 42px !important;
-}
-
-/* Field spacing. Each plugin wraps its fields differently, so the
-   gap is set on every wrapper we know of plus the bare <p> that
-   Contact Form 7 emits. */
-.cf-formslot p,
-.cf-formslot .wpforms-field,
-.cf-formslot .gfield,
-.cf-formslot .elementor-field-group,
-.cf-formslot .cf-field {
-  margin: 0 0 20px !important;
-  padding: 0 !important;
-}
-.cf-formslot p:last-child,
-.cf-formslot .cf-field:last-child { margin-bottom: 0 !important; }
-
-/* Two-up rows. Add class cf-half to a field wrapper (every plugin
-   above supports a per-field CSS class) and two of them share a
-   line — first name / last name, phone / city. */
-.cf-formslot .cf-row2 {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 18px;
-}
-.cf-formslot .cf-half { grid-column: span 1; }
-
-/* Submit. Matches the solid green CTA on the Leadership page so
-   the two pages share one button language. */
-.cf-formslot input[type="submit"],
-.cf-formslot button[type="submit"],
-.cf-formslot .wpforms-submit,
-.cf-formslot .gform_button,
-.cf-formslot .elementor-button {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 10px !important;
-  width: auto !important;
-  min-height: 0 !important;
-  padding: 17px 34px !important;
-  margin: 6px 0 0 !important;
-  font-family: 'Montserrat', sans-serif !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  line-height: 1 !important;
-  letter-spacing: 2.2px !important;
-  text-transform: uppercase !important;
-  color: #06210C !important;
-  background: var(--cf-green, #35B44A) !important;
+#cf .cf-embed iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: inherit;
   border: 0 !important;
-  border-radius: 2px !important;
-  box-shadow: none !important;
-  cursor: pointer !important;
-  transition: background 0.3s ease, transform 0.35s var(--cf-ease-expo), box-shadow 0.3s ease;
-}
-.cf-formslot input[type="submit"]:hover,
-.cf-formslot button[type="submit"]:hover,
-.cf-formslot .wpforms-submit:hover,
-.cf-formslot .gform_button:hover,
-.cf-formslot .elementor-button:hover {
-  background: #43C959 !important;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px -12px rgba(53,180,74,0.7) !important;
-}
-.cf-formslot input[type="submit"]:focus-visible,
-.cf-formslot button[type="submit"]:focus-visible {
-  outline: 2px solid var(--cf-green-dk, #268A38) !important;
-  outline-offset: 3px !important;
-}
-
-/* Plugin validation and status messages, toned to the palette
-   rather than each plugin's stock red-on-pink. */
-.cf-formslot .wpforms-error,
-.cf-formslot .gfield_description.validation_message,
-.cf-formslot .wpcf7-not-valid-tip,
-.cf-formslot .elementor-message-danger {
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  color: #D64545 !important;
-  margin-top: 7px !important;
-}
-.cf-formslot input.wpforms-error,
-.cf-formslot textarea.wpforms-error,
-.cf-formslot .wpcf7-not-valid {
-  border-color: #D64545 !important;
-}
-
-.cf-formslot .wpcf7-response-output,
-.cf-formslot .wpforms-confirmation-container-full,
-.cf-formslot .elementor-message {
-  margin: 18px 0 0 !important;
-  padding: 14px 16px !important;
-  border: 1px solid var(--cf-hair, rgba(18,20,25,0.10)) !important;
-  border-left: 3px solid var(--cf-green, #35B44A) !important;
-  border-radius: 2px !important;
-  background: var(--cf-paper-2, #F5F6F4) !important;
-  font-size: 13.5px !important;
-  line-height: 1.6 !important;
-  color: var(--cf-head, #121419) !important;
+  display: block;
 }
 
 /* ────────────────────────────
@@ -648,20 +479,15 @@ html, body { margin: 0; padding: 0; }
   #cf .cf-row__icon { width: 36px; height: 36px; }
   #cf .cf-row__icon svg { width: 16px; height: 16px; }
 
-  /* Two-up name fields go single file — 160px-wide inputs are
-     not a form, they are a puzzle. */
-  .cf-formslot .cf-row2 { grid-template-columns: 1fr; }
-
   #cf .cf-map { width: 100%; justify-content: center; }
-  .cf-formslot input[type="submit"],
-  .cf-formslot button[type="submit"],
-  .cf-formslot .wpforms-submit,
-  .cf-formslot .gform_button { width: 100% !important; }
+
+  /* A phone gives the embed more of the viewport — the form is
+     the whole reason the visitor scrolled here. */
+  #cf .cf-embed { min-height: clamp(520px, 78vh, 700px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #cf *, #cf *::before, #cf *::after,
-  .cf-formslot * { animation: none !important; transition: none !important; }
+  #cf *, #cf *::before, #cf *::after { animation: none !important; transition: none !important; }
   #cf.cf-js .cf-rise { opacity: 1 !important; transform: none !important; }
 }
 </style>
@@ -766,96 +592,24 @@ html, body { margin: 0; padding: 0; }
 
         <div class="cf-form__head">
           <h3 class="cf-h3">Write to us</h3>
-          <p class="cf-form__note">Fields marked with an asterisk are required.</p>
+          <p class="cf-form__note">Fill in the form and we&rsquo;ll get back to you shortly.</p>
         </div>
 
-        <!-- ══════════════════════════════════════════════════
-             ▼▼  YOUR FORM GOES HERE  ▼▼
-
-             Delete the demo markup below and drop your shortcode
-             in its place, keeping the .cf-formslot wrapper:
-
-                 <div class="cf-formslot">
-                   [your_form_shortcode]
-                 </div>
-
-             Where the shortcode actually runs:
-
-             · Block editor — a Custom HTML block works as-is.
-               Block content passes through the_content, which
-               runs do_shortcode.
-
-             · Elementor — the HTML widget does NOT run
-               shortcodes. Two options:
-                 a) Keep this section in the HTML widget, delete
-                    this whole form panel, and put an Elementor
-                    Shortcode widget beside it with the CSS class
-                    cf-formslot (Advanced → CSS Classes). The
-                    form styles above are class-scoped precisely
-                    so this works.
-                 b) Use a Shortcode widget nested inside a
-                    two-column Elementor container, with this
-                    file's <style> block in an HTML widget above.
-
-             The demo form below is only so this file previews
-             correctly on its own. It submits nowhere.
-        ══════════════════════════════════════════════════ -->
-        <div class="cf-formslot">
-
-          <!-- Submission is handled by the GOOGLE SHEETS bridge at
-               the bottom of the script block. Paste your Apps
-               Script Web App URL into CF_SHEET_ENDPOINT there and
-               this form starts writing rows. -->
-          <form id="cfForm" action="#" method="post" novalidate>
-
-            <div class="cf-row2">
-              <div class="cf-field cf-half">
-                <label class="cf-label" for="cfFirst">First name</label>
-                <input type="text" id="cfFirst" name="first" placeholder="First name" autocomplete="given-name">
-              </div>
-              <div class="cf-field cf-half">
-                <label class="cf-label" for="cfLast">Last name</label>
-                <input type="text" id="cfLast" name="last" placeholder="Last name" autocomplete="family-name">
-              </div>
-            </div>
-
-            <div class="cf-field">
-              <label class="cf-label" for="cfEmail">Email <span class="required">*</span></label>
-              <input type="email" id="cfEmail" name="email" placeholder="you@company.com" required autocomplete="email">
-            </div>
-
-            <div class="cf-field">
-              <label class="cf-label" for="cfSubject">Subject</label>
-              <input type="text" id="cfSubject" name="subject" placeholder="How can we help?">
-            </div>
-
-            <div class="cf-field">
-              <label class="cf-label" for="cfMessage">Your message <span class="required">*</span></label>
-              <textarea id="cfMessage" name="message" placeholder="Tell us a little about what you need" required></textarea>
-            </div>
-
-            <!-- Honeypot: invisible to people, irresistible to
-                 bots. A submission that fills it is dropped
-                 client-side before it ever reaches the sheet.
-                 Positioned off-screen rather than display:none,
-                 which the cruder bots check for. -->
-            <div aria-hidden="true"
-                 style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;">
-              <label for="cfCompanyHp">Company</label>
-              <input type="text" id="cfCompanyHp" name="company_hp" tabindex="-1" autocomplete="off">
-            </div>
-
-            <button type="submit" id="cfSubmit">Submit Form</button>
-
-            <!-- Status line, written by the bridge. role=status
-                 makes screen readers announce the outcome. -->
-            <p id="cfStatus" role="status" aria-live="polite"
-               style="display:none;margin:18px 0 0;padding:14px 16px;font-size:13.5px;line-height:1.6;border:1px solid rgba(18,20,25,0.10);border-left:3px solid #35B44A;border-radius:2px;background:#F5F6F4;color:#121419;"></p>
-
-          </form>
-
+        <!-- ─── ZAPIER INTERFACES EMBED ───
+             The form itself is a Zapier Interfaces page rendered
+             inside the web component below. Its fields, colours
+             and submission handling are all configured in the
+             Zapier Interfaces editor — page CSS cannot reach into
+             the embed, so the wrapper only controls the space it
+             occupies: full panel width, a responsive height, and
+             a themed loading state that shows until Zapier's
+             script hydrates the component. -->
+        <div class="cf-embed" id="cfEmbed">
+          <zapier-interfaces-page-embed
+            page-id="cms4i2qxe000a5y1rjzth34rd"
+            test-id="cms4i2qxe000a5y1rjzth34rd-zapier-interfaces-page-embed-iframe"
+            no-background="false"></zapier-interfaces-page-embed>
         </div>
-        <!-- ▲▲  END FORM SLOT  ▲▲ -->
 
       </div>
 
@@ -915,77 +669,6 @@ html, body { margin: 0; padding: 0; }
     }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
     rises.forEach(function (el) { io.observe(el); });
   }
-
-  /* ══════════════════════════════════════════════════════════
-     GOOGLE SHEETS BRIDGE
-     Submits the form to a Google Apps Script Web App, which
-     appends a row to your sheet.
-
-     ▼ PASTE YOUR WEB APP URL BETWEEN THE QUOTES ▼
-     It looks like:
-     https://script.google.com/macros/s/AKfycb.../exec
-  ══════════════════════════════════════════════════════════ */
-  var CF_SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzk3JemyAzVxIIABqA_4pu-c70JxmXYUxnLpSe2EVTN01qabel0BlimYe3dkf71nu7s6Q/exec';
-
-  var form   = document.getElementById('cfForm');
-  var status = document.getElementById('cfStatus');
-  var submit = document.getElementById('cfSubmit');
-  if (!form || !status || !submit) return;
-
-  function say(msg, isError) {
-    status.textContent = msg;
-    status.style.display = 'block';
-    status.style.borderLeftColor = isError ? '#D64545' : '#35B44A';
-  }
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    /* Native validation first — reportValidity paints the
-       browser's own bubbles on the offending field. */
-    if (!form.reportValidity()) return;
-
-    /* Honeypot tripped: pretend success, save nothing. Telling a
-       bot it failed just invites a retry. */
-    if (form.company_hp && form.company_hp.value) {
-      say('Thank you — your message has been sent.', false);
-      form.reset();
-      return;
-    }
-
-    if (!CF_SHEET_ENDPOINT) {
-      say('This form is not connected yet — add the Web App URL to CF_SHEET_ENDPOINT in the page code.', true);
-      return;
-    }
-
-    var data = new FormData(form);
-    data.delete('company_hp');
-
-    submit.disabled = true;
-    var label = submit.textContent;
-    submit.textContent = 'Sending…';
-
-    /* mode:'no-cors' matters. Apps Script Web Apps don't answer
-       preflight requests, so a normal cross-origin fetch dies
-       before it starts. FormData posts as a "simple request"
-       (no preflight), and no-cors lets it through. The trade-off
-       is an opaque response — we can't read the script's reply,
-       so network success is treated as delivery. The row is
-       already written by the time this resolves. */
-    fetch(CF_SHEET_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: data
-    }).then(function () {
-      say('Thank you — your message has been sent. We’ll get back to you shortly.', false);
-      form.reset();
-    }).catch(function () {
-      say('Something went wrong sending your message. Please try again, or email us directly at info@saeragroup.com.', true);
-    }).finally(function () {
-      submit.disabled = false;
-      submit.textContent = label;
-    });
-  });
 
 }());
 </script>
