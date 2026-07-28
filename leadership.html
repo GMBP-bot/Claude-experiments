@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leadership — Saera Electric Auto</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- YouTube is only contacted when a film is clicked (see the facade
+     note in the JS). Warming the connection here means that click
+     starts the video instead of starting a DNS lookup. -->
+<link rel="preconnect" href="https://www.youtube-nocookie.com">
+<link rel="preconnect" href="https://i.ytimg.com">
+
+<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/02/Sunehri-2.png">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   LEADERSHIP — theme-proof build
+
+   Same defensive approach as the hero showcase: everything is
+   scoped to the #lp id, which gives every rule a specificity of
+   at least 1,0,0 — more than a WordPress theme or page builder
+   can reach with its class-based content selectors. Custom
+   properties are --lp-* and declared on #lp rather than :root,
+   and every @keyframes name is lp-prefixed, because keyframe
+   names are global and a later theme definition of `fadeUp`
+   would silently hijack ours.
+
+   Drop-in notes
+   ─────────────
+   · Paste everything from <style> to the closing </script> into
+     an Elementor HTML widget (full-width, no container padding)
+     or a Custom HTML block. It is self-contained apart from the
+     Google Fonts link, which the theme most likely already loads.
+   · Swap artwork in the ASSETS block below — nothing else
+     references a URL.
+   · The two dark bands are deliberate: light for the Chairman,
+     dark for the Director, so the page alternates the way the
+     original did, just with the rhythm evened out.
+══════════════════════════════════════════════════════════════ */
+
+/* Only rule outside the #lp scope, and only needed when this file
+   is served standalone — without it the browser's default body
+   margin leaves an 8px gutter beside the full-bleed sections.
+   Safe to delete when pasting into a theme that normalises body. */
+html, body { margin: 0; padding: 0; }
+
+#lp {
+  /* ── ASSETS ─────────────────────────────────────────────
+     Every image the page uses. Replace a URL here and the
+     component picks it up — no other rule hard-codes one.
+     Film posters come from YouTube itself, keyed off the
+     data-id on each button, so they are not listed here.
+  ── */
+  --lp-img-hero:     url('https://ddfintech.net/wp-content/uploads/2026/02/Sunehri-2.png');
+  --lp-img-chairman: url('https://ddfintech.net/wp-content/uploads/2026/01/Untitled-design-3.png');
+  --lp-img-director: url('https://ddfintech.net/wp-content/uploads/2026/01/DDD03611.jpg');
+
+  /* Both portraits are cropped to one ratio so the two spreads
+     stay symmetrical. They are `cover` crops — if a source file
+     is landscape and the crop cuts someone off, change the ratio
+     here (3/4 and 1/1 both hold up) rather than adding a rule. */
+  --lp-portrait-ratio: 4 / 5;
+
+  /* ── PALETTE ──
+     Green is the brand accent carried through from the site
+     footer; it is the only saturated colour on the page, which
+     is what keeps the editorial sections calm. Text greys are
+     picked so body copy lands near 8:1 on paper and 7:1 on ink. */
+  --lp-green:     #35B44A;
+  --lp-green-dk:  #268A38;
+  --lp-ink:       #0B0B0E;   /* darkest band            */
+  --lp-ink-2:     #16171C;   /* raised surface on ink   */
+  --lp-paper:     #FFFFFF;
+  --lp-paper-2:   #F5F6F4;   /* tinted band on paper    */
+  --lp-head:      #121419;
+  --lp-body:      #55575E;
+  --lp-hair:      rgba(18,20,25,0.10);
+  --lp-hair-dark: rgba(255,255,255,0.10);
+
+  /* ── RHYTHM ──
+     One vertical scale for the whole page. Sections use
+     --lp-pad-y, content columns use --lp-gap, and the shell
+     below owns the horizontal gutter. Because all three are
+     clamp()ed against the viewport, the page tightens on a
+     phone and opens up on a desktop without a single media
+     query touching spacing. This is the fix for the original
+     page, where every band had its own arbitrary padding. */
+  --lp-pad-y:  clamp(72px, 9.5vw, 148px);
+  --lp-gutter: clamp(22px, 6vw, 88px);
+  --lp-gap:    clamp(38px, 5.2vw, 80px);
+  --lp-max:    1240px;
+
+  /* Timeline gutters live here because the rail segments are sized
+     against them — grid gap and rail length must not drift apart. */
+  --lp-tl-col: clamp(20px, 2.6vw, 40px);
+  --lp-tl-row: clamp(28px, 4vw, 40px);
+
+  --lp-ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
+  --lp-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ────────────────────────────
+   SCOPED RESET
+   Neutralises inherited theme styling inside the page only. It
+   sits above the component rules, all of which are #lp-scoped
+   and therefore equally or more specific — so it never fights
+   our own CSS.
+──────────────────────────── */
+#lp, #lp *, #lp *::before, #lp *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  max-width: none;
+  list-style: none;
+}
+
+/* Buttons and links are what themes hit hardest — a global
+   `button { background: #e6e6e6 !important }` is exactly what
+   turns the film posters into grey boxes. The flags here are the
+   minimum needed to beat declarations that are themselves
+   !important; component rules below re-assert what they need. */
+#lp button,
+#lp a {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none !important;
+  text-align: inherit;
+  line-height: normal;
+  width: auto;
+  height: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Icon plugins like to inject pseudo-element glyphs into buttons.
+   Nothing here wants one. */
+#lp button::before,
+#lp button::after { content: none; display: none; }
+
+#lp img,
+#lp iframe {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ────────────────────────────
+   ROOT
+──────────────────────────── */
+#lp {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: clip;          /* the offset portrait frames overhang */
+  isolation: isolate;
+  background: var(--lp-paper) !important;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--lp-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Sections are the other element themes love to pad and colour
+   (`body section { padding: 40px !important }` insets every band
+   and exposes a page-coloured frame around it). */
+#lp .lp-band {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: var(--lp-pad-y) var(--lp-gutter) !important;
+}
+
+/* The single measure every band shares. Left and right edges line
+   up from the hero to the footer CTA — the thing the original
+   page never quite did. */
+#lp .lp-shell {
+  width: 100%;
+  max-width: var(--lp-max);
+  margin: 0 auto !important;
+}
+
+#lp .lp-band--ink   { background: var(--lp-ink) !important;   color: rgba(255,255,255,0.66); }
+#lp .lp-band--ink2  { background: var(--lp-ink-2) !important; color: rgba(255,255,255,0.66); }
+#lp .lp-band--tint  { background: var(--lp-paper-2) !important; }
+
+/* Hairline seams between same-family bands, so consecutive dark
+   sections read as chapters rather than one long block. */
+#lp .lp-band--ink2  { border-top: 1px solid rgba(255,255,255,0.06) !important; }
+#lp .lp-band--tint  { border-top: 1px solid var(--lp-hair) !important; }
+
+/* ────────────────────────────
+   SHARED TYPE
+   Every property a theme forces on bare h1/h2/h3/p carries a flag:
+   font stack, size, colour and the vertical-rhythm margins.
+   Everything else stays flag-free.
+──────────────────────────── */
+#lp .lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 3.4px;
+  text-transform: uppercase;
+  color: var(--lp-green-dk) !important;
+  margin: 0 0 20px !important;
+}
+#lp .lp-band--ink .lp-eyebrow,
+#lp .lp-band--ink2 .lp-eyebrow,
+#lp .lp-hero .lp-eyebrow { color: var(--lp-green) !important; }
+
+/* The short rule that opens every eyebrow. Drawn as a
+   pseudo-element so the markup stays a single clean element. */
+#lp .lp-eyebrow::before {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 2px;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+
+#lp .lp-h2 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(28px, 3.6vw, 46px) !important;
+  font-weight: 800 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.8px;
+  color: var(--lp-head) !important;
+  margin: 0 0 22px !important;
+}
+#lp .lp-band--ink .lp-h2,
+#lp .lp-band--ink2 .lp-h2 { color: #fff !important; }
+
+#lp .lp-h3 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.2px;
+  color: var(--lp-head) !important;
+  margin: 0 0 12px !important;
+}
+#lp .lp-band--ink .lp-h3,
+#lp .lp-band--ink2 .lp-h3 { color: #fff !important; }
+
+#lp .lp-p {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(14.5px, 1.05vw, 16px) !important;
+  font-weight: 400 !important;
+  line-height: 1.85 !important;
+  color: var(--lp-body) !important;
+  margin: 0 0 20px !important;
+  /* Caps the measure at a comfortable ~72 characters even when the
+     grid column is wider. Long lines are what made the original
+     body copy hard to scan. */
+  max-width: 60ch;
+}
+#lp .lp-band--ink .lp-p,
+#lp .lp-band--ink2 .lp-p { color: rgba(255,255,255,0.60) !important; }
+#lp .lp-p:last-child { margin-bottom: 0 !important; }
+
+/* ────────────────────────────
+   HERO
+   Sized in svh so a mobile URL bar sliding in and out doesn't
+   jog the layout, and capped so it never eats a 4K screen.
+──────────────────────────── */
+#lp .lp-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100% !important;
+  min-height: 460px;
+  height: 82vh;
+  height: 82svh;
+  max-height: 760px;
+  padding: 0 !important;
+  overflow: hidden;
+  background: var(--lp-ink) !important;
+  isolation: isolate;
+}
+
+#lp .lp-hero__bg {
+  position: absolute;
+  inset: 0;
+  background-image: var(--lp-img-hero);
+  background-size: cover;
+  background-position: center 58%;
+  background-repeat: no-repeat;
+  transform: scale(1.06);
+  will-change: transform;
+}
+/* A slow push-in that runs once on load rather than looping —
+   enough to make the hero feel alive without becoming a
+   distraction while someone reads the headline. */
+#lp.is-ready .lp-hero__bg { animation: lp-kb 12s var(--lp-ease-quart) both; }
+
+@keyframes lp-kb {
+  from { transform: scale(1.06); }
+  to   { transform: scale(1.00); }
+}
+
+/* Two stacked gradients: a soft left weight for the copy, plus a
+   strong bottom lift. The photograph is bright and warm across
+   its whole width, so a plain vignette left the eyebrow floating
+   on the pale building behind it. */
+#lp .lp-hero__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg,
+      rgba(6,7,9,0.86) 0%,
+      rgba(6,7,9,0.60) 34%,
+      rgba(6,7,9,0.22) 66%,
+      rgba(6,7,9,0.06) 100%),
+    linear-gradient(to top,
+      rgba(6,7,9,0.88) 0%,
+      rgba(6,7,9,0.28) 32%,
+      rgba(6,7,9,0.00) 62%);
+  pointer-events: none;
+}
+
+#lp .lp-hero__inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 0 var(--lp-gutter) clamp(56px, 9vh, 104px) !important;
+}
+
+#lp .lp-hero__title {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(34px, 5.6vw, 74px) !important;
+  font-weight: 800 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -1.4px;
+  color: #fff !important;
+  margin: 0 0 22px !important;
+  max-width: 15ch;
+  text-shadow: 0 2px 30px rgba(6,7,9,0.45);
+}
+
+#lp .lp-hero__sub {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(14px, 1.15vw, 17px) !important;
+  font-weight: 300 !important;
+  line-height: 1.75 !important;
+  color: rgba(255,255,255,0.72) !important;
+  margin: 0 !important;
+  max-width: 46ch;
+}
+
+/* Curtain reveal for the hero copy: each .lp-line is a shutter
+   (overflow:hidden) and the inner span rises into it. Staggered
+   by 120ms, keyed off .is-ready so it plays after fonts settle
+   rather than animating fallback glyphs. */
+#lp .lp-line { display: block; overflow: hidden; padding-bottom: 0.06em; line-height: inherit !important; }
+#lp .lp-line > span {
+  display: block;
+  line-height: inherit !important;
+  transform: translateY(112%);
+}
+#lp.is-ready .lp-line:nth-child(1) > span { animation: lp-lineUp 1s var(--lp-ease-expo) 0.15s both; }
+#lp.is-ready .lp-line:nth-child(2) > span { animation: lp-lineUp 1s var(--lp-ease-expo) 0.27s both; }
+
+@keyframes lp-lineUp {
+  from { transform: translateY(112%); }
+  to   { transform: translateY(0); }
+}
+
+#lp .lp-hero__eyebrow,
+#lp .lp-hero__sub { opacity: 0; }
+#lp.is-ready .lp-hero__eyebrow { animation: lp-fadeUp 0.8s var(--lp-ease-expo) 0.05s both; }
+#lp.is-ready .lp-hero__sub     { animation: lp-fadeUp 0.9s var(--lp-ease-expo) 0.50s both; }
+
+@keyframes lp-fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Scroll cue — bottom right, out of the copy's way. The line
+   inside travels on a loop so it reads as an invitation rather
+   than decoration. */
+#lp .lp-cue {
+  position: absolute;
+  right: var(--lp-gutter);
+  bottom: clamp(56px, 9vh, 104px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.42) !important;
+  opacity: 0;
+}
+#lp.is-ready .lp-cue { animation: lp-fadeUp 0.9s var(--lp-ease-expo) 0.68s both; }
+
+#lp .lp-cue__track {
+  position: relative;
+  display: block;
+  width: 46px;
+  height: 1px;
+  background: rgba(255,255,255,0.18);
+  overflow: hidden;
+}
+#lp .lp-cue__track::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--lp-green);
+  transform: translateX(-100%);
+  animation: lp-sweep 2.4s var(--lp-ease-quart) infinite;
+}
+@keyframes lp-sweep {
+  0%        { transform: translateX(-100%); }
+  55%, 100% { transform: translateX(100%);  }
+}
+
+/* Hidden below the fold on short screens, where it collides with
+   the headline block. */
+@media (max-height: 620px) { #lp .lp-cue { display: none; } }
+
+/* ────────────────────────────
+   STAT STRIP
+   Bridges the hero and the first long read. Four equal cells on a
+   single hairline grid — the 1px gap with a hairline background
+   draws all the dividers at once, so there are no odd borders to
+   strip off the first and last child at each breakpoint.
+──────────────────────────── */
+#lp .lp-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--lp-hair);
+  border-top: 1px solid var(--lp-hair);
+  border-bottom: 1px solid var(--lp-hair);
+}
+
+#lp .lp-stat {
+  padding: clamp(26px, 3vw, 40px) clamp(18px, 2.4vw, 34px) !important;
+  background: var(--lp-paper);
+  text-align: left;
+}
+
+#lp .lp-stat__n {
+  display: block;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(26px, 3vw, 40px) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: -1px;
+  color: var(--lp-head) !important;
+  margin: 0 0 10px !important;
+}
+#lp .lp-stat__n em {
+  font-style: normal;
+  color: var(--lp-green-dk) !important;
+}
+
+#lp .lp-stat__l {
+  display: block;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.6 !important;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #8A8C93 !important;
+  margin: 0 !important;
+}
+
+/* ────────────────────────────
+   FIGURE — portrait + copy
+   The asymmetric column split (portrait narrower than the copy)
+   is what keeps the reading column at a sane measure. `align-items:
+   start` stops the shorter column from stretching, which is the
+   alignment bug visible in the original layout.
+──────────────────────────── */
+#lp .lp-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: var(--lp-gap);
+  align-items: start;
+}
+
+/* Director section mirrors the Chairman: portrait on the left
+   there, portrait on the right here, so the two spreads don't
+   read as the same slide twice. */
+#lp .lp-figure--flip { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
+#lp .lp-figure--flip .lp-figure__media { order: 2; }
+#lp .lp-figure--flip .lp-figure__body  { order: 1; }
+
+/* Sticky portrait on tall viewports: the copy scrolls, the face
+   stays. Falls back to static wherever position:sticky can't
+   apply, and is switched off entirely below the stacking
+   breakpoint where it would just pin an image over the text. */
+#lp .lp-figure__media {
+  position: sticky;
+  top: clamp(24px, 8vh, 96px);
+}
+
+/* Offset accent frame. Drawn behind the photo with a
+   pseudo-element rather than an extra div, and inset on the
+   overhang side so it can never widen the grid column. */
+#lp .lp-portrait {
+  position: relative;
+  display: block;
+}
+#lp .lp-portrait::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 18px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--lp-green);
+  opacity: 0.55;
+  pointer-events: none;
+  transition: transform 0.6s var(--lp-ease-expo), opacity 0.4s ease;
+}
+#lp .lp-figure--flip .lp-portrait::before { left: auto; right: -14px; }
+#lp .lp-portrait:hover::before { transform: translate(6px, -6px); opacity: 0.9; }
+
+#lp .lp-portrait__img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--lp-portrait-ratio);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-color: #E9EAE7;   /* holds the box while the file loads */
+  filter: grayscale(0.12) contrast(1.02);
+  transition: filter 0.6s ease;
+}
+#lp .lp-band--ink .lp-portrait__img,
+#lp .lp-band--ink2 .lp-portrait__img { background-color: #1E2027; }
+#lp .lp-portrait:hover .lp-portrait__img { filter: grayscale(0) contrast(1.04); }
+
+#lp .lp-portrait--chairman .lp-portrait__img { background-image: var(--lp-img-chairman); }
+#lp .lp-portrait--director .lp-portrait__img { background-image: var(--lp-img-director); }
+
+/* Name block. The rule above it and the tight leading are what
+   turn three stacked lines into a caption instead of three
+   unrelated paragraphs. */
+#lp .lp-name {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(21px, 2.1vw, 28px) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.4px;
+  color: var(--lp-head) !important;
+  margin: 0 0 6px !important;
+}
+#lp .lp-band--ink .lp-name,
+#lp .lp-band--ink2 .lp-name { color: #fff !important; }
+
+#lp .lp-role {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1.7 !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--lp-green-dk) !important;
+  margin: 0 !important;
+}
+#lp .lp-band--ink .lp-role,
+#lp .lp-band--ink2 .lp-role { color: var(--lp-green) !important; }
+
+#lp .lp-org {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.7 !important;
+  color: #8A8C93 !important;
+  margin: 2px 0 0 !important;
+}
+#lp .lp-band--ink .lp-org,
+#lp .lp-band--ink2 .lp-org { color: rgba(255,255,255,0.42) !important; }
+
+/* Consistent spacer between the name block and what follows it. */
+#lp .lp-namecard { margin: 0 0 30px !important; padding-bottom: 26px !important; border-bottom: 1px solid var(--lp-hair) !important; }
+#lp .lp-band--ink .lp-namecard,
+#lp .lp-band--ink2 .lp-namecard { border-bottom-color: var(--lp-hair-dark) !important; }
+
+/* ── AWARDS ──
+   Recognition reads as a scannable row of chips rather than being
+   buried mid-paragraph, which is where it sat originally. */
+#lp .lp-awards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 28px 0 0 !important;
+}
+
+#lp .lp-award {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 15px !important;
+  border: 1px solid var(--lp-hair) !important;
+  background: var(--lp-paper-2) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0.2px;
+  color: var(--lp-head) !important;
+  transition: border-color 0.3s ease, transform 0.3s var(--lp-ease-expo);
+}
+#lp .lp-award:hover { border-color: var(--lp-green) !important; transform: translateY(-2px); }
+
+#lp .lp-award svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: var(--lp-green-dk);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── PULL QUOTE ──
+   The Director's statement. A left rule plus optical hanging
+   punctuation, which is why the glyph sits outside the text
+   block instead of indenting the first line. */
+#lp .lp-quote {
+  position: relative;
+  margin: 30px 0 0 !important;
+  padding: 4px 0 4px 30px !important;
+  border-left: 2px solid var(--lp-green) !important;
+}
+#lp .lp-quote__mark {
+  position: absolute;
+  left: 22px;
+  top: -18px;
+  font-family: Georgia, 'Times New Roman', serif !important;
+  font-size: 68px !important;
+  line-height: 1 !important;
+  color: var(--lp-green) !important;
+  opacity: 0.20;
+  pointer-events: none;
+  user-select: none;
+}
+#lp .lp-quote__t {
+  position: relative;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(16px, 1.5vw, 21px) !important;
+  font-weight: 300 !important;
+  font-style: italic !important;
+  line-height: 1.72 !important;
+  color: rgba(255,255,255,0.90) !important;
+  margin: 0 !important;
+  max-width: 52ch;
+}
+#lp .lp-quote__by {
+  display: block;
+  margin: 18px 0 0 !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  font-style: normal !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.38) !important;
+}
+
+/* ────────────────────────────
+   TIMELINE
+   Four beats of the founding story, laid on one horizontal rail.
+   The rail is a background on the track rather than a border on
+   each step, so it stays unbroken regardless of how the steps
+   wrap.
+──────────────────────────── */
+#lp .lp-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--lp-tl-row) var(--lp-tl-col);
+  margin: clamp(40px, 5vw, 64px) 0 0 !important;
+}
+
+#lp .lp-step { position: relative; padding-top: 34px !important; }
+
+/* Rail + node. Each step draws its own segment — its own width
+   plus the grid gap — so the segments meet exactly under the next
+   node and the rail reads as one continuous line. The last step
+   stops at the shell edge rather than bleeding into the gutter. */
+#lp .lp-step::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: calc(100% + var(--lp-tl-col));
+  height: 1px;
+  background: var(--lp-hair);
+}
+#lp .lp-step:last-child::before { width: 100%; }
+#lp .lp-step::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--lp-green);
+  border-radius: 50%;
+  background: var(--lp-paper-2);
+}
+
+#lp .lp-step__k {
+  display: block;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: var(--lp-green-dk) !important;
+  margin: 0 0 12px !important;
+}
+
+#lp .lp-step__t {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  color: var(--lp-head) !important;
+  margin: 0 0 10px !important;
+}
+
+#lp .lp-step__p {
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.75 !important;
+  color: var(--lp-body) !important;
+  margin: 0 !important;
+}
+
+/* ────────────────────────────
+   FILMS
+   Click-to-play facades: a poster plus a play control, with the
+   real iframe injected only on click. Six embeds on one page
+   would otherwise pull in several megabytes of YouTube player
+   before anyone pressed anything — the single biggest reason the
+   original page felt heavy.
+──────────────────────────── */
+#lp .lp-films__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin: 0 0 clamp(28px, 3.4vw, 44px) !important;
+  padding-bottom: 22px !important;
+  border-bottom: 1px solid var(--lp-hair) !important;
+}
+#lp .lp-band--ink .lp-films__head,
+#lp .lp-band--ink2 .lp-films__head { border-bottom-color: var(--lp-hair-dark) !important; }
+
+#lp .lp-films__head .lp-h2 { margin: 0 !important; }
+
+#lp .lp-films__count {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: #9A9CA2 !important;
+  white-space: nowrap;
+  padding-bottom: 4px !important;
+}
+
+#lp .lp-films {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(18px, 2.2vw, 30px);
+}
+
+#lp .lp-film {
+  display: block;
+  width: 100% !important;
+  text-align: left;
+}
+
+#lp .lp-film__frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #101116 !important;
+  border: 1px solid var(--lp-hair);
+}
+#lp .lp-band--ink .lp-film__frame,
+#lp .lp-band--ink2 .lp-film__frame { border-color: var(--lp-hair-dark); }
+
+/* object-fit crops the 4:3 letterboxed fallback poster to 16:9,
+   so a video without a maxres thumbnail still fills its frame
+   instead of showing black bars. */
+#lp .lp-film__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.01);
+  transition: transform 0.7s var(--lp-ease-expo), filter 0.5s ease;
+  filter: saturate(0.92) brightness(0.92);
+}
+#lp .lp-film:hover .lp-film__poster,
+#lp .lp-film:focus-visible .lp-film__poster { transform: scale(1.06); filter: saturate(1) brightness(1); }
+
+#lp .lp-film__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(6,7,9,0.72) 0%, rgba(6,7,9,0.10) 52%, rgba(6,7,9,0.04) 100%);
+  pointer-events: none;
+}
+
+/* Play control. A ring rather than YouTube's red lozenge, so the
+   grid keeps the page's own visual language. */
+#lp .lp-film__play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 62px;
+  height: 62px;
+  margin: -31px 0 0 -31px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.55);
+  background: rgba(10,11,14,0.28);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.35s ease, border-color 0.35s ease, transform 0.45s var(--lp-ease-expo);
+  pointer-events: none;   /* the whole card is the button */
+}
+#lp .lp-film:hover .lp-film__play,
+#lp .lp-film:focus-visible .lp-film__play {
+  background: var(--lp-green);
+  border-color: var(--lp-green);
+  transform: scale(1.08);
+}
+
+#lp .lp-film__play svg {
+  width: 16px;
+  height: 18px;
+  margin-left: 3px;    /* optical centring for a triangle */
+  fill: #fff;
+}
+
+#lp .lp-film__meta { padding: 16px 2px 0 !important; }
+
+#lp .lp-film__t {
+  display: block;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: var(--lp-head) !important;
+  transition: color 0.3s ease;
+}
+#lp .lp-band--ink .lp-film__t,
+#lp .lp-band--ink2 .lp-film__t { color: rgba(255,255,255,0.90) !important; }
+#lp .lp-film:hover .lp-film__t { color: var(--lp-green-dk) !important; }
+#lp .lp-band--ink .lp-film:hover .lp-film__t,
+#lp .lp-band--ink2 .lp-film:hover .lp-film__t { color: var(--lp-green) !important; }
+
+#lp .lp-film__s {
+  display: block;
+  margin-top: 6px !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #9A9CA2 !important;
+}
+#lp .lp-band--ink .lp-film__s,
+#lp .lp-band--ink2 .lp-film__s { color: rgba(255,255,255,0.34) !important; }
+
+#lp .lp-film:focus-visible .lp-film__frame { outline: 2px solid var(--lp-green); outline-offset: 3px; }
+
+/* Once playing, the card stops behaving like a button. */
+#lp .lp-film.is-playing { cursor: default; }
+#lp .lp-film.is-playing .lp-film__frame > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ────────────────────────────
+   CLOSING CTA
+──────────────────────────── */
+#lp .lp-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 56px);
+  flex-wrap: wrap;
+}
+
+#lp .lp-cta__t {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(22px, 2.6vw, 34px) !important;
+  font-weight: 800 !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.6px;
+  color: #fff !important;
+  margin: 0 !important;
+  max-width: 22ch;
+}
+#lp .lp-cta__t em { font-style: normal; color: var(--lp-green) !important; }
+
+#lp .lp-cta__actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+/* Buttons re-assert padding and border with flags because the
+   reset above had to strip them with flags to beat the theme. */
+#lp .lp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.35s var(--lp-ease-expo);
+}
+#lp .lp-btn:hover { transform: translateY(-2px); }
+
+#lp .lp-btn--solid {
+  background: var(--lp-green) !important;
+  color: #06210C !important;
+}
+#lp .lp-btn--solid:hover { background: #43C959 !important; }
+
+#lp .lp-btn--ghost {
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  color: rgba(255,255,255,0.80) !important;
+}
+#lp .lp-btn--ghost:hover { border-color: var(--lp-green) !important; color: #fff !important; }
+
+#lp .lp-btn:focus-visible { outline: 2px solid var(--lp-green); outline-offset: 4px; }
+
+#lp .lp-btn__arr {
+  display: inline-block;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  transition: transform 0.32s var(--lp-ease-expo);
+}
+#lp .lp-btn:hover .lp-btn__arr { transform: translateX(5px); }
+
+/* ────────────────────────────
+   SCROLL REVEAL
+   Opt-in: .lp-rise starts hidden only after JS confirms it can
+   observe and un-hide it. Without that guard, a JS error or a
+   blocked script would leave the entire page invisible.
+──────────────────────────── */
+#lp.lp-js .lp-rise {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.85s var(--lp-ease-quart), transform 0.85s var(--lp-ease-expo);
+}
+#lp.lp-js .lp-rise.is-in { opacity: 1; transform: none; }
+
+/* Children stagger off the parent's own reveal, so a grid of
+   cards cascades from one observer instead of six. */
+#lp.lp-js .lp-rise[data-stagger] > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s var(--lp-ease-quart), transform 0.7s var(--lp-ease-expo);
+}
+#lp.lp-js .lp-rise[data-stagger].is-in > * { opacity: 1; transform: none; }
+#lp.lp-js .lp-rise[data-stagger].is-in > *:nth-child(1) { transition-delay: 0.06s; }
+#lp.lp-js .lp-rise[data-stagger].is-in > *:nth-child(2) { transition-delay: 0.15s; }
+#lp.lp-js .lp-rise[data-stagger].is-in > *:nth-child(3) { transition-delay: 0.24s; }
+#lp.lp-js .lp-rise[data-stagger].is-in > *:nth-child(4) { transition-delay: 0.33s; }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   Three breakpoints, each fixing one specific failure:
+     1080 — the two-column spread runs out of measure
+      860 — four across becomes unreadable
+      560 — phones: single column everywhere
+   Spacing itself is handled by the clamp()ed scale, so these
+   blocks only ever change structure.
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 1080px) {
+  #lp .lp-figure,
+  #lp .lp-figure--flip {
+    grid-template-columns: 1fr;
+    gap: clamp(30px, 5vw, 44px);
+  }
+  /* Order is reset so both spreads read portrait-then-copy when
+     stacked; a flipped stack would put the Director's name above
+     an image of someone the reader hasn't met yet. */
+  #lp .lp-figure--flip .lp-figure__media { order: 1; }
+  #lp .lp-figure--flip .lp-figure__body  { order: 2; }
+
+  /* Sticky is meaningless once the columns stack. */
+  #lp .lp-figure__media { position: static; }
+
+  /* Portrait is capped and centred rather than stretched to the
+     full band width, which would blow a 4:5 crop up to a
+     billboard. */
+  #lp .lp-portrait { max-width: 460px; margin: 0 auto !important; }
+  #lp .lp-portrait::before { left: -12px; }
+  #lp .lp-figure--flip .lp-portrait::before { right: -12px; left: auto; }
+
+  #lp .lp-p { max-width: none; }
+}
+
+/* The timeline gives up a column earlier than everything else:
+   four cells of running text hit an unreadable ~9-word measure
+   well before the film grid or the stat strip are in trouble. */
+@media (max-width: 1000px) {
+  #lp .lp-timeline { grid-template-columns: repeat(2, 1fr); }
+
+  /* Two across: every second step now ends a row, so it — not just
+     the last one — is where the rail has to stop. */
+  #lp .lp-step:nth-child(2n)::before { width: 100%; }
+}
+
+@media (max-width: 860px) {
+  #lp .lp-stats { grid-template-columns: repeat(2, 1fr); }
+  #lp .lp-films { grid-template-columns: repeat(2, 1fr); }
+
+  #lp .lp-hero { height: 72vh; height: 72svh; }
+  #lp .lp-hero__title { max-width: none; }
+}
+
+@media (max-width: 560px) {
+  #lp .lp-stats    { grid-template-columns: 1fr; }
+  #lp .lp-timeline { grid-template-columns: 1fr; }
+  #lp .lp-films    { grid-template-columns: 1fr; }
+
+  /* The rail turns vertical: the node stays at the top-left of each
+     step and the segment drops down the left edge — step height
+     plus the row gap, so it lands on the next node. The last step
+     has nothing to connect to, so it draws no line at all. */
+  #lp .lp-step { padding: 0 0 0 30px !important; }
+  #lp .lp-step::before {
+    left: 6px;
+    top: 2px;
+    width: 1px;
+    height: calc(100% + var(--lp-tl-row));
+  }
+  #lp .lp-step:last-child::before { display: none; }
+  #lp .lp-step::after { left: 0; top: 2px; }
+
+  #lp .lp-films__head { align-items: flex-start; flex-direction: column; gap: 10px; }
+  #lp .lp-film__play  { width: 52px; height: 52px; margin: -26px 0 0 -26px; }
+
+  #lp .lp-cta { flex-direction: column; align-items: flex-start; }
+  #lp .lp-btn { width: 100%; justify-content: center; }
+
+  /* A left-weighted gradient does nothing on a narrow screen —
+     swap to a straight bottom lift so the copy keeps contrast. */
+  #lp .lp-hero__veil {
+    background: linear-gradient(to top,
+      rgba(6,7,9,0.92) 0%,
+      rgba(6,7,9,0.62) 38%,
+      rgba(6,7,9,0.18) 74%,
+      rgba(6,7,9,0.05) 100%);
+  }
+}
+
+/* ── REDUCED MOTION ──
+   Everything that moves is decorative, so all of it is dropped
+   rather than shortened. Reveal targets are forced visible in
+   case the observer hasn't fired yet. */
+@media (prefers-reduced-motion: reduce) {
+  #lp *,
+  #lp *::before,
+  #lp *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  #lp .lp-hero__eyebrow,
+  #lp .lp-hero__sub,
+  #lp .lp-cue { opacity: 1 !important; }
+  #lp .lp-line > span { transform: none !important; }
+  #lp.lp-js .lp-rise,
+  #lp.lp-js .lp-rise[data-stagger] > * { opacity: 1 !important; transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LEADERSHIP
+     Paste from here through the closing
+     </script> tag. Nothing outside #lp is
+     required except the fonts link in <head>.
+══════════════════════════════════════════ -->
+<main id="lp">
+
+  <!-- ─────────── HERO ─────────── -->
+  <section class="lp-hero" aria-labelledby="lpHeroTitle">
+    <div class="lp-hero__bg" role="img" aria-label="A Saera electric vehicle outside the manufacturing facility"></div>
+    <div class="lp-hero__veil"></div>
+
+    <div class="lp-hero__inner">
+      <div class="lp-shell">
+        <p class="lp-eyebrow lp-hero__eyebrow">Leadership</p>
+        <h1 class="lp-hero__title" id="lpHeroTitle">
+          <span class="lp-line"><span>From Invention</span></span>
+          <span class="lp-line"><span>to Innovation</span></span>
+        </h1>
+        <p class="lp-hero__sub">
+          The people who put India's first E-Rickshaw on the road — and keep
+          moving millions, every day.
+        </p>
+      </div>
+    </div>
+
+    <span class="lp-cue" aria-hidden="true">
+      Scroll
+      <span class="lp-cue__track"></span>
+    </span>
+  </section>
+
+  <!-- ─────────── STAT STRIP ───────────
+       Sits flush against the hero on purpose: no top padding, so
+       the numbers act as a caption to the image above them. -->
+  <section class="lp-band" style="padding-top:0 !important; padding-bottom:0 !important;" aria-label="Company at a glance">
+    <div class="lp-shell">
+      <div class="lp-stats lp-rise" data-stagger>
+        <div class="lp-stat">
+          <span class="lp-stat__n">40<em>+</em></span>
+          <span class="lp-stat__l">Years of electric<br>innovation</span>
+        </div>
+        <div class="lp-stat">
+          <span class="lp-stat__n">1972</span>
+          <span class="lp-stat__l">The pledge<br>taken at IIT</span>
+        </div>
+        <div class="lp-stat">
+          <span class="lp-stat__n"><em>1</em>st</span>
+          <span class="lp-stat__l">E-Rickshaw<br>made in India</span>
+        </div>
+        <div class="lp-stat">
+          <span class="lp-stat__n">02</span>
+          <span class="lp-stat__l">Manufacturing plants<br>Bhiwadi &amp; Bawal</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── CHAIRMAN ─────────── -->
+  <section class="lp-band" aria-labelledby="lpChairman">
+    <div class="lp-shell">
+      <div class="lp-figure">
+
+        <div class="lp-figure__media lp-rise">
+          <div class="lp-portrait lp-portrait--chairman">
+            <div class="lp-portrait__img" role="img" aria-label="Portrait of Mr. Vijay Kapoor"></div>
+          </div>
+        </div>
+
+        <div class="lp-figure__body lp-rise">
+          <p class="lp-eyebrow">The Chairman</p>
+          <h2 class="lp-h2" id="lpChairman">Meet the Father of the E-Rickshaw</h2>
+
+          <div class="lp-namecard">
+            <p class="lp-name">Mr. Vijay Kapoor</p>
+            <p class="lp-role">Chairman</p>
+            <p class="lp-org">Satra Group &amp; Saera Electric Auto Limited</p>
+          </div>
+
+          <p class="lp-p">
+            Mr. Vijay Kapoor has a legacy of four decades for creating components
+            for the automotive industry in India. For his invaluable commitment,
+            dedication, and contribution towards the society, he has been honoured
+            with several awards.
+          </p>
+
+          <h3 class="lp-h3">How the journey started</h3>
+          <p class="lp-p">
+            The story of the E-Rickshaw is connected to the pledge taken way back
+            at IIT in 1972 — "to give back to the society". A paddle rickshaw ride
+            of Vijay Kapoor from Chandni Chowk car parking to market exhibited the
+            pain that a driver goes through every day. After a thought provoking
+            conversation with the driver, Vijay Kapoor created a vehicle which is
+            eco friendly, had a low running cost and requires almost zero human
+            effort. And that is what led to the birth of the E-Rickshaw in India.
+          </p>
+          <p class="lp-p">
+            With a constant belief to create self employment for thousands of
+            people, we want to upgrade their status in society by providing them
+            with a more steady source of income.
+          </p>
+
+          <ul class="lp-awards">
+            <li class="lp-award">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="9" r="6"/><path d="M8.5 14.2L7 22l5-2.6L17 22l-1.5-7.8"/></svg>
+              Rajiv Gandhi Ekta Award
+            </li>
+            <li class="lp-award">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="9" r="6"/><path d="M8.5 14.2L7 22l5-2.6L17 22l-1.5-7.8"/></svg>
+              Indira Gandhi Priyadarshini Award
+            </li>
+            <li class="lp-award">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="9" r="6"/><path d="M8.5 14.2L7 22l5-2.6L17 22l-1.5-7.8"/></svg>
+              Media Excellence Param Shree
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── TIMELINE ─────────── -->
+  <section class="lp-band lp-band--tint" aria-labelledby="lpJourney">
+    <div class="lp-shell">
+      <p class="lp-eyebrow lp-rise">The Journey</p>
+      <h2 class="lp-h2 lp-rise" id="lpJourney">Four beats that built an industry</h2>
+
+      <div class="lp-timeline lp-rise" data-stagger>
+        <div class="lp-step">
+          <span class="lp-step__k">1972</span>
+          <h3 class="lp-step__t">The Pledge</h3>
+          <p class="lp-step__p">A promise taken at IIT — to give back to the society. Every decision since has traced back to it.</p>
+        </div>
+        <div class="lp-step">
+          <span class="lp-step__k">Four Decades</span>
+          <h3 class="lp-step__t">Building the Parts</h3>
+          <p class="lp-step__p">A legacy of creating components for India's automotive industry, and the engineering depth that came with it.</p>
+        </div>
+        <div class="lp-step">
+          <span class="lp-step__k">Chandni Chowk</span>
+          <h3 class="lp-step__t">The Ride That Changed It</h3>
+          <p class="lp-step__p">One paddle rickshaw ride, one conversation with the driver, and the daily toll of the work made plain.</p>
+        </div>
+        <div class="lp-step">
+          <span class="lp-step__k">Today</span>
+          <h3 class="lp-step__t">India's First E-Rickshaw</h3>
+          <p class="lp-step__p">Eco friendly, low running cost, almost zero human effort — and steady income for thousands of families.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── CHAIRMAN FILMS ─────────── -->
+  <section class="lp-band" aria-labelledby="lpFilms1">
+    <div class="lp-shell">
+      <div class="lp-films__head lp-rise">
+        <div>
+          <p class="lp-eyebrow">In His Words</p>
+          <h2 class="lp-h2" id="lpFilms1">The Story Behind India's 1st E-Rickshaw</h2>
+        </div>
+        <span class="lp-films__count">Three films</span>
+      </div>
+
+      <div class="lp-films lp-rise" data-stagger>
+
+        <button class="lp-film" type="button" data-id="yUcxMQBsLUU"
+                aria-label="Play film: The Story Behind India's 1st E-Rickshaw, part one">
+          <span class="lp-film__frame">
+            <img class="lp-film__poster" alt=""
+                 src="https://i.ytimg.com/vi/yUcxMQBsLUU/maxresdefault.jpg"
+                 data-fallback="https://i.ytimg.com/vi/yUcxMQBsLUU/hqdefault.jpg"
+                 loading="lazy" decoding="async" width="1280" height="720">
+            <span class="lp-film__scrim"></span>
+            <span class="lp-film__play"><svg viewBox="0 0 16 18" aria-hidden="true" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
+          </span>
+          <span class="lp-film__meta">
+            <span class="lp-film__t">The Story Behind India's 1st E-Rickshaw</span>
+            <span class="lp-film__s">Part One</span>
+          </span>
+        </button>
+
+        <button class="lp-film" type="button" data-id="1YolwuqbVIY"
+                aria-label="Play film: The Story Behind India's 1st E-Rickshaw, part two">
+          <span class="lp-film__frame">
+            <img class="lp-film__poster" alt=""
+                 src="https://i.ytimg.com/vi/1YolwuqbVIY/maxresdefault.jpg"
+                 data-fallback="https://i.ytimg.com/vi/1YolwuqbVIY/hqdefault.jpg"
+                 loading="lazy" decoding="async" width="1280" height="720">
+            <span class="lp-film__scrim"></span>
+            <span class="lp-film__play"><svg viewBox="0 0 16 18" aria-hidden="true" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
+          </span>
+          <span class="lp-film__meta">
+            <span class="lp-film__t">The Story Behind India's 1st E-Rickshaw</span>
+            <span class="lp-film__s">Part Two</span>
+          </span>
+        </button>
+
+        <button class="lp-film" type="button" data-id="FoGoadAJtxw"
+                aria-label="Play film: The Story Behind India's 1st E-Rickshaw, part three">
+          <span class="lp-film__frame">
+            <img class="lp-film__poster" alt=""
+                 src="https://i.ytimg.com/vi/FoGoadAJtxw/maxresdefault.jpg"
+                 data-fallback="https://i.ytimg.com/vi/FoGoadAJtxw/hqdefault.jpg"
+                 loading="lazy" decoding="async" width="1280" height="720">
+            <span class="lp-film__scrim"></span>
+            <span class="lp-film__play"><svg viewBox="0 0 16 18" aria-hidden="true" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
+          </span>
+          <span class="lp-film__meta">
+            <span class="lp-film__t">The Story Behind India's 1st E-Rickshaw</span>
+            <span class="lp-film__s">Part Three</span>
+          </span>
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── DIRECTOR ─────────── -->
+  <section class="lp-band lp-band--ink" aria-labelledby="lpDirector">
+    <div class="lp-shell">
+      <div class="lp-figure lp-figure--flip">
+
+        <div class="lp-figure__media lp-rise">
+          <div class="lp-portrait lp-portrait--director">
+            <div class="lp-portrait__img" role="img" aria-label="Portrait of Mr. Nitin Kapoor"></div>
+          </div>
+        </div>
+
+        <div class="lp-figure__body lp-rise">
+          <p class="lp-eyebrow">The Director</p>
+          <h2 class="lp-h2" id="lpDirector">Engineering the next mile</h2>
+
+          <div class="lp-namecard">
+            <p class="lp-name">Mr. Nitin Kapoor</p>
+            <p class="lp-role">Director</p>
+            <p class="lp-org">Saera Electric Auto Limited</p>
+          </div>
+
+          <p class="lp-p">
+            Leading design, engineering and manufacturing across Saera's plants,
+            Mr. Nitin Kapoor carries the founding pledge into every new vehicle —
+            refining what works, and rebuilding what doesn't.
+          </p>
+
+          <blockquote class="lp-quote">
+            <span class="lp-quote__mark" aria-hidden="true">&ldquo;</span>
+            <p class="lp-quote__t">
+              Innovation is the foundation of engineering. Our commitment to
+              constantly refining our ideas enables us to achieve excellence and
+              deliver exceptional products, services, and mobility solutions that
+              consistently push the boundaries of what's possible.
+            </p>
+            <cite class="lp-quote__by">Mr. Nitin Kapoor — Director</cite>
+          </blockquote>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── DIRECTOR FILMS ─────────── -->
+  <section class="lp-band lp-band--ink2" aria-labelledby="lpFilms2">
+    <div class="lp-shell">
+      <div class="lp-films__head lp-rise">
+        <div>
+          <p class="lp-eyebrow">On Record</p>
+          <h2 class="lp-h2" id="lpFilms2">Establishing the E-Rickshaw Industry</h2>
+        </div>
+        <span class="lp-films__count">Three films</span>
+      </div>
+
+      <div class="lp-films lp-rise" data-stagger>
+
+        <!-- data-start mirrors the ?t= on the source link. -->
+        <button class="lp-film" type="button" data-id="dd3Z8EidhhU" data-start="77"
+                aria-label="Play film: Establishing the E-Rickshaw Industry, part one">
+          <span class="lp-film__frame">
+            <img class="lp-film__poster" alt=""
+                 src="https://i.ytimg.com/vi/dd3Z8EidhhU/maxresdefault.jpg"
+                 data-fallback="https://i.ytimg.com/vi/dd3Z8EidhhU/hqdefault.jpg"
+                 loading="lazy" decoding="async" width="1280" height="720">
+            <span class="lp-film__scrim"></span>
+            <span class="lp-film__play"><svg viewBox="0 0 16 18" aria-hidden="true" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
+          </span>
+          <span class="lp-film__meta">
+            <span class="lp-film__t">Establishing the E-Rickshaw Industry</span>
+            <span class="lp-film__s">Part One</span>
+          </span>
+        </button>
+
+        <button class="lp-film" type="button" data-id="H56J6qSJxAY"
+                aria-label="Play film: Establishing the E-Rickshaw Industry, part two">
+          <span class="lp-film__frame">
+            <img class="lp-film__poster" alt=""
+                 src="https://i.ytimg.com/vi/H56J6qSJxAY/maxresdefault.jpg"
+                 data-fallback="https://i.ytimg.com/vi/H56J6qSJxAY/hqdefault.jpg"
+                 loading="lazy" decoding="async" width="1280" height="720">
+            <span class="lp-film__scrim"></span>
+            <span class="lp-film__play"><svg viewBox="0 0 16 18" aria-hidden="true" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
+          </span>
+          <span class="lp-film__meta">
+            <span class="lp-film__t">Establishing the E-Rickshaw Industry</span>
+            <span class="lp-film__s">Part Two</span>
+          </span>
+        </button>
+
+        <button class="lp-film" type="button" data-id="EOVGiEnI31M"
+                aria-label="Play film: Establishing the E-Rickshaw Industry, part three">
+          <span class="lp-film__frame">
+            <img class="lp-film__poster" alt=""
+                 src="https://i.ytimg.com/vi/EOVGiEnI31M/maxresdefault.jpg"
+                 data-fallback="https://i.ytimg.com/vi/EOVGiEnI31M/hqdefault.jpg"
+                 loading="lazy" decoding="async" width="1280" height="720">
+            <span class="lp-film__scrim"></span>
+            <span class="lp-film__play"><svg viewBox="0 0 16 18" aria-hidden="true" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
+          </span>
+          <span class="lp-film__meta">
+            <span class="lp-film__t">Establishing the E-Rickshaw Industry</span>
+            <span class="lp-film__s">Part Three</span>
+          </span>
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── CLOSING CTA ─────────── -->
+  <section class="lp-band lp-band--ink" aria-label="Work with Saera">
+    <div class="lp-shell">
+      <div class="lp-cta lp-rise">
+        <h2 class="lp-cta__t">Built on a pledge. <em>Driven by you.</em></h2>
+        <div class="lp-cta__actions">
+          <a class="lp-btn lp-btn--solid" href="https://ddfintech.net/become-a-dealer/">
+            Become a Dealer <span class="lp-btn__arr" aria-hidden="true">&rarr;</span>
+          </a>
+          <a class="lp-btn lp-btn--ghost" href="https://ddfintech.net/contact-us/">
+            Contact Us <span class="lp-btn__arr" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var lp = document.getElementById('lp');
+  if (!lp) return;
+
+  /* Marks JS as alive. The reveal styles hang off .lp-js, so if
+     this script never runs the page simply renders fully visible
+     instead of staying blank. */
+  lp.classList.add('lp-js');
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── HERO ENTRANCE ──
+     Deferred one frame past load so the Ken Burns and the curtain
+     reveal start against painted pixels, not a white flash. */
+  requestAnimationFrame(function () { lp.classList.add('is-ready'); });
+
+  /* ── SCROLL REVEAL ──
+     One observer for every target, unobserving as it goes: these
+     are one-shot entrances, so there is no reason to keep paying
+     for elements already on screen. rootMargin pulls the trigger
+     up from the fold so a section is already settled by the time
+     it is properly in view. */
+  var rises = Array.prototype.slice.call(lp.querySelectorAll('.lp-rise'));
+
+  if (reduced || !('IntersectionObserver' in window)) {
+    rises.forEach(function (el) { el.classList.add('is-in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    rises.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ── POSTER FALLBACK ──
+     maxresdefault only exists for videos uploaded at 720p or
+     better; YouTube answers 404 with a 120x90 grey placeholder
+     rather than a failed request, so `onerror` never fires. The
+     dimension check is what actually catches it. */
+  Array.prototype.slice.call(lp.querySelectorAll('.lp-film__poster')).forEach(function (img) {
+    function demote() {
+      var fb = img.getAttribute('data-fallback');
+      if (!fb || img.src === fb) return;
+      img.src = fb;
+    }
+    function check() {
+      if (img.naturalWidth && img.naturalWidth < 200) demote();
+    }
+    img.addEventListener('error', demote);
+    img.addEventListener('load', check);
+    if (img.complete) check();
+  });
+
+  /* ── FILM FACADES ──
+     The poster is swapped for a real embed on click, so the page
+     loads six images instead of six YouTube players. Uses
+     youtube-nocookie.com, which defers YouTube's tracking cookies
+     until playback actually begins.
+
+     `enablejsapi` is deliberately omitted — nothing here drives
+     the player after handoff, and leaving it off keeps one fewer
+     script talking to the page. */
+  function play(btn) {
+    if (btn.classList.contains('is-playing')) return;
+
+    var id = btn.getAttribute('data-id');
+    if (!id) return;
+
+    var frame = btn.querySelector('.lp-film__frame');
+    if (!frame) return;
+
+    var params = 'autoplay=1&rel=0&modestbranding=1&playsinline=1';
+    var start = btn.getAttribute('data-start');
+    if (start) params += '&start=' + encodeURIComponent(start);
+
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?' + params;
+    iframe.title = (btn.querySelector('.lp-film__t') || {}).textContent || 'Video';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    iframe.loading = 'eager';
+
+    frame.innerHTML = '';
+    frame.appendChild(iframe);
+
+    /* The card stops behaving like a button once it holds a player:
+       taken out of the tab order so focus lands on the player
+       itself, and the is-playing guard above stops a stray Enter
+       from rebuilding the iframe mid-playback.
+
+       Not `disabled` — a disabled button swallows pointer events
+       for its whole subtree, which would leave the video visible
+       but unclickable. */
+    btn.classList.add('is-playing');
+    btn.setAttribute('aria-label', 'Now playing');
+    btn.setAttribute('tabindex', '-1');
+  }
+
+  Array.prototype.slice.call(lp.querySelectorAll('.lp-film')).forEach(function (btn) {
+    btn.addEventListener('click', function () { play(btn); });
+  });
+
+}());
+</script>
+
+</body>
+</html>
