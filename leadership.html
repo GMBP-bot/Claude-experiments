@@ -172,9 +172,30 @@ html, body { margin: 0; padding: 0; }
 ──────────────────────────── */
 #lp {
   display: block;
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
+
+  /* ── FULL-BLEED BREAKOUT ──────────────────────────────────
+     Elementor drops this widget inside a centred, padded
+     container, so `width: 100%` stops at the theme's content
+     width and leaves a gutter down both sides of the hero.
+
+     The negative margins cancel that: 50% resolves against the
+     parent's content box, so `50% - half a viewport` lands the
+     left edge exactly on the viewport edge — and it works
+     whatever padding or content width the container happens to
+     have, without needing a rule that targets the theme.
+
+     --lp-vw is 100vw as a fallback, but 100vw *includes* the
+     scrollbar and would hand the page a ~15px horizontal
+     scroll on Windows. The JS overwrites it with
+     documentElement.clientWidth, which excludes the scrollbar.
+     Both margins are also clamped at 0 so the widget can never
+     grow the page inside the Elementor editor canvas, which is
+     itself narrower than the viewport.
+  ── */
+  --lp-vw: 100vw;
+  width: var(--lp-vw) !important;
+  max-width: var(--lp-vw) !important;
+  margin: 0 min(0px, calc(50% - var(--lp-vw) / 2)) !important;
   padding: 0 !important;
   overflow-x: clip;          /* the offset portrait frames overhang */
   isolation: isolate;
@@ -1484,6 +1505,27 @@ html, body { margin: 0; padding: 0; }
   lp.classList.add('lp-js');
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── FULL-BLEED WIDTH ──
+     Feeds the breakout above a scrollbar-free viewport width.
+     clientWidth is the layout viewport minus the scrollbar, which
+     is the number 100vw gets wrong — using it here is what keeps
+     an edge-to-edge section from adding a horizontal scrollbar.
+     Re-measured on resize (rAF-throttled) so it survives rotation
+     and a window drag. */
+  var vwPending = false;
+
+  function syncVW() {
+    vwPending = false;
+    lp.style.setProperty('--lp-vw', document.documentElement.clientWidth + 'px');
+  }
+
+  syncVW();
+  window.addEventListener('resize', function () {
+    if (vwPending) return;
+    vwPending = true;
+    requestAnimationFrame(syncVW);
+  }, { passive: true });
 
   /* ── HERO ENTRANCE ──
      Deferred one frame past load so the Ken Burns and the curtain
