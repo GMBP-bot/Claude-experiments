@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Saera Electric Auto</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   CONTACT — theme-proof build
+   Companion to the Leadership page: same green accent, same
+   Montserrat, same clamp()ed spacing scale, so the two sections
+   read as one site rather than two templates.
+
+   Scoping works the same way — everything hangs off the #cf id,
+   which outranks any class-based theme selector, and custom
+   properties are --cf-* on #cf rather than :root.
+
+   THE ONE EXCEPTION is .cf-formslot, which is a *class*. The
+   form is rendered by a plugin, so its markup is not ours to
+   write, and in Elementor it may not even live inside our HTML
+   widget (that widget does not run shortcodes — see the note by
+   the slot in the markup below). Making the form styles hang off
+   a class means they apply whether the form sits inside #cf or
+   in a separate Elementor Shortcode widget you tag with
+   cf-formslot. Those rules carry !important for the same reason
+   the buttons do: plugin stylesheets ship their own !important
+   declarations, and specificity alone loses to those.
+══════════════════════════════════════════════════════════════ */
+
+html, body { margin: 0; padding: 0; }
+
+#cf {
+  /* ── PALETTE — identical to the Leadership page ── */
+  --cf-green:     #35B44A;
+  --cf-green-dk:  #268A38;
+  --cf-ink:       #0B0B0E;
+  --cf-ink-2:     #16171C;
+  --cf-paper:     #FFFFFF;
+  --cf-paper-2:   #F5F6F4;
+  --cf-head:      #121419;
+  --cf-body:      #55575E;
+  --cf-muted:     #8A8C93;
+  --cf-hair:      rgba(18,20,25,0.10);
+  --cf-hair-dark: rgba(255,255,255,0.10);
+
+  /* ── RHYTHM — same scale, so bands stack without a seam ── */
+  --cf-pad-y:  clamp(72px, 9.5vw, 148px);
+  --cf-gutter: clamp(22px, 6vw, 88px);
+  --cf-max:    1240px;
+
+  /* Inner padding for the two panels. One value drives both, so
+     the ink panel and the form column always breathe equally —
+     the mismatch that made the original section look assembled
+     rather than designed. */
+  --cf-pad-in: clamp(28px, 3.6vw, 56px);
+
+  --cf-ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
+  --cf-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* ── FULL-BLEED BREAKOUT ──
+     Same measured approach as the Leadership page: the JS writes
+     both properties, and they default to inert values so a
+     blocked script leaves the section merely inset. See the long
+     note in that file for why this is measured rather than
+     calculated from percentages. */
+  --cf-vw: 100%;
+  --cf-pull: 0px;
+}
+
+/* ── SCOPED RESET ──
+   Deliberately does NOT reach inside .cf-formslot. Plugin form
+   markup relies on its own padding and borders for layout, and
+   flattening all of it just to rebuild it below is how you end
+   up fighting a checkbox row you never styled. The form gets
+   targeted rules instead.
+
+   The :not() filters are wrapped in :where(), which contributes
+   zero specificity — without it each :not(.cf-formslot) would
+   add a class worth of weight and the reset would outrank the
+   component rules below it (painting the ink panel white, for
+   one). */
+#cf, #cf :where(*:not(.cf-formslot):not(.cf-formslot *)),
+#cf :where(*:not(.cf-formslot):not(.cf-formslot *))::before,
+#cf :where(*:not(.cf-formslot):not(.cf-formslot *))::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  max-width: none;
+  list-style: none;
+}
+
+/* The form subtree still needs a predictable box model. */
+.cf-formslot, .cf-formslot * { box-sizing: border-box; }
+
+#cf a {
+  font: inherit;
+  color: inherit;
+  text-decoration: none !important;
+  background: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#cf svg { display: block; }
+
+/* ────────────────────────────
+   ROOT
+──────────────────────────── */
+#cf {
+  display: block;
+  width: var(--cf-vw) !important;
+  max-width: var(--cf-vw) !important;
+  margin: 0 0 0 var(--cf-pull) !important;
+  padding: var(--cf-pad-y) var(--cf-gutter) !important;
+  overflow-x: clip;
+  isolation: isolate;
+  background: var(--cf-paper-2) !important;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--cf-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#cf .cf-shell {
+  width: 100%;
+  max-width: var(--cf-max);
+  margin: 0 auto !important;
+}
+
+/* ────────────────────────────
+   SECTION HEAD
+──────────────────────────── */
+#cf .cf-head {
+  max-width: 640px;
+  margin: 0 0 clamp(34px, 4vw, 56px) !important;
+}
+
+#cf .cf-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 3.4px;
+  text-transform: uppercase;
+  color: var(--cf-green-dk) !important;
+  margin: 0 0 20px !important;
+}
+#cf .cf-eyebrow::before {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 2px;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+
+#cf .cf-h2 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(28px, 3.6vw, 46px) !important;
+  font-weight: 800 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.8px;
+  color: var(--cf-head) !important;
+  margin: 0 0 16px !important;
+}
+
+#cf .cf-lede {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(14.5px, 1.05vw, 16px) !important;
+  font-weight: 400 !important;
+  line-height: 1.8 !important;
+  color: var(--cf-body) !important;
+  margin: 0 !important;
+  max-width: 56ch;
+}
+
+/* ────────────────────────────
+   CARD — one surface, two panels
+   The original had two loose columns floating on the page. A
+   single bordered surface split down the middle reads as one
+   deliberate object, and it gives the form a place to sit
+   instead of hanging in white space.
+──────────────────────────── */
+#cf .cf-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  background: var(--cf-paper);
+  border: 1px solid var(--cf-hair);
+  /* The only shadow on the page: wide, soft and nearly black at
+     4% — enough to lift the card off the tinted band without
+     announcing itself. */
+  box-shadow: 0 30px 70px -40px rgba(12,14,20,0.38);
+  overflow: hidden;
+}
+
+/* ── INK PANEL ── */
+#cf .cf-info {
+  position: relative;
+  padding: var(--cf-pad-in) !important;
+  background: var(--cf-ink);
+  color: rgba(255,255,255,0.66);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* A single soft green bloom in the top corner. Pure decoration,
+   but it stops a large flat black rectangle from reading as a
+   hole in the layout. */
+#cf .cf-info::before {
+  content: '';
+  position: absolute;
+  top: -140px;
+  right: -120px;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(53,180,74,0.20) 0%, rgba(53,180,74,0) 68%);
+  pointer-events: none;
+}
+
+#cf .cf-info__head { position: relative; margin: 0 0 clamp(26px, 3vw, 38px) !important; }
+
+#cf .cf-info .cf-eyebrow { color: var(--cf-green) !important; }
+
+#cf .cf-h3 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(19px, 1.9vw, 24px) !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.3px;
+  color: #fff !important;
+  margin: 0 !important;
+}
+
+/* ── CONTACT ROWS ──
+   Icon column is a fixed 44px track, so the labels align down a
+   single edge no matter how many lines each value runs to. The
+   old layout let the text start wherever the icon happened to
+   end. */
+#cf .cf-rows { position: relative; display: block; }
+
+#cf .cf-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding: 22px 0 !important;
+  border-top: 1px solid var(--cf-hair-dark);
+}
+#cf .cf-row:first-child { border-top: 0; padding-top: 0 !important; }
+
+#cf .cf-row__icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--cf-hair-dark);
+  background: rgba(255,255,255,0.03);
+  transition: border-color 0.35s ease, background 0.35s ease;
+}
+#cf .cf-row:hover .cf-row__icon {
+  border-color: var(--cf-green);
+  background: rgba(53,180,74,0.10);
+}
+
+#cf .cf-row__icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--cf-green);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#cf .cf-row__k {
+  display: block;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.38) !important;
+  margin: 0 0 10px !important;
+}
+
+#cf .cf-row__v {
+  display: block;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 1.65 !important;
+  color: rgba(255,255,255,0.92) !important;
+  margin: 0 !important;
+}
+
+/* Tel and mailto links get an underline that grows on hover
+   rather than a colour swap — quieter, and it keeps the two
+   phone numbers from fighting the labels for attention. */
+#cf a.cf-link {
+  position: relative;
+  display: inline-block;
+  color: rgba(255,255,255,0.92) !important;
+  transition: color 0.3s ease;
+}
+#cf a.cf-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: var(--cf-green);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.4s var(--cf-ease-expo);
+}
+#cf a.cf-link:hover { color: #fff !important; }
+#cf a.cf-link:hover::after { transform: scaleX(1); }
+#cf a.cf-link:focus-visible { outline: 2px solid var(--cf-green); outline-offset: 3px; }
+
+/* Sales / Service pairs sit on their own line each, with the
+   role as a fixed-width tag so both numbers start at the same x. */
+#cf .cf-pair {
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+#cf .cf-pair + .cf-pair { margin-top: 10px !important; }
+
+#cf .cf-pair__t {
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--cf-green) !important;
+  line-height: 1.8 !important;
+}
+
+/* ── PANEL FOOT ──
+   margin-top:auto pins this to the bottom of the ink panel, so
+   the map link lines up with the submit button opposite it
+   instead of floating mid-column. */
+#cf .cf-info__foot {
+  position: relative;
+  margin-top: auto !important;
+  padding-top: clamp(26px, 3vw, 38px) !important;
+}
+
+#cf .cf-map {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62) !important;
+  padding: 14px 22px !important;
+  border: 1px solid var(--cf-hair-dark) !important;
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+}
+#cf .cf-map:hover {
+  border-color: var(--cf-green) !important;
+  color: #fff !important;
+  background: rgba(53,180,74,0.10) !important;
+}
+#cf .cf-map:focus-visible { outline: 2px solid var(--cf-green); outline-offset: 3px; }
+
+#cf .cf-map__arr {
+  display: inline-block;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  transition: transform 0.32s var(--cf-ease-expo);
+}
+#cf .cf-map:hover .cf-map__arr { transform: translateX(4px); }
+
+/* ── FORM PANEL ── */
+#cf .cf-form {
+  padding: var(--cf-pad-in) !important;
+  background: var(--cf-paper);
+}
+
+#cf .cf-form__head { margin: 0 0 clamp(24px, 2.8vw, 34px) !important; }
+
+#cf .cf-form__head .cf-h3 { color: var(--cf-head) !important; }
+
+#cf .cf-form__note {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.7 !important;
+  color: var(--cf-muted) !important;
+  margin: 10px 0 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FORM CONTROLS
+   Scoped to the .cf-formslot class, not #cf — see the note at the
+   top. Selectors are written by *element* wherever possible so
+   they land on whatever the plugin emits; the plugin-specific
+   ones below only handle the wrappers, which is the one thing
+   element selectors cannot reach.
+══════════════════════════════════════════════════════════════ */
+
+/* Labels — every plugin names its own, so they are listed
+   together rather than styled generically; a bare `label` rule
+   would also catch checkbox and radio captions and shrink them
+   to unreadable micro-caps. */
+.cf-formslot > label,
+.cf-formslot p > label,
+.cf-formslot .wpforms-field-label,
+.cf-formslot .gfield_label,
+.cf-formslot .elementor-field-label,
+.cf-formslot .cf-label {
+  display: block !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 1.8px !important;
+  text-transform: uppercase !important;
+  color: var(--cf-head, #121419) !important;
+  margin: 0 0 9px !important;
+}
+
+/* Required marks stay red but stop shouting. */
+.cf-formslot .wpforms-required-label,
+.cf-formslot .gfield_required,
+.cf-formslot .required,
+.cf-formslot abbr[title="required"] {
+  color: #D64545 !important;
+  border: 0 !important;
+  text-decoration: none !important;
+  font-weight: 700 !important;
+}
+
+/* The controls themselves. 52px is the smallest height that
+   still reads as generous at this type size, and the flat 2px
+   radius replaces the pill shape — pills fought the square
+   geometry of everything else on the page. */
+.cf-formslot input[type="text"],
+.cf-formslot input[type="email"],
+.cf-formslot input[type="tel"],
+.cf-formslot input[type="url"],
+.cf-formslot input[type="number"],
+.cf-formslot input[type="search"],
+.cf-formslot input[type="date"],
+.cf-formslot select,
+.cf-formslot textarea {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 52px !important;
+  padding: 14px 16px !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 14.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: var(--cf-head, #121419) !important;
+  background: var(--cf-paper-2, #F5F6F4) !important;
+  border: 1px solid var(--cf-hair, rgba(18,20,25,0.10)) !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cf-formslot textarea {
+  min-height: 156px !important;
+  resize: vertical !important;
+  line-height: 1.7 !important;
+}
+
+/* Focus is the one place colour is spent: the field goes white,
+   the border turns green, and a 3px tinted ring separates it
+   from its neighbours. */
+.cf-formslot input:focus,
+.cf-formslot select:focus,
+.cf-formslot textarea:focus {
+  background: #fff !important;
+  border-color: var(--cf-green, #35B44A) !important;
+  box-shadow: 0 0 0 3px rgba(53,180,74,0.14) !important;
+}
+
+.cf-formslot input::placeholder,
+.cf-formslot textarea::placeholder {
+  color: #A9ABB1 !important;
+  opacity: 1 !important;    /* Firefox dims placeholders by default */
+}
+
+/* Native select needs its own chevron once appearance is off. */
+.cf-formslot select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355575E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 16px 16px !important;
+  padding-right: 42px !important;
+}
+
+/* Field spacing. Each plugin wraps its fields differently, so the
+   gap is set on every wrapper we know of plus the bare <p> that
+   Contact Form 7 emits. */
+.cf-formslot p,
+.cf-formslot .wpforms-field,
+.cf-formslot .gfield,
+.cf-formslot .elementor-field-group,
+.cf-formslot .cf-field {
+  margin: 0 0 20px !important;
+  padding: 0 !important;
+}
+.cf-formslot p:last-child,
+.cf-formslot .cf-field:last-child { margin-bottom: 0 !important; }
+
+/* Two-up rows. Add class cf-half to a field wrapper (every plugin
+   above supports a per-field CSS class) and two of them share a
+   line — first name / last name, phone / city. */
+.cf-formslot .cf-row2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+}
+.cf-formslot .cf-half { grid-column: span 1; }
+
+/* Submit. Matches the solid green CTA on the Leadership page so
+   the two pages share one button language. */
+.cf-formslot input[type="submit"],
+.cf-formslot button[type="submit"],
+.cf-formslot .wpforms-submit,
+.cf-formslot .gform_button,
+.cf-formslot .elementor-button {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  width: auto !important;
+  min-height: 0 !important;
+  padding: 17px 34px !important;
+  margin: 6px 0 0 !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 2.2px !important;
+  text-transform: uppercase !important;
+  color: #06210C !important;
+  background: var(--cf-green, #35B44A) !important;
+  border: 0 !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: background 0.3s ease, transform 0.35s var(--cf-ease-expo), box-shadow 0.3s ease;
+}
+.cf-formslot input[type="submit"]:hover,
+.cf-formslot button[type="submit"]:hover,
+.cf-formslot .wpforms-submit:hover,
+.cf-formslot .gform_button:hover,
+.cf-formslot .elementor-button:hover {
+  background: #43C959 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -12px rgba(53,180,74,0.7) !important;
+}
+.cf-formslot input[type="submit"]:focus-visible,
+.cf-formslot button[type="submit"]:focus-visible {
+  outline: 2px solid var(--cf-green-dk, #268A38) !important;
+  outline-offset: 3px !important;
+}
+
+/* Plugin validation and status messages, toned to the palette
+   rather than each plugin's stock red-on-pink. */
+.cf-formslot .wpforms-error,
+.cf-formslot .gfield_description.validation_message,
+.cf-formslot .wpcf7-not-valid-tip,
+.cf-formslot .elementor-message-danger {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #D64545 !important;
+  margin-top: 7px !important;
+}
+.cf-formslot input.wpforms-error,
+.cf-formslot textarea.wpforms-error,
+.cf-formslot .wpcf7-not-valid {
+  border-color: #D64545 !important;
+}
+
+.cf-formslot .wpcf7-response-output,
+.cf-formslot .wpforms-confirmation-container-full,
+.cf-formslot .elementor-message {
+  margin: 18px 0 0 !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--cf-hair, rgba(18,20,25,0.10)) !important;
+  border-left: 3px solid var(--cf-green, #35B44A) !important;
+  border-radius: 2px !important;
+  background: var(--cf-paper-2, #F5F6F4) !important;
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+  color: var(--cf-head, #121419) !important;
+}
+
+/* ────────────────────────────
+   REVEAL
+   Opt-in behind .cf-js, so a blocked script leaves the section
+   visible rather than blank.
+──────────────────────────── */
+#cf.cf-js .cf-rise {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s var(--cf-ease-quart), transform 0.8s var(--cf-ease-expo);
+}
+#cf.cf-js .cf-rise.is-in { opacity: 1; transform: none; }
+#cf.cf-js .cf-rise:nth-child(2) { transition-delay: 0.10s; }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 960px) {
+  /* The card stacks: details first, then the form. Reversing that
+     would make someone scroll past a form to find the phone
+     number they came for. */
+  #cf .cf-card { grid-template-columns: 1fr; }
+  #cf .cf-info__foot { padding-top: clamp(22px, 3vw, 30px) !important; }
+}
+
+@media (max-width: 560px) {
+  #cf .cf-row { grid-template-columns: 36px minmax(0, 1fr); gap: 14px; }
+  #cf .cf-row__icon { width: 36px; height: 36px; }
+  #cf .cf-row__icon svg { width: 16px; height: 16px; }
+
+  /* Two-up name fields go single file — 160px-wide inputs are
+     not a form, they are a puzzle. */
+  .cf-formslot .cf-row2 { grid-template-columns: 1fr; }
+
+  #cf .cf-map { width: 100%; justify-content: center; }
+  .cf-formslot input[type="submit"],
+  .cf-formslot button[type="submit"],
+  .cf-formslot .wpforms-submit,
+  .cf-formslot .gform_button { width: 100% !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #cf *, #cf *::before, #cf *::after,
+  .cf-formslot * { animation: none !important; transition: none !important; }
+  #cf.cf-js .cf-rise { opacity: 1 !important; transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     CONTACT
+     Paste from here through the closing
+     </script> tag.
+══════════════════════════════════════════ -->
+<section id="cf" aria-labelledby="cfTitle">
+  <div class="cf-shell">
+
+    <div class="cf-head cf-rise">
+      <p class="cf-eyebrow">Contact</p>
+      <h2 class="cf-h2" id="cfTitle">Let's get you moving</h2>
+      <p class="cf-lede">
+        Dealership enquiries, service support, or a question about a vehicle —
+        reach the right desk directly, or send us a note and we'll come back to you.
+      </p>
+    </div>
+
+    <div class="cf-card cf-rise">
+
+      <!-- ─────── INK PANEL: contact details ─────── -->
+      <div class="cf-info">
+
+        <div class="cf-info__head">
+          <p class="cf-eyebrow">Contact info</p>
+          <h3 class="cf-h3">Talk to us directly</h3>
+        </div>
+
+        <div class="cf-rows">
+
+          <div class="cf-row">
+            <span class="cf-row__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <rect x="2.5" y="5" width="19" height="14" rx="1.5"/>
+                <path d="M3 6.5l9 6.5 9-6.5"/>
+              </svg>
+            </span>
+            <div>
+              <span class="cf-row__k">Email us at</span>
+              <span class="cf-row__v">
+                <a class="cf-link" href="mailto:info@saeragroup.com">info@saeragroup.com</a>
+              </span>
+            </div>
+          </div>
+
+          <div class="cf-row">
+            <span class="cf-row__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M6.5 3h3l1.5 4.5-2 1.5a12 12 0 006 6l1.5-2 4.5 1.5v3a2 2 0 01-2.2 2A17 17 0 014.5 5.2 2 2 0 016.5 3z"/>
+              </svg>
+            </span>
+            <div>
+              <span class="cf-row__k">Call us at</span>
+              <span class="cf-row__v">
+                <span class="cf-pair">
+                  <span class="cf-pair__t">Sales</span>
+                  <a class="cf-link" href="tel:+919658965841">+91 965-896-5841</a>
+                </span>
+                <span class="cf-pair">
+                  <span class="cf-pair__t">Service</span>
+                  <a class="cf-link" href="tel:+919560800251">+91 956-080-0251</a>
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="cf-row">
+            <span class="cf-row__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 21s7-5.6 7-11a7 7 0 10-14 0c0 5.4 7 11 7 11z"/>
+                <circle cx="12" cy="10" r="2.5"/>
+              </svg>
+            </span>
+            <div>
+              <span class="cf-row__k">Reach us at</span>
+              <span class="cf-row__v">
+                Saera Tower, Plot No. 1, Sector 11 Dwarka<br>
+                New Delhi &ndash; 110075
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="cf-info__foot">
+          <a class="cf-map"
+             href="https://www.google.com/maps/search/?api=1&amp;query=Saera+Tower+Plot+No+1+Sector+11+Dwarka+New+Delhi+110075"
+             target="_blank" rel="noopener">
+            View on Google Maps <span class="cf-map__arr" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- ─────── FORM PANEL ─────── -->
+      <div class="cf-form">
+
+        <div class="cf-form__head">
+          <h3 class="cf-h3">Write to us</h3>
+          <p class="cf-form__note">Fields marked with an asterisk are required.</p>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════
+             ▼▼  YOUR FORM GOES HERE  ▼▼
+
+             Delete the demo markup below and drop your shortcode
+             in its place, keeping the .cf-formslot wrapper:
+
+                 <div class="cf-formslot">
+                   [your_form_shortcode]
+                 </div>
+
+             Where the shortcode actually runs:
+
+             · Block editor — a Custom HTML block works as-is.
+               Block content passes through the_content, which
+               runs do_shortcode.
+
+             · Elementor — the HTML widget does NOT run
+               shortcodes. Two options:
+                 a) Keep this section in the HTML widget, delete
+                    this whole form panel, and put an Elementor
+                    Shortcode widget beside it with the CSS class
+                    cf-formslot (Advanced → CSS Classes). The
+                    form styles above are class-scoped precisely
+                    so this works.
+                 b) Use a Shortcode widget nested inside a
+                    two-column Elementor container, with this
+                    file's <style> block in an HTML widget above.
+
+             The demo form below is only so this file previews
+             correctly on its own. It submits nowhere.
+        ══════════════════════════════════════════════════ -->
+        <div class="cf-formslot">
+
+          <form action="#" method="post" novalidate>
+
+            <div class="cf-row2">
+              <div class="cf-field cf-half">
+                <label class="cf-label" for="cfFirst">First name</label>
+                <input type="text" id="cfFirst" name="first" placeholder="First name">
+              </div>
+              <div class="cf-field cf-half">
+                <label class="cf-label" for="cfLast">Last name</label>
+                <input type="text" id="cfLast" name="last" placeholder="Last name">
+              </div>
+            </div>
+
+            <div class="cf-field">
+              <label class="cf-label" for="cfEmail">Email <span class="required">*</span></label>
+              <input type="email" id="cfEmail" name="email" placeholder="you@company.com" required>
+            </div>
+
+            <div class="cf-field">
+              <label class="cf-label" for="cfSubject">Subject</label>
+              <input type="text" id="cfSubject" name="subject" placeholder="How can we help?">
+            </div>
+
+            <div class="cf-field">
+              <label class="cf-label" for="cfMessage">Your message <span class="required">*</span></label>
+              <textarea id="cfMessage" name="message" placeholder="Tell us a little about what you need" required></textarea>
+            </div>
+
+            <button type="submit">Submit Form</button>
+
+          </form>
+
+        </div>
+        <!-- ▲▲  END FORM SLOT  ▲▲ -->
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  var cf = document.getElementById('cf');
+  if (!cf) return;
+
+  cf.classList.add('cf-js');
+
+  /* ── FULL-BLEED BREAKOUT ──
+     Identical to the Leadership page: zero the pull, read the
+     element's natural left offset, negate it. Measured rather
+     than calculated, so it holds inside any container — padded,
+     centred, flexed or offset. clientWidth excludes the
+     scrollbar, which is what keeps this from adding a horizontal
+     one of its own. */
+  var pending = false;
+
+  function syncBleed() {
+    pending = false;
+    cf.style.setProperty('--cf-pull', '0px');
+    cf.style.setProperty('--cf-vw', document.documentElement.clientWidth + 'px');
+    var left = cf.getBoundingClientRect().left;
+    cf.style.setProperty('--cf-pull', (-left) + 'px');
+  }
+
+  syncBleed();
+
+  window.addEventListener('resize', function () {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(syncBleed);
+  }, { passive: true });
+
+  window.addEventListener('load', syncBleed);
+
+  /* ── REVEAL ── */
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var rises = Array.prototype.slice.call(cf.querySelectorAll('.cf-rise'));
+
+  if (reduced || !('IntersectionObserver' in window)) {
+    rises.forEach(function (el) { el.classList.add('is-in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+    rises.forEach(function (el) { io.observe(el); });
+  }
+
+}());
+</script>
+
+</body>
+</html>
