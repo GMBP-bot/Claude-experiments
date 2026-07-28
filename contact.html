@@ -407,10 +407,13 @@ html, body { margin: 0; padding: 0; }
 #cf .cf-embed {
   position: relative;
   width: 100%;
-  min-height: clamp(460px, 62vh, 640px);
-  background:
-    /* spinner-free loading hint: hairline frame + label */
-    var(--cf-paper-2);
+  /* A definite height, not a min-height. The Zapier component
+     sizes its internal iframe as a percentage of its host, and a
+     percentage cannot resolve against min-height — with only a
+     minimum set, the iframe collapsed to a sliver while the rest
+     of the panel sat on the loading state. */
+  height: clamp(560px, 75vh, 800px);
+  background: var(--cf-paper-2);
   border: 1px solid var(--cf-hair);
   border-radius: 2px;
   overflow: hidden;
@@ -439,16 +442,21 @@ html, body { margin: 0; padding: 0; }
   display: block;
   width: 100% !important;
   max-width: none !important;
-  height: 100% !important;
-  min-height: inherit;
+  height: 100% !important;  /* resolves now that .cf-embed has a real height */
 }
+/* Only reaches an iframe rendered in light DOM; harmless if
+   Zapier keeps it in the shadow root, where the host height
+   above is what sizes it. */
 #cf .cf-embed iframe {
   width: 100% !important;
   height: 100% !important;
-  min-height: inherit;
   border: 0 !important;
   display: block;
 }
+
+/* Dropped by JS once Zapier's component registers, so the label
+   cannot show through a transparent form background. */
+#cf .cf-embed.is-live::before { display: none; }
 
 /* ────────────────────────────
    REVEAL
@@ -483,7 +491,7 @@ html, body { margin: 0; padding: 0; }
 
   /* A phone gives the embed more of the viewport — the form is
      the whole reason the visitor scrolled here. */
-  #cf .cf-embed { min-height: clamp(520px, 78vh, 700px); }
+  #cf .cf-embed { height: clamp(600px, 85vh, 820px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -652,6 +660,17 @@ html, body { margin: 0; padding: 0; }
   }, { passive: true });
 
   window.addEventListener('load', syncBleed);
+
+  /* ── EMBED READY ──
+     Retire the "Loading form…" label once Zapier's web component
+     has registered — from that point the component owns the box,
+     and the label must not bleed through a transparent form. */
+  if (window.customElements && customElements.whenDefined) {
+    customElements.whenDefined('zapier-interfaces-page-embed').then(function () {
+      var embed = document.getElementById('cfEmbed');
+      if (embed) embed.classList.add('is-live');
+    });
+  }
 
   /* ── REVEAL ── */
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
