@@ -178,24 +178,32 @@ html, body { margin: 0; padding: 0; }
      container, so `width: 100%` stops at the theme's content
      width and leaves a gutter down both sides of the hero.
 
-     The negative margins cancel that: 50% resolves against the
-     parent's content box, so `50% - half a viewport` lands the
-     left edge exactly on the viewport edge — and it works
-     whatever padding or content width the container happens to
-     have, without needing a rule that targets the theme.
+     Both values below are measured and written by the JS:
 
-     --lp-vw is 100vw as a fallback, but 100vw *includes* the
-     scrollbar and would hand the page a ~15px horizontal
-     scroll on Windows. The JS overwrites it with
-     documentElement.clientWidth, which excludes the scrollbar.
-     Both margins are also clamped at 0 so the widget can never
-     grow the page inside the Elementor editor canvas, which is
-     itself narrower than the viewport.
+       --lp-vw    the viewport width, from clientWidth. Not
+                  100vw, which *includes* the scrollbar and
+                  would hand the page a ~15px horizontal scroll.
+       --lp-pull  how far this element's natural left edge sits
+                  from the viewport edge, negated.
+
+     Measuring the offset is the whole point. The obvious version
+     of this trick — `margin-left: calc(50% - 50vw)` — assumes
+     the parent is a plain centred block, and silently breaks
+     when it isn't: Elementor's widget wrapper is a flex item
+     whose inline size the percentage can resolve against as
+     zero, which throws the section half a viewport to the left.
+     A measured pixel offset has no such assumption and is
+     correct for any parent — padded, centred, flexed, or offset.
+
+     The defaults are the no-JS state: 100% wide and no pull, so
+     a blocked script leaves the section merely inset rather
+     than dragged off-screen.
   ── */
-  --lp-vw: 100vw;
+  --lp-vw: 100%;
+  --lp-pull: 0px;
   width: var(--lp-vw) !important;
   max-width: var(--lp-vw) !important;
-  margin: 0 min(0px, calc(50% - var(--lp-vw) / 2)) !important;
+  margin: 0 0 0 var(--lp-pull) !important;
   padding: 0 !important;
   overflow-x: clip;          /* the offset portrait frames overhang */
   isolation: isolate;
@@ -1506,26 +1514,45 @@ html, body { margin: 0; padding: 0; }
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ── FULL-BLEED WIDTH ──
-     Feeds the breakout above a scrollbar-free viewport width.
-     clientWidth is the layout viewport minus the scrollbar, which
-     is the number 100vw gets wrong — using it here is what keeps
-     an edge-to-edge section from adding a horizontal scrollbar.
-     Re-measured on resize (rAF-throttled) so it survives rotation
-     and a window drag. */
-  var vwPending = false;
+  /* ── FULL-BLEED BREAKOUT ──
+     Drives the two custom properties the CSS above leaves at
+     their inert defaults.
 
-  function syncVW() {
-    vwPending = false;
+     Order matters. The pull is zeroed first so the rect we read
+     is the element's *natural* flow position — its left edge
+     where the theme put it. Negating that offset is what lands
+     it on the viewport edge, and because it is a measurement it
+     holds for any parent regardless of padding, centring or
+     flex layout.
+
+     clientWidth, not innerWidth or 100vw: it is the layout
+     viewport minus the scrollbar, so an edge-to-edge section
+     never adds a horizontal scrollbar of its own. */
+  var bleedPending = false;
+
+  function syncBleed() {
+    bleedPending = false;
+
+    lp.style.setProperty('--lp-pull', '0px');
     lp.style.setProperty('--lp-vw', document.documentElement.clientWidth + 'px');
+
+    /* Forces the sync layout we need before reading the rect. */
+    var left = lp.getBoundingClientRect().left;
+    lp.style.setProperty('--lp-pull', (-left) + 'px');
   }
 
-  syncVW();
+  syncBleed();
+
+  /* Re-measured on resize so it survives a rotation or a window
+     drag, and once more on load in case a webfont or a late
+     stylesheet shifts the container after first paint. */
   window.addEventListener('resize', function () {
-    if (vwPending) return;
-    vwPending = true;
-    requestAnimationFrame(syncVW);
+    if (bleedPending) return;
+    bleedPending = true;
+    requestAnimationFrame(syncBleed);
   }, { passive: true });
+
+  window.addEventListener('load', syncBleed);
 
   /* ── HERO ENTRANCE ──
      Deferred one frame past load so the Ken Burns and the curtain
