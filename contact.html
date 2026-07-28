@@ -802,22 +802,26 @@ html, body { margin: 0; padding: 0; }
         ══════════════════════════════════════════════════ -->
         <div class="cf-formslot">
 
-          <form action="#" method="post" novalidate>
+          <!-- Submission is handled by the GOOGLE SHEETS bridge at
+               the bottom of the script block. Paste your Apps
+               Script Web App URL into CF_SHEET_ENDPOINT there and
+               this form starts writing rows. -->
+          <form id="cfForm" action="#" method="post" novalidate>
 
             <div class="cf-row2">
               <div class="cf-field cf-half">
                 <label class="cf-label" for="cfFirst">First name</label>
-                <input type="text" id="cfFirst" name="first" placeholder="First name">
+                <input type="text" id="cfFirst" name="first" placeholder="First name" autocomplete="given-name">
               </div>
               <div class="cf-field cf-half">
                 <label class="cf-label" for="cfLast">Last name</label>
-                <input type="text" id="cfLast" name="last" placeholder="Last name">
+                <input type="text" id="cfLast" name="last" placeholder="Last name" autocomplete="family-name">
               </div>
             </div>
 
             <div class="cf-field">
               <label class="cf-label" for="cfEmail">Email <span class="required">*</span></label>
-              <input type="email" id="cfEmail" name="email" placeholder="you@company.com" required>
+              <input type="email" id="cfEmail" name="email" placeholder="you@company.com" required autocomplete="email">
             </div>
 
             <div class="cf-field">
@@ -830,7 +834,23 @@ html, body { margin: 0; padding: 0; }
               <textarea id="cfMessage" name="message" placeholder="Tell us a little about what you need" required></textarea>
             </div>
 
-            <button type="submit">Submit Form</button>
+            <!-- Honeypot: invisible to people, irresistible to
+                 bots. A submission that fills it is dropped
+                 client-side before it ever reaches the sheet.
+                 Positioned off-screen rather than display:none,
+                 which the cruder bots check for. -->
+            <div aria-hidden="true"
+                 style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;">
+              <label for="cfCompanyHp">Company</label>
+              <input type="text" id="cfCompanyHp" name="company_hp" tabindex="-1" autocomplete="off">
+            </div>
+
+            <button type="submit" id="cfSubmit">Submit Form</button>
+
+            <!-- Status line, written by the bridge. role=status
+                 makes screen readers announce the outcome. -->
+            <p id="cfStatus" role="status" aria-live="polite"
+               style="display:none;margin:18px 0 0;padding:14px 16px;font-size:13.5px;line-height:1.6;border:1px solid rgba(18,20,25,0.10);border-left:3px solid #35B44A;border-radius:2px;background:#F5F6F4;color:#121419;"></p>
 
           </form>
 
@@ -895,6 +915,77 @@ html, body { margin: 0; padding: 0; }
     }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
     rises.forEach(function (el) { io.observe(el); });
   }
+
+  /* ══════════════════════════════════════════════════════════
+     GOOGLE SHEETS BRIDGE
+     Submits the form to a Google Apps Script Web App, which
+     appends a row to your sheet.
+
+     ▼ PASTE YOUR WEB APP URL BETWEEN THE QUOTES ▼
+     It looks like:
+     https://script.google.com/macros/s/AKfycb.../exec
+  ══════════════════════════════════════════════════════════ */
+  var CF_SHEET_ENDPOINT = '';
+
+  var form   = document.getElementById('cfForm');
+  var status = document.getElementById('cfStatus');
+  var submit = document.getElementById('cfSubmit');
+  if (!form || !status || !submit) return;
+
+  function say(msg, isError) {
+    status.textContent = msg;
+    status.style.display = 'block';
+    status.style.borderLeftColor = isError ? '#D64545' : '#35B44A';
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    /* Native validation first — reportValidity paints the
+       browser's own bubbles on the offending field. */
+    if (!form.reportValidity()) return;
+
+    /* Honeypot tripped: pretend success, save nothing. Telling a
+       bot it failed just invites a retry. */
+    if (form.company_hp && form.company_hp.value) {
+      say('Thank you — your message has been sent.', false);
+      form.reset();
+      return;
+    }
+
+    if (!CF_SHEET_ENDPOINT) {
+      say('This form is not connected yet — add the Web App URL to CF_SHEET_ENDPOINT in the page code.', true);
+      return;
+    }
+
+    var data = new FormData(form);
+    data.delete('company_hp');
+
+    submit.disabled = true;
+    var label = submit.textContent;
+    submit.textContent = 'Sending…';
+
+    /* mode:'no-cors' matters. Apps Script Web Apps don't answer
+       preflight requests, so a normal cross-origin fetch dies
+       before it starts. FormData posts as a "simple request"
+       (no preflight), and no-cors lets it through. The trade-off
+       is an opaque response — we can't read the script's reply,
+       so network success is treated as delivery. The row is
+       already written by the time this resolves. */
+    fetch(CF_SHEET_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: data
+    }).then(function () {
+      say('Thank you — your message has been sent. We’ll get back to you shortly.', false);
+      form.reset();
+    }).catch(function () {
+      say('Something went wrong sending your message. Please try again, or email us directly at info@saeragroup.com.', true);
+    }).finally(function () {
+      submit.disabled = false;
+      submit.textContent = label;
+    });
+  });
 
 }());
 </script>
