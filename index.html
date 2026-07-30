@@ -186,64 +186,6 @@ html, body { margin: 0; padding: 0; }
   #ps .ps-panel:hover .ps-grad  { opacity: 1; }
 }
 
-/* ── Logo — top-left, revealed on expand ──
-   A fixed-height box (not just the <img>) is what keeps every
-   logo — square, wide, tall, whatever aspect ratio the brand art
-   ships in — anchored to the exact same baseline. Without the
-   box, a short-and-wide logo (SGC-Horizontal) and a tall one
-   (Mayuri) would visually sit at different heights even though
-   both images have "top" alignment. */
-#ps .ps-logo-box {
-  position: absolute;
-  top: clamp(18px, 3vh, 30px);
-  left: clamp(18px, 2.2vw, 34px);
-  height: clamp(64px, 11vh, 108px);
-  max-width: min(340px, 66%);
-  display: flex;
-  align-items: flex-start;
-  overflow: hidden;   /* clips the per-brand zoom below at the box edge */
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.55s ease 0.12s, transform 0.6s var(--ps-ease) 0.12s;
-  pointer-events: none;
-  z-index: 2;
-}
-#ps .ps-panel.is-open .ps-logo-box { opacity: 1; transform: translateY(0); }
-@media (hover: hover) {
-  #ps .ps-panel:hover .ps-logo-box { opacity: 1; transform: translateY(0); }
-}
-
-#ps .ps-logo {
-  display: block;
-  height: 100% !important;
-  width: auto !important;
-  max-width: 100% !important;
-  object-fit: contain;
-  object-position: left top;
-  transform-origin: left top;
-  /* Guarantees legibility whether the logo art is light or dark,
-     and whatever photo it happens to sit on. */
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.75)) drop-shadow(0 0 18px rgba(0,0,0,0.45));
-}
-
-/* Mayuri and Sunehri ship as a small mark sitting in a mostly
-   transparent canvas, unlike the Golf Carts / Fleet files which
-   are cropped tight to their artwork. Scaling the whole box to a
-   shared height therefore left those two looking tiny even
-   though the box itself was the same size as everyone else's.
-   Zooming in from the top-left corner (where the artwork already
-   sits) restores them to a comparable visual weight; the box's
-   overflow:hidden above stops the zoomed image from spilling
-   into the name/tagline below it.
-   Tune ps-logo-zoom per brand if the real crop differs from this
-   estimate — it's based on screenshots, not the source files
-   (this environment can't reach ddfintech.net to measure them). */
-#ps .ps-panel--mayuri .ps-logo,
-#ps .ps-panel--sunehri .ps-logo {
-  --ps-logo-zoom: 2.6;
-  transform: scale(var(--ps-logo-zoom));
-}
-
 /* ── Meta block — number, name, tagline ── */
 #ps .ps-meta {
   position: absolute;
@@ -381,16 +323,7 @@ html, body { margin: 0; padding: 0; }
   #ps .ps-panel.is-open .ps-name { font-size: 27px !important; letter-spacing: 3px; }
   #ps .ps-tag  { font-size: 12px !important; margin-top: 10px !important; }
 
-  #ps .ps-logo-box {
-    top: 16px;
-    left: 18px;
-    height: 64px;
-    max-width: 64%;
-  }
-
-  /* Collapsed bars centre their label vertically and never show
-     the (still-transparent) logo box, so a tap target isn't
-     partially covered by an invisible element. */
+  /* Collapsed bars centre their label vertically. */
   #ps .ps-panel:not(.is-open) .ps-meta {
     top: 50%;
     bottom: auto;
@@ -400,7 +333,6 @@ html, body { margin: 0; padding: 0; }
     gap: 14px;
   }
   #ps .ps-panel:not(.is-open) .ps-num { margin-bottom: 0 !important; }
-  #ps .ps-panel:not(.is-open) .ps-logo-box { display: none; }
 }
 
 /* ────────────────────────────
@@ -411,7 +343,6 @@ html, body { margin: 0; padding: 0; }
   #ps .ps-bg,
   #ps .ps-shade,
   #ps .ps-grad,
-  #ps .ps-logo-box,
   #ps .ps-name,
   #ps .ps-go,
   #ps .ps-tag,
@@ -433,9 +364,6 @@ html, body { margin: 0; padding: 0; }
       <span class="ps-bg" aria-hidden="true"></span>
       <span class="ps-shade" aria-hidden="true"></span>
       <span class="ps-grad" aria-hidden="true"></span>
-      <span class="ps-logo-box" aria-hidden="true">
-        <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/1-1.webp" alt="" loading="lazy" decoding="async">
-      </span>
       <span class="ps-meta">
         <span class="ps-num" aria-hidden="true">01</span>
         <span class="ps-name">Mayuri<span class="ps-go" aria-hidden="true">↗</span></span>
@@ -449,9 +377,6 @@ html, body { margin: 0; padding: 0; }
       <span class="ps-bg" aria-hidden="true"></span>
       <span class="ps-shade" aria-hidden="true"></span>
       <span class="ps-grad" aria-hidden="true"></span>
-      <span class="ps-logo-box" aria-hidden="true">
-        <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/Sunhari-Logo-2024-04.png" alt="" loading="lazy" decoding="async">
-      </span>
       <span class="ps-meta">
         <span class="ps-num" aria-hidden="true">02</span>
         <span class="ps-name">Sunehri<span class="ps-go" aria-hidden="true">↗</span></span>
@@ -467,9 +392,6 @@ html, body { margin: 0; padding: 0; }
       <span class="ps-bg" aria-hidden="true"></span>
       <span class="ps-shade" aria-hidden="true"></span>
       <span class="ps-grad" aria-hidden="true"></span>
-      <span class="ps-logo-box" aria-hidden="true">
-        <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/SGC-Horizontal.png" alt="" loading="lazy" decoding="async">
-      </span>
       <span class="ps-meta">
         <span class="ps-num" aria-hidden="true">03</span>
         <span class="ps-name">Golf Carts<span class="ps-go" aria-hidden="true">↗</span></span>
@@ -483,9 +405,6 @@ html, body { margin: 0; padding: 0; }
       <span class="ps-bg" aria-hidden="true"></span>
       <span class="ps-shade" aria-hidden="true"></span>
       <span class="ps-grad" aria-hidden="true"></span>
-      <span class="ps-logo-box" aria-hidden="true">
-        <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/2-1-e1784715698625.webp" alt="" loading="lazy" decoding="async">
-      </span>
       <span class="ps-meta">
         <span class="ps-num" aria-hidden="true">04</span>
         <span class="ps-name">Saera Fleet<span class="ps-go" aria-hidden="true">↗</span></span>
