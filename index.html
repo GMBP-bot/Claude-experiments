@@ -569,6 +569,351 @@ html, body { margin: 0; padding: 0; }
 @media (hover: none) {
   #hs .hs-arrow { display: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BRAND SHOWCASE — expanding panels, theme-proof build
+
+   Same defensive strategy as the hero above: every rule is
+   scoped to the #ps id so specificity beats theme selectors,
+   custom props live on #ps (not :root), and classnames are
+   ps-prefixed so nothing here can collide with the hero's hs-*
+   rules or a theme's own utility classes.
+
+   Each panel is ONE <a> — the photo, the logo, the number and
+   the name are all part of the same link, so the whole card is
+   clickable and there is no separate "Explore brand" button.
+
+   To change a destination URL, edit the href on the matching
+   .ps-panel below. To swap an image or logo, edit the matching
+   .ps-panel--* rule or <img src>.
+══════════════════════════════════════════════════════════════ */
+#ps {
+  --ps-accent: #14D8C0;             /* teal — matches the hero's link/pill accents */
+  --ps-ink:    #0A0B0E;
+  --ps-ease:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ps-grow:   0.85s;               /* panel expand/collapse duration */
+}
+
+#ps, #ps *, #ps *::before, #ps *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  list-style: none;
+}
+
+#ps a {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none !important;
+  line-height: normal;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#ps {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: clamp(20px, 4vw, 56px) !important;
+  background: var(--ps-ink) !important;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #fff;
+  isolation: isolate;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ps .ps-track {
+  display: flex;
+  gap: clamp(8px, 1vw, 14px);
+  width: 100%;
+  height: clamp(520px, 82vh, 780px);
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+/* ── Panel — the whole card is the link ── */
+#ps .ps-panel {
+  position: relative;
+  display: block;
+  flex: 1 1 0%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  background-color: #101218 !important;   /* paints before the photo loads */
+  transition: flex-grow var(--ps-grow) var(--ps-ease);
+  will-change: flex-grow;
+}
+
+/* One selector list drives every "expanded" treatment below.
+   Hover only expands on devices that actually have hover —
+   touch expansion is handled by the .is-open class from JS. */
+#ps .ps-panel.is-open { flex-grow: 3.4; }
+@media (hover: hover) {
+  #ps .ps-track:not(:hover) .ps-panel.is-open { flex-grow: 3.4; }
+  #ps .ps-panel:hover { flex-grow: 3.4; }
+  /* While the mouse is inside the track, hover wins over any
+     stale .is-open left behind by keyboard focus. */
+  #ps .ps-track:hover .ps-panel.is-open:not(:hover) { flex-grow: 1; }
+}
+#ps .ps-panel:focus-visible {
+  outline: 2px solid var(--ps-accent);
+  outline-offset: -2px;
+}
+
+#ps .ps-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.02);
+  transition: transform 1.1s var(--ps-ease);
+}
+
+#ps .ps-panel--mayuri .ps-bg  { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/1-3.webp'); }
+#ps .ps-panel--sunehri .ps-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/3-2.webp'); }
+#ps .ps-panel--golf .ps-bg    { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/2-3.webp'); }
+#ps .ps-panel--fleet .ps-bg   { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-95.webp'); }
+
+/* Collapsed panels sit dark and quiet; the expanded one opens
+   up to show the photo, keeping just enough gradient top and
+   bottom for the logo and the name to stay readable on any
+   photograph. */
+#ps .ps-shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 9, 12, 0.78);
+  transition: background 0.7s ease, opacity 0.7s ease;
+  pointer-events: none;
+}
+
+#ps .ps-grad {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    linear-gradient(to bottom, rgba(8,9,12,0.62) 0%, rgba(8,9,12,0) 30%),
+    linear-gradient(to top,    rgba(8,9,12,0.88) 0%, rgba(8,9,12,0.35) 26%, rgba(8,9,12,0) 52%);
+  transition: opacity 0.7s ease;
+  pointer-events: none;
+}
+
+/* Expanded treatments — grouped per property so hover (fine
+   pointers) and .is-open (touch/keyboard) stay identical. */
+#ps .ps-panel.is-open .ps-bg    { transform: scale(1.07); }
+#ps .ps-panel.is-open .ps-shade { background: rgba(8, 9, 12, 0.0); }
+#ps .ps-panel.is-open .ps-grad  { opacity: 1; }
+@media (hover: hover) {
+  #ps .ps-panel:hover .ps-bg    { transform: scale(1.07); }
+  #ps .ps-panel:hover .ps-shade { background: rgba(8, 9, 12, 0.0); }
+  #ps .ps-panel:hover .ps-grad  { opacity: 1; }
+}
+
+/* ── Logo — top-left, revealed on expand ── */
+#ps .ps-logo {
+  position: absolute;
+  top: clamp(18px, 3vh, 30px);
+  left: clamp(18px, 2.2vw, 34px);
+  display: block;
+  height: clamp(44px, 8vh, 74px) !important;
+  width: auto !important;
+  max-width: min(300px, 62%) !important;
+  object-fit: contain;
+  object-position: left top;
+  /* Guarantees legibility whether the logo art is light or dark. */
+  filter: drop-shadow(0 3px 14px rgba(0,0,0,0.55));
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.55s ease 0.12s, transform 0.6s var(--ps-ease) 0.12s;
+  pointer-events: none;
+}
+#ps .ps-panel.is-open .ps-logo { opacity: 1; transform: translateY(0); }
+@media (hover: hover) {
+  #ps .ps-panel:hover .ps-logo { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Meta block — number, name, tagline ── */
+#ps .ps-meta {
+  position: absolute;
+  left: clamp(18px, 2.4vw, 40px);
+  right: clamp(14px, 1.6vw, 26px);
+  bottom: clamp(22px, 4.5vh, 44px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+#ps .ps-num {
+  display: block;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.38) !important;
+  margin-bottom: 12px !important;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.5s ease;
+}
+#ps .ps-panel.is-open .ps-num { color: var(--ps-accent) !important; }
+@media (hover: hover) {
+  #ps .ps-panel:hover .ps-num { color: var(--ps-accent) !important; }
+}
+
+/* Collapsed panels are narrow, so long names (e.g. "Saera Fleet")
+   truncate with an ellipsis rather than wrapping or overflowing
+   into the neighbouring card. */
+#ps .ps-name {
+  display: block;
+  font-size: clamp(15px, 1.35vw, 19px) !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #fff !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: font-size var(--ps-grow) var(--ps-ease), letter-spacing var(--ps-grow) var(--ps-ease);
+}
+#ps .ps-panel.is-open .ps-name { font-size: clamp(26px, 3vw, 44px) !important; letter-spacing: 4px; }
+@media (hover: hover) {
+  #ps .ps-panel:hover .ps-name { font-size: clamp(26px, 3vw, 44px) !important; letter-spacing: 4px; }
+}
+
+/* Small arrow after the name — a quiet cue that the card is a
+   link, replacing the old "Explore brand" button. */
+#ps .ps-name .ps-go {
+  display: inline-block;
+  font-size: 0.5em !important;
+  font-weight: 700 !important;
+  color: var(--ps-accent) !important;
+  vertical-align: 0.55em;
+  margin-left: 10px !important;
+  opacity: 0;
+  transform: translate(-6px, 6px);
+  transition: opacity 0.45s ease 0.2s, transform 0.5s var(--ps-ease) 0.2s;
+}
+#ps .ps-panel.is-open .ps-go { opacity: 1; transform: translate(0,0); }
+@media (hover: hover) {
+  #ps .ps-panel:hover .ps-go { opacity: 1; transform: translate(0,0); }
+}
+
+#ps .ps-tag {
+  display: block;
+  font-size: clamp(11px, 1vw, 13.5px) !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+  color: rgba(255,255,255,0.66) !important;
+  margin-top: 14px !important;
+  max-width: 420px !important;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease 0.18s, transform 0.55s var(--ps-ease) 0.18s;
+}
+#ps .ps-panel.is-open .ps-tag { opacity: 1; transform: translateY(0); }
+@media (hover: hover) {
+  #ps .ps-panel:hover .ps-tag { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Accent bar along the bottom edge of the expanded panel ── */
+#ps .ps-bar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: var(--ps-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.7s var(--ps-ease) 0.1s;
+  pointer-events: none;
+}
+#ps .ps-panel.is-open .ps-bar { transform: scaleX(1); }
+@media (hover: hover) {
+  #ps .ps-panel:hover .ps-bar { transform: scaleX(1); }
+}
+
+/* ── Tablet — slightly gentler expansion ── */
+@media (max-width: 1024px) and (min-width: 761px) {
+  #ps .ps-panel.is-open { flex-grow: 2.6; }
+  #ps .ps-panel:hover   { flex-grow: 2.6; }
+}
+
+/* ── Mobile — vertical accordion
+   Same markup, column layout. The open card grows tall enough
+   to read the photo; collapsed cards become slim dark bars that
+   still show number + name and are still fully tappable. ── */
+@media (max-width: 760px) {
+  #ps { padding: 16px !important; }
+
+  #ps .ps-track {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+    border-radius: 16px;
+  }
+
+  #ps .ps-panel {
+    flex: none;
+    height: 88px;
+    border-radius: 14px;
+    transition: height var(--ps-grow) var(--ps-ease);
+    will-change: height;
+  }
+  #ps .ps-panel.is-open { height: min(58vh, 440px); }
+
+  #ps .ps-meta { left: 20px; right: 18px; bottom: 20px; }
+  #ps .ps-num  { margin-bottom: 8px !important; }
+  #ps .ps-name { font-size: 15px !important; }
+  #ps .ps-panel.is-open .ps-name { font-size: 27px !important; letter-spacing: 3px; }
+  #ps .ps-tag  { font-size: 12px !important; margin-top: 10px !important; }
+
+  #ps .ps-logo {
+    top: 16px;
+    left: 18px;
+    height: 46px !important;
+    max-width: 58% !important;
+  }
+
+  /* Collapsed bars centre their label vertically. */
+  #ps .ps-panel:not(.is-open) .ps-meta {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  #ps .ps-panel:not(.is-open) .ps-num { margin-bottom: 0 !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ps .ps-panel,
+  #ps .ps-bg,
+  #ps .ps-shade,
+  #ps .ps-grad,
+  #ps .ps-logo,
+  #ps .ps-name,
+  #ps .ps-go,
+  #ps .ps-tag,
+  #ps .ps-bar { transition-duration: 0.01ms !important; transition-delay: 0s !important; }
+}
 </style>
 </head>
 <body>
@@ -658,6 +1003,74 @@ html, body { margin: 0; padding: 0; }
      style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"></p>
 
 </section>
+
+<!-- ═══════════════════════════════════════
+     BRAND SHOWCASE — each card is one link
+══════════════════════════════════════════ -->
+<section id="ps" aria-label="Our brands">
+  <div class="ps-track" id="psTrack">
+
+    <a class="ps-panel ps-panel--mayuri" href="https://ddfintech.net/brands/mayuri/"
+       aria-label="Mayuri — visit the brand page">
+      <span class="ps-bg" aria-hidden="true"></span>
+      <span class="ps-shade" aria-hidden="true"></span>
+      <span class="ps-grad" aria-hidden="true"></span>
+      <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/1-1.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <span class="ps-meta">
+        <span class="ps-num" aria-hidden="true">01</span>
+        <span class="ps-name">Mayuri<span class="ps-go" aria-hidden="true">↗</span></span>
+        <span class="ps-tag">India's trusted e-rickshaw.</span>
+      </span>
+      <span class="ps-bar" aria-hidden="true"></span>
+    </a>
+
+    <a class="ps-panel ps-panel--sunehri" href="https://ddfintech.net/brands/sunehri/"
+       aria-label="Sunehri — visit the brand page">
+      <span class="ps-bg" aria-hidden="true"></span>
+      <span class="ps-shade" aria-hidden="true"></span>
+      <span class="ps-grad" aria-hidden="true"></span>
+      <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/Sunhari-Logo-2024-04.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <span class="ps-meta">
+        <span class="ps-num" aria-hidden="true">02</span>
+        <span class="ps-name">Sunehri<span class="ps-go" aria-hidden="true">↗</span></span>
+        <span class="ps-tag">The Golden Ride.</span>
+      </span>
+      <span class="ps-bar" aria-hidden="true"></span>
+    </a>
+
+    <!-- Separate domain, so this one opens in a new tab, matching the hero's Saera CTA. -->
+    <a class="ps-panel ps-panel--golf" href="https://saeragolfcart.com/"
+       target="_blank" rel="noopener"
+       aria-label="Saera Golf Carts — visit the brand site (opens in a new tab)">
+      <span class="ps-bg" aria-hidden="true"></span>
+      <span class="ps-shade" aria-hidden="true"></span>
+      <span class="ps-grad" aria-hidden="true"></span>
+      <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/SGC-Horizontal.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <span class="ps-meta">
+        <span class="ps-num" aria-hidden="true">03</span>
+        <span class="ps-name">Golf Carts<span class="ps-go" aria-hidden="true">↗</span></span>
+        <span class="ps-tag">Silent. Premium. Emission-free.</span>
+      </span>
+      <span class="ps-bar" aria-hidden="true"></span>
+    </a>
+
+    <a class="ps-panel ps-panel--fleet" href="https://ddfintech.net/brands/saera-fleet/"
+       aria-label="Saera Fleet — visit the brand page">
+      <span class="ps-bg" aria-hidden="true"></span>
+      <span class="ps-shade" aria-hidden="true"></span>
+      <span class="ps-grad" aria-hidden="true"></span>
+      <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/2-1-e1784715698625.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <span class="ps-meta">
+        <span class="ps-num" aria-hidden="true">04</span>
+        <span class="ps-name">Saera Fleet<span class="ps-go" aria-hidden="true">↗</span></span>
+        <span class="ps-tag">Fleet mobility, fully electric.</span>
+      </span>
+      <span class="ps-bar" aria-hidden="true"></span>
+    </a>
+
+  </div>
+</section>
+
 <!-- ═══════════════════════════════════════
      Your page content continues here —
      the slider never captures scroll or wheel.
@@ -899,6 +1312,64 @@ html, body { margin: 0; padding: 0; }
      Slide 1 ships with is-active + is-in so it paints on the
      first frame with no JS-induced flash. */
   restartClock();
+}());
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  var track = document.getElementById('psTrack');
+  if (!track) return;
+
+  var panels = Array.prototype.slice.call(track.querySelectorAll('.ps-panel'));
+  var canHover = window.matchMedia('(hover: hover)').matches;
+  var isMobile = window.matchMedia('(max-width: 760px)').matches;
+
+  function open(panel) {
+    panels.forEach(function (p) { p.classList.toggle('is-open', p === panel); });
+  }
+
+  /* Mobile boots with the first card open so the section never
+     appears as four anonymous dark bars. Desktop with a mouse
+     boots collapsed — hover does the work there. */
+  if (isMobile || !canHover) open(panels[0]);
+
+  /* ── TOUCH: first tap expands, second tap navigates ──
+     Without this, a tap on a collapsed card would navigate
+     before the visitor ever saw the photo or the logo. */
+  if (!canHover) {
+    panels.forEach(function (p) {
+      p.addEventListener('click', function (e) {
+        if (!p.classList.contains('is-open')) {
+          e.preventDefault();
+          open(p);
+        }
+        /* already open → let the link navigate */
+      });
+    });
+  }
+
+  /* ── KEYBOARD: focusing a card expands it, Enter follows the
+     link natively (it's a real <a>). ── */
+  panels.forEach(function (p) {
+    p.addEventListener('focus', function () {
+      if (canHover) open(p);
+    });
+  });
+  track.addEventListener('focusout', function (e) {
+    if (canHover && !track.contains(e.relatedTarget)) {
+      panels.forEach(function (p) { p.classList.remove('is-open'); });
+    }
+  });
+
+  /* Keep the touch/desktop default sane across orientation and
+     resize changes (e.g. tablet rotate crossing the breakpoint). */
+  window.matchMedia('(max-width: 760px)').addEventListener('change', function (m) {
+    if (m.matches && !panels.some(function (p) { return p.classList.contains('is-open'); })) {
+      open(panels[0]);
+    }
+  });
 }());
 </script>
 
