@@ -3,597 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hero Showcase</title>
+<title>Brand Showcase</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400&display=swap" rel="stylesheet">
-
-<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/07/2-1-1.webp">
-<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/07/SUNEHRI-1.webp">
-<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/07/1-1-1.webp">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 /* ══════════════════════════════════════════════════════════════
-   HERO SHOWCASE — theme-proof build
-
-   Everything is scoped to the #hs id. That gives every rule a
-   specificity of at least 1,0,0, which outranks essentially any
-   theme selector (WordPress themes and page builders style bare
-   `button` / `a` through class-based wrappers like
-   `.entry-content button`, only 0,1,1). Without this, the theme's
-   global button styling paints the arrows and pills as grey boxes.
-
-   Same reasoning applies to the names below:
-     · custom properties are --hs-* and declared on #hs, not :root,
-       so a theme's own --gold or --fade can't reach in
-     · @keyframes are hs-prefixed, because keyframe names are global
-       and a later theme definition of `fadeUp` would silently
-       hijack ours
-══════════════════════════════════════════════════════════════ */
-
-/* Only rule outside the #hs scope. It exists so this file is
-   correct as a standalone page — without it the browser's default
-   body margin leaves an 8px gutter around the hero. Safe to delete
-   when pasting into a theme that already normalises body. */
-html, body { margin: 0; padding: 0; }
-
-#hs {
-  --hs-gold: #BF9B4D;
-  --hs-ink:  #07070A;
-
-  /* Timing — single source of truth. JS reads these off #hs at
-     boot, so changing a number here changes it everywhere. */
-  --hs-dwell: 5800ms;   /* how long each slide holds */
-  --hs-fade:  1100ms;   /* crossfade duration        */
-
-  --hs-ease-expo:  cubic-bezier(0.22, 1, 0.36, 1);
-  --hs-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* ────────────────────────────
-   SCOPED RESET
-   Neutralises inherited theme styling inside the hero only.
-   Sits above the component rules, all of which are #hs-scoped
-   and therefore more specific — so this never fights our own CSS.
-──────────────────────────── */
-#hs, #hs *, #hs *::before, #hs *::after {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  box-sizing: border-box;
-  background: none;
-  box-shadow: none;
-  text-shadow: none;
-  border-radius: 0;
-  min-width: 0;
-  min-height: 0;
-  max-width: none;
-  list-style: none;
-}
-
-/* Buttons and links are what themes hit hardest. The !important
-   flags are the minimum needed to win against theme declarations
-   that are themselves !important — specificity alone loses to
-   those, and `button { background: #e6e6e6 !important }` is
-   exactly what paints the controls as grey boxes. */
-#hs button,
-#hs a {
-  -webkit-appearance: none;
-  appearance: none;
-  font: inherit;
-  color: inherit;
-  letter-spacing: normal;
-  text-transform: none;
-  text-decoration: none !important;
-  text-align: inherit;
-  line-height: normal;
-  width: auto;
-  height: auto;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: none !important;
-  box-shadow: none !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  outline: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Themes and icon plugins like to inject pseudo-element glyphs
-   into buttons. Only the pill hit-area below re-enables one. */
-#hs button::before,
-#hs button::after { content: none; display: none; }
-
-/* ────────────────────────────
-   HERO — sits in page flow
-──────────────────────────── */
-/* The container itself is a <section>, which themes love to pad
-   and colour (`body section { padding: 40px !important }` insets
-   the entire hero and exposes a page-coloured frame around it). */
-#hs {
-  position: relative;
-  display: block;
-  width: 100% !important;
-  max-width: none !important;
-  height: 100vh;
-  height: 100svh;          /* dodges mobile URL-bar jitter */
-  max-height: 960px;
-  min-height: 560px;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  overflow: hidden;
-  background: var(--hs-ink) !important;
-  isolation: isolate;
-  /* Base font for the subtree, so anything the reset sets to
-     `inherit` lands on ours rather than the theme's serif. */
-  font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #fff;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-#hs:focus { outline: none; }
-#hs:focus-visible { outline: 2px solid var(--hs-gold); outline-offset: -2px; }
-
-/* ────────────────────────────
-   SLIDES
-   Two independent state classes, and that separation is the
-   whole trick:
-     .is-active  → owns opacity / stacking (the crossfade)
-     .is-in      → owns the entrance animations
-   An outgoing slide drops .is-active immediately but keeps .is-in
-   until the fade finishes, so its text and Ken Burns hold their
-   final pose while it dissolves instead of snapping back to the
-   pre-animation state mid-fade.
-──────────────────────────── */
-#hs .hs-slide {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--hs-fade) var(--hs-ease-quart),
-              visibility 0s linear var(--hs-fade);
-}
-
-#hs .hs-slide.is-active {
-  opacity: 1;
-  visibility: visible;
-  z-index: 2;
-  transition: opacity var(--hs-fade) var(--hs-ease-quart),
-              visibility 0s linear 0s;
-}
-
-/* Only the two slides in play get promoted — keeps the
-   compositor from holding layers it doesn't need. */
-#hs .hs-slide.is-active,
-#hs .hs-slide.is-in { will-change: opacity; }
-
-/* ────────────────────────────
-   BACKGROUND + KEN BURNS
-   Duration equals dwell + fade, so the zoom is still travelling
-   when the slide hands off. It never reaches its endpoint and
-   never visibly parks.
-──────────────────────────── */
-#hs .hs-bg {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  transform: scale(1.05);
-  will-change: transform;
-}
-
-#hs .hs-slide.is-in .hs-bg {
-  animation: hs-kb calc(var(--hs-dwell) + var(--hs-fade)) linear both;
-}
-
-@keyframes hs-kb {
-  from { transform: scale(1.05); }
-  to   { transform: scale(1.13); }
-}
-
-#hs .hs-slide--a .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/SUNEHRI-1.webp'); }
-#hs .hs-slide--b .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/2-1-1.webp'); }
-#hs .hs-slide--c .hs-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/1-1-1.webp'); }
-
-/* ────────────────────────────
-   CINEMATIC OVERLAY
-   Weighted a little heavier on the left than a pure vignette
-   would be — these product shots are bright and warm, and the
-   copy has to stay readable across all three.
-──────────────────────────── */
-#hs .hs-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(105deg,
-      rgba(7,7,10,0.93) 0%,
-      rgba(7,7,10,0.74) 26%,
-      rgba(7,7,10,0.38) 56%,
-      rgba(7,7,10,0.06) 100%),
-    linear-gradient(to top,
-      rgba(7,7,10,0.86) 0%,
-      rgba(7,7,10,0.00) 48%);
-  pointer-events: none;
-}
-
-/* ────────────────────────────
-   CONTENT
-──────────────────────────── */
-#hs .hs-content {
-  position: absolute;
-  bottom: clamp(88px, 15.5vh, 148px);
-  left:   clamp(32px, 8vw, 120px);
-  max-width: min(600px, 80vw);
-  z-index: 3;
-}
-
-/* ────────────────────────────
-   TITLE — line-by-line curtain reveal
-   Each .hs-line is a shutter (overflow:hidden); .hs-line-in
-   starts beneath it and slides up into view.
-──────────────────────────── */
-/* Typography carries !important on the properties themes force on
-   bare h1/h2/p/a selectors — font stack, colour, and the vertical
-   rhythm margins. Everything else stays flag-free. */
-#hs .hs-title {
-  font-family: 'Montserrat', sans-serif !important;
-  font-size: clamp(32px, 4.8vw, 68px) !important;
-  font-weight: 800 !important;
-  line-height: 1.05 !important;
-  color: #fff !important;
-  text-transform: uppercase !important;
-  letter-spacing: -0.5px;
-  margin: 0 0 20px !important;
-}
-
-/* line-height must be pinned to the title's own value. Themes
-   commonly set a loose `body span { line-height: 2.4 }`, which
-   otherwise lands on these two wrappers and tears the headline
-   lines apart. */
-#hs .hs-line {
-  display: block;
-  overflow: hidden;
-  line-height: inherit !important;
-  padding-bottom: 0.06em;   /* descenders clear the shutter */
-}
-
-#hs .hs-line-in {
-  display: block;
-  line-height: inherit !important;
-  opacity: 0;
-  transform: translateY(110%);
-  /* Carries the title over bright patches in the photography
-     without needing a heavier overlay. */
-  text-shadow: 0 2px 28px rgba(7,7,10,0.42);
-}
-
-/* Staggered 130ms apart */
-#hs .hs-slide.is-in .hs-line:nth-child(1) .hs-line-in { animation: hs-lineUp 0.9s var(--hs-ease-expo) 0.26s both; }
-#hs .hs-slide.is-in .hs-line:nth-child(2) .hs-line-in { animation: hs-lineUp 0.9s var(--hs-ease-expo) 0.39s both; }
-#hs .hs-slide.is-in .hs-line:nth-child(3) .hs-line-in { animation: hs-lineUp 0.9s var(--hs-ease-expo) 0.52s both; }
-#hs .hs-slide.is-in .hs-line:nth-child(4) .hs-line-in { animation: hs-lineUp 0.9s var(--hs-ease-expo) 0.65s both; }
-
-@keyframes hs-lineUp {
-  from { opacity: 0; transform: translateY(110%); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-/* ────────────────────────────
-   SUBTITLE
-──────────────────────────── */
-#hs .hs-sub {
-  font-family: 'Noto Sans Devanagari', 'Montserrat', sans-serif !important;
-  font-size: clamp(11px, 1.22vw, 14.5px) !important;
-  font-weight: 300 !important;
-  line-height: 1.95 !important;
-  color: rgba(255,255,255,0.56) !important;
-  margin: 0 0 36px !important;
-  opacity: 0;
-}
-
-#hs .hs-slide.is-in .hs-sub { animation: hs-fadeUp 0.85s var(--hs-ease-expo) 0.60s both; }
-
-/* ────────────────────────────
-   CTA
-──────────────────────────── */
-#hs .hs-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(255,255,255,0.62) !important;
-  font-family: 'Montserrat', sans-serif !important;
-  font-size: 8.5px !important;
-  font-weight: 600 !important;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  padding-bottom: 6px !important;
-  border-bottom: 1px solid rgba(255,255,255,0.18) !important;
-  opacity: 0;
-  transition: color 0.28s ease, border-color 0.28s ease;
-}
-
-#hs .hs-slide.is-in .hs-cta { animation: hs-fadeUp 0.75s var(--hs-ease-expo) 0.76s both; }
-
-@keyframes hs-fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-#hs .hs-cta:hover { color: var(--hs-gold) !important; border-color: var(--hs-gold) !important; }
-#hs .hs-cta:focus-visible { outline: 1.5px solid var(--hs-gold); outline-offset: 5px; }
-
-#hs .hs-arr {
-  display: inline-block;
-  font-size: 13px !important;
-  line-height: 1 !important;
-  transition: transform 0.32s var(--hs-ease-expo);
-}
-#hs .hs-cta:hover .hs-arr { transform: translateX(5px); }
-
-/* Belt-and-braces: visibility:hidden already drops inactive
-   slides out of the tab order, this stops stray clicks mid-fade. */
-#hs .hs-slide:not(.is-active) .hs-cta { pointer-events: none; }
-
-/* ────────────────────────────
-   BRAND WATERMARK
-──────────────────────────── */
-#hs .hs-brand {
-  position: absolute;
-  top: 6%;
-  right: 6%;
-  font-family: 'Montserrat', sans-serif !important;
-  font-size: 8px !important;
-  font-weight: 600 !important;
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.09) !important;
-  opacity: 0;
-}
-
-#hs .hs-slide.is-in .hs-brand { animation: hs-ghostIn 1.5s ease 0.15s both; }
-
-@keyframes hs-ghostIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* ────────────────────────────
-   NAV CLUSTER — bottom right
-──────────────────────────── */
-#hs .hs-nav {
-  position: absolute;
-  right: clamp(28px, 7.5vw, 108px);
-  bottom: clamp(30px, 5.5vh, 52px);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-  z-index: 10;
-}
-
-#hs .hs-counter {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-family: 'Montserrat', sans-serif !important;
-  font-size: 9px !important;
-  font-weight: 500 !important;
-  letter-spacing: 1.5px;
-  line-height: 1 !important;
-  color: rgba(255,255,255,0.28) !important;
-  font-variant-numeric: tabular-nums;   /* digits don't jitter on change */
-}
-#hs .hs-cur { color: var(--hs-gold) !important; font-weight: 700 !important; font-size: 10.5px !important; }
-#hs .hs-rule {
-  display: inline-block;
-  width: 14px;
-  height: 1px;
-  background: rgba(255,255,255,0.22);
-}
-
-/* ────────────────────────────
-   PILLS
-   The gold fill is a child element scaled by --hs-p, which JS
-   writes from its own rAF clock. There is no CSS keyframe to fall
-   out of sync with, so pause/resume is exact and
-   prefers-reduced-motion can't shorten the progress bar out from
-   under the timer.
-──────────────────────────── */
-#hs .hs-pills { display: flex; gap: 8px; align-items: center; }
-
-/* The !important flags here answer the reset above, which had to
-   use them to beat the theme. They are scoped to this one
-   component and never leave it. */
-#hs .hs-pill {
-  position: relative;
-  display: block;
-  flex: 0 0 auto;
-  width: 24px !important;
-  height: 2px !important;
-  background: rgba(255,255,255,0.18) !important;
-  overflow: hidden;
-  transition: width 0.45s var(--hs-ease-expo), background 0.3s ease;
-}
-
-/* Generous invisible hit area — no missed taps */
-#hs .hs-pill::before {
-  content: '';
-  display: block;
-  position: absolute;
-  inset: -12px -6px;
-}
-
-#hs .hs-pill.is-active {
-  width: 48px !important;
-  background: rgba(255,255,255,0.12) !important;
-  cursor: default;
-}
-
-#hs .hs-pill__fill {
-  display: block;
-  position: absolute;
-  inset: 0;
-  background: var(--hs-gold);
-  transform: scaleX(var(--hs-p, 0));
-  transform-origin: left center;
-  opacity: 0;
-}
-#hs .hs-pill.is-active .hs-pill__fill { opacity: 1; }
-
-#hs .hs-pill:not(.is-active):hover { background: rgba(255,255,255,0.38) !important; }
-#hs .hs-pill:focus-visible { outline: 1.5px solid var(--hs-gold); outline-offset: 4px; }
-
-/* ────────────────────────────
-   PREV / NEXT
-──────────────────────────── */
-#hs .hs-arrow {
-  position: absolute;
-  top: 50%;
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: 50% !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  background: rgba(7,7,10,0.28) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: rgba(255,255,255,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  z-index: 10;
-  transform: translateY(-50%) scale(0.94);
-  transition: opacity 0.4s ease,
-              transform 0.4s var(--hs-ease-expo),
-              border-color 0.28s ease,
-              color 0.28s ease,
-              background 0.28s ease;
-}
-
-#hs:hover .hs-arrow,
-#hs:focus-within .hs-arrow {
-  opacity: 1;
-  transform: translateY(-50%) scale(1);
-}
-
-#hs .hs-arrow:hover {
-  border-color: var(--hs-gold) !important;
-  color: var(--hs-gold);
-  background: rgba(7,7,10,0.52) !important;
-  transform: translateY(-50%) scale(1.1);
-}
-
-#hs .hs-arrow--prev { left:  clamp(16px, 3.5vw, 40px); }
-#hs .hs-arrow--next { right: clamp(16px, 3.5vw, 40px); }
-
-#hs .hs-arrow svg {
-  display: block;
-  width: 16px !important;
-  height: 16px !important;
-  fill: none;
-  stroke: currentColor;
-}
-
-#hs .hs-arrow:focus-visible {
-  opacity: 1;
-  transform: translateY(-50%) scale(1);
-  outline: 1.5px solid var(--hs-gold);
-  outline-offset: 2px;
-}
-
-/* ────────────────────────────
-   BOTTOM RULE
-──────────────────────────── */
-#hs::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0;
-  width: 100%;
-  height: 1px;
-  background: rgba(255,255,255,0.05);
-  z-index: 9;
-  pointer-events: none;
-}
-
-/* ────────────────────────────
-   REDUCED MOTION
-   Kill the movement, keep the slideshow. Crossfade survives at a
-   shortened duration because a hard cut between full-bleed photos
-   is harsher than a quick dissolve.
-──────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  #hs .hs-slide,
-  #hs .hs-slide.is-active { transition-duration: 300ms; }
-
-  #hs .hs-slide.is-in .hs-bg { animation: none; }
-  #hs .hs-bg { transform: none; }
-
-  /* !important is deliberate: the staggered title rules are
-     nth-child-qualified and would otherwise out-specify this
-     accessibility override, leaving the copy stuck at opacity 0. */
-  #hs .hs-slide.is-in .hs-line .hs-line-in,
-  #hs .hs-slide.is-in .hs-sub,
-  #hs .hs-slide.is-in .hs-cta,
-  #hs .hs-slide.is-in .hs-brand {
-    animation: none !important;
-    opacity: 1;
-    transform: none;
-  }
-
-  #hs .hs-pill,
-  #hs .hs-arrow,
-  #hs .hs-arr { transition-duration: 0.01ms; }
-}
-
-/* ────────────────────────────
-   MOBILE
-──────────────────────────── */
-@media (max-width: 600px) {
-  #hs { height: 88vh; height: 88svh; min-height: 480px; }
-  #hs .hs-title { font-size: clamp(28px, 9.5vw, 44px); letter-spacing: -0.2px; }
-  #hs .hs-sub { font-size: 11.5px; }
-  #hs .hs-arrow { display: none; }
-  #hs .hs-nav { right: 20px; bottom: 22px; }
-  #hs .hs-counter { display: none; }
-}
-
-/* Coarse pointers get no hover-only affordances at any width. */
-@media (hover: none) {
-  #hs .hs-arrow { display: none; }
-}
-
-/* ══════════════════════════════════════════════════════════════
    BRAND SHOWCASE — expanding panels, theme-proof build
 
-   Same defensive strategy as the hero above: every rule is
-   scoped to the #ps id so specificity beats theme selectors,
-   custom props live on #ps (not :root), and classnames are
-   ps-prefixed so nothing here can collide with the hero's hs-*
-   rules or a theme's own utility classes.
+   Everything is scoped to the #ps id. That gives every rule a
+   specificity of at least 1,0,0, which outranks essentially any
+   theme selector (WordPress themes and page builders style bare
+   `a` / `img` through class-based wrappers like
+   `.entry-content a`, only 0,1,1). Custom properties live on #ps
+   (not :root) and classnames are ps-prefixed so nothing here can
+   collide with a theme's own utility classes.
 
    Each panel is ONE <a> — the photo, the logo, the number and
    the name are all part of the same link, so the whole card is
-   clickable and there is no separate "Explore brand" button.
+   clickable. There is no separate "Explore brand" button.
 
    To change a destination URL, edit the href on the matching
-   .ps-panel below. To swap an image or logo, edit the matching
+   .ps-panel below. To swap a photo or logo, edit the matching
    .ps-panel--* rule or <img src>.
 ══════════════════════════════════════════════════════════════ */
+
+/* Standalone-page nicety only — safe to delete inside a theme
+   that already normalises body margin. */
+html, body { margin: 0; padding: 0; }
+
 #ps {
-  --ps-accent: #14D8C0;             /* teal — matches the hero's link/pill accents */
+  --ps-accent: #14D8C0;             /* teal accent for numerals / underline */
   --ps-ink:    #0A0B0E;
   --ps-ease:   cubic-bezier(0.22, 1, 0.36, 1);
   --ps-grow:   0.85s;               /* panel expand/collapse duration */
 }
 
+/* ────────────────────────────
+   SCOPED RESET
+──────────────────────────── */
 #ps, #ps *, #ps *::before, #ps *::after {
   margin: 0;
   padding: 0;
@@ -627,6 +77,9 @@ html, body { margin: 0; padding: 0; }
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ────────────────────────────
+   SECTION SHELL
+──────────────────────────── */
 #ps {
   position: relative;
   display: block;
@@ -651,7 +104,9 @@ html, body { margin: 0; padding: 0; }
   overflow: hidden;
 }
 
-/* ── Panel — the whole card is the link ── */
+/* ────────────────────────────
+   PANEL — the whole card is the link
+──────────────────────────── */
 #ps .ps-panel {
   position: relative;
   display: block;
@@ -680,6 +135,7 @@ html, body { margin: 0; padding: 0; }
   outline-offset: -2px;
 }
 
+/* ── Photo ── */
 #ps .ps-bg {
   position: absolute;
   inset: 0;
@@ -690,9 +146,10 @@ html, body { margin: 0; padding: 0; }
   transition: transform 1.1s var(--ps-ease);
 }
 
-#ps .ps-panel--mayuri .ps-bg  { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/1-3.webp'); }
-#ps .ps-panel--sunehri .ps-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/3-2.webp'); }
-#ps .ps-panel--golf .ps-bg    { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/2-3.webp'); }
+/* Position order: 1 Mayuri · 2 Sunehri · 3 Golf Carts · 4 Saera Fleet */
+#ps .ps-panel--mayuri .ps-bg  { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/3-2.webp'); }
+#ps .ps-panel--sunehri .ps-bg { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/2-3.webp'); }
+#ps .ps-panel--golf .ps-bg    { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/1-3.webp'); }
 #ps .ps-panel--fleet .ps-bg   { background-image: url('https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-95.webp'); }
 
 /* Collapsed panels sit dark and quiet; the expanded one opens
@@ -729,27 +186,42 @@ html, body { margin: 0; padding: 0; }
   #ps .ps-panel:hover .ps-grad  { opacity: 1; }
 }
 
-/* ── Logo — top-left, revealed on expand ── */
-#ps .ps-logo {
+/* ── Logo — top-left, revealed on expand ──
+   A fixed-height box (not just the <img>) is what keeps every
+   logo — square, wide, tall, whatever aspect ratio the brand art
+   ships in — anchored to the exact same baseline. Without the
+   box, a short-and-wide logo (SGC-Horizontal) and a tall one
+   (Mayuri) would visually sit at different heights even though
+   both images have "top" alignment. */
+#ps .ps-logo-box {
   position: absolute;
   top: clamp(18px, 3vh, 30px);
   left: clamp(18px, 2.2vw, 34px);
-  display: block;
-  height: clamp(44px, 8vh, 74px) !important;
-  width: auto !important;
-  max-width: min(300px, 62%) !important;
-  object-fit: contain;
-  object-position: left top;
-  /* Guarantees legibility whether the logo art is light or dark. */
-  filter: drop-shadow(0 3px 14px rgba(0,0,0,0.55));
+  height: clamp(40px, 7vh, 64px);
+  max-width: min(280px, 58%);
+  display: flex;
+  align-items: flex-start;
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.55s ease 0.12s, transform 0.6s var(--ps-ease) 0.12s;
   pointer-events: none;
+  z-index: 2;
 }
-#ps .ps-panel.is-open .ps-logo { opacity: 1; transform: translateY(0); }
+#ps .ps-panel.is-open .ps-logo-box { opacity: 1; transform: translateY(0); }
 @media (hover: hover) {
-  #ps .ps-panel:hover .ps-logo { opacity: 1; transform: translateY(0); }
+  #ps .ps-panel:hover .ps-logo-box { opacity: 1; transform: translateY(0); }
+}
+
+#ps .ps-logo {
+  display: block;
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain;
+  object-position: left top;
+  /* Guarantees legibility whether the logo art is light or dark,
+     and whatever photo it happens to sit on. */
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.75)) drop-shadow(0 0 18px rgba(0,0,0,0.45));
 }
 
 /* ── Meta block — number, name, tagline ── */
@@ -778,7 +250,7 @@ html, body { margin: 0; padding: 0; }
 }
 
 /* Collapsed panels are narrow, so long names (e.g. "Saera Fleet")
-   truncate with an ellipsis rather than wrapping or overflowing
+   fade out through a mask rather than wrapping or overflowing
    into the neighbouring card. */
 #ps .ps-name {
   display: block;
@@ -790,7 +262,8 @@ html, body { margin: 0; padding: 0; }
   color: #fff !important;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  -webkit-mask-image: linear-gradient(to right, #000 78%, transparent 98%);
+          mask-image: linear-gradient(to right, #000 78%, transparent 98%);
   transition: font-size var(--ps-grow) var(--ps-ease), letter-spacing var(--ps-grow) var(--ps-ease);
 }
 #ps .ps-panel.is-open .ps-name { font-size: clamp(26px, 3vw, 44px) !important; letter-spacing: 4px; }
@@ -849,16 +322,20 @@ html, body { margin: 0; padding: 0; }
   #ps .ps-panel:hover .ps-bar { transform: scaleX(1); }
 }
 
-/* ── Tablet — slightly gentler expansion ── */
+/* ────────────────────────────
+   TABLET — slightly gentler expansion
+──────────────────────────── */
 @media (max-width: 1024px) and (min-width: 761px) {
   #ps .ps-panel.is-open { flex-grow: 2.6; }
   #ps .ps-panel:hover   { flex-grow: 2.6; }
 }
 
-/* ── Mobile — vertical accordion
+/* ────────────────────────────
+   MOBILE — vertical accordion
    Same markup, column layout. The open card grows tall enough
    to read the photo; collapsed cards become slim dark bars that
-   still show number + name and are still fully tappable. ── */
+   still show number + name and are still fully tappable.
+──────────────────────────── */
 @media (max-width: 760px) {
   #ps { padding: 16px !important; }
 
@@ -884,14 +361,16 @@ html, body { margin: 0; padding: 0; }
   #ps .ps-panel.is-open .ps-name { font-size: 27px !important; letter-spacing: 3px; }
   #ps .ps-tag  { font-size: 12px !important; margin-top: 10px !important; }
 
-  #ps .ps-logo {
+  #ps .ps-logo-box {
     top: 16px;
     left: 18px;
-    height: 46px !important;
-    max-width: 58% !important;
+    height: 40px;
+    max-width: 54%;
   }
 
-  /* Collapsed bars centre their label vertically. */
+  /* Collapsed bars centre their label vertically and never show
+     the (still-transparent) logo box, so a tap target isn't
+     partially covered by an invisible element. */
   #ps .ps-panel:not(.is-open) .ps-meta {
     top: 50%;
     bottom: auto;
@@ -901,14 +380,18 @@ html, body { margin: 0; padding: 0; }
     gap: 14px;
   }
   #ps .ps-panel:not(.is-open) .ps-num { margin-bottom: 0 !important; }
+  #ps .ps-panel:not(.is-open) .ps-logo-box { display: none; }
 }
 
+/* ────────────────────────────
+   REDUCED MOTION
+──────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   #ps .ps-panel,
   #ps .ps-bg,
   #ps .ps-shade,
   #ps .ps-grad,
-  #ps .ps-logo,
+  #ps .ps-logo-box,
   #ps .ps-name,
   #ps .ps-go,
   #ps .ps-tag,
@@ -919,93 +402,8 @@ html, body { margin: 0; padding: 0; }
 <body>
 
 <!-- ═══════════════════════════════════════
-     HERO SLIDER
-══════════════════════════════════════════ -->
-<section class="hs" id="hs" tabindex="0" aria-roledescription="carousel" aria-label="Product showcase">
-
-  <!-- ─ Slide 1: Rattan ─ -->
-  <div class="hs-slide hs-slide--a is-active is-in" role="group" aria-roledescription="slide" aria-label="1 of 3: Rattan">
-    <div class="hs-bg"></div>
-    <div class="hs-overlay"></div>
-    <span class="hs-brand" aria-hidden="true">Rattan</span>
-    <div class="hs-content">
-      <h1 class="hs-title">
-        <span class="hs-line"><span class="hs-line-in">Start Your</span></span>
-        <span class="hs-line"><span class="hs-line-in">Journey</span></span>
-        <span class="hs-line"><span class="hs-line-in">with Rattan</span></span>
-      </h1>
-      <p class="hs-sub">अपनी यात्रा की शुरुआत<br>Rattan के साथ करें।</p>
-      <a class="hs-cta" href="https://ddfintech.net/brands/mayuri/">Explore Rattan <span class="hs-arr" aria-hidden="true">→</span></a>
-    </div>
-  </div>
-
-  <!-- ─ Slide 2: Sunehri ─ -->
-  <div class="hs-slide hs-slide--b" role="group" aria-roledescription="slide" aria-label="2 of 3: Sunehri">
-    <div class="hs-bg"></div>
-    <div class="hs-overlay"></div>
-    <span class="hs-brand" aria-hidden="true">Sunehri</span>
-    <div class="hs-content">
-      <h2 class="hs-title">
-        <span class="hs-line"><span class="hs-line-in">Conquer</span></span>
-        <span class="hs-line"><span class="hs-line-in">Every</span></span>
-        <span class="hs-line"><span class="hs-line-in">Journey</span></span>
-      </h2>
-      <p class="hs-sub">SUNEHRI के साथ हर सफर पर<br>जीत हासिल करें।</p>
-      <a class="hs-cta" href="https://ddfintech.net/brands/sunehri/">Experience Sunehri <span class="hs-arr" aria-hidden="true">→</span></a>
-    </div>
-  </div>
-
-  <!-- ─ Slide 3: Saera ─ -->
-  <div class="hs-slide hs-slide--c" role="group" aria-roledescription="slide" aria-label="3 of 3: Saera">
-    <div class="hs-bg"></div>
-    <div class="hs-overlay"></div>
-    <span class="hs-brand" aria-hidden="true">Saera</span>
-    <div class="hs-content">
-      <h2 class="hs-title">
-        <span class="hs-line"><span class="hs-line-in">Redefining</span></span>
-        <span class="hs-line"><span class="hs-line-in">Every</span></span>
-        <span class="hs-line"><span class="hs-line-in">Ride</span></span>
-      </h2>
-      <p class="hs-sub">with SAERA Golf Carts —<br>precision, comfort &amp; performance.</p>
-      <!-- Separate domain, so this one opens in a new tab. -->
-      <a class="hs-cta" href="https://saeragolfcart.com/" target="_blank" rel="noopener">Discover SAERA <span class="hs-arr" aria-hidden="true">→</span></a>
-    </div>
-  </div>
-
-  <!-- ─ Arrows ─ -->
-  <button class="hs-arrow hs-arrow--prev" id="hsPrev" type="button" aria-label="Previous slide">
-    <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-      <path d="M15 18l-6-6 6-6"/>
-    </svg>
-  </button>
-  <button class="hs-arrow hs-arrow--next" id="hsNext" type="button" aria-label="Next slide">
-    <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-      <path d="M9 18l6-6-6-6"/>
-    </svg>
-  </button>
-
-  <!-- ─ Navigation cluster ─ -->
-  <div class="hs-nav">
-    <div class="hs-counter">
-      <span class="hs-cur" id="hsCur">01</span>
-      <span class="hs-rule" aria-hidden="true"></span>
-      <span>03</span>
-    </div>
-    <div class="hs-pills" id="hsPills">
-      <button class="hs-pill is-active" type="button" data-idx="0" aria-label="Go to slide 1" aria-current="true"><span class="hs-pill__fill"></span></button>
-      <button class="hs-pill" type="button" data-idx="1" aria-label="Go to slide 2"><span class="hs-pill__fill"></span></button>
-      <button class="hs-pill" type="button" data-idx="2" aria-label="Go to slide 3"><span class="hs-pill__fill"></span></button>
-    </div>
-  </div>
-
-  <!-- Screen-reader announcement channel, kept out of the visual design. -->
-  <p id="hsLive" aria-live="polite" aria-atomic="true"
-     style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"></p>
-
-</section>
-
-<!-- ═══════════════════════════════════════
      BRAND SHOWCASE — each card is one link
+     Order: 1 Mayuri · 2 Sunehri · 3 Golf Carts · 4 Saera Fleet
 ══════════════════════════════════════════ -->
 <section id="ps" aria-label="Our brands">
   <div class="ps-track" id="psTrack">
@@ -1015,7 +413,9 @@ html, body { margin: 0; padding: 0; }
       <span class="ps-bg" aria-hidden="true"></span>
       <span class="ps-shade" aria-hidden="true"></span>
       <span class="ps-grad" aria-hidden="true"></span>
-      <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/1-1.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <span class="ps-logo-box" aria-hidden="true">
+        <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/1-1.webp" alt="" loading="lazy" decoding="async">
+      </span>
       <span class="ps-meta">
         <span class="ps-num" aria-hidden="true">01</span>
         <span class="ps-name">Mayuri<span class="ps-go" aria-hidden="true">↗</span></span>
@@ -1029,7 +429,9 @@ html, body { margin: 0; padding: 0; }
       <span class="ps-bg" aria-hidden="true"></span>
       <span class="ps-shade" aria-hidden="true"></span>
       <span class="ps-grad" aria-hidden="true"></span>
-      <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/Sunhari-Logo-2024-04.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <span class="ps-logo-box" aria-hidden="true">
+        <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/Sunhari-Logo-2024-04.png" alt="" loading="lazy" decoding="async">
+      </span>
       <span class="ps-meta">
         <span class="ps-num" aria-hidden="true">02</span>
         <span class="ps-name">Sunehri<span class="ps-go" aria-hidden="true">↗</span></span>
@@ -1038,14 +440,16 @@ html, body { margin: 0; padding: 0; }
       <span class="ps-bar" aria-hidden="true"></span>
     </a>
 
-    <!-- Separate domain, so this one opens in a new tab, matching the hero's Saera CTA. -->
+    <!-- Separate domain, so this one opens in a new tab. -->
     <a class="ps-panel ps-panel--golf" href="https://saeragolfcart.com/"
        target="_blank" rel="noopener"
        aria-label="Saera Golf Carts — visit the brand site (opens in a new tab)">
       <span class="ps-bg" aria-hidden="true"></span>
       <span class="ps-shade" aria-hidden="true"></span>
       <span class="ps-grad" aria-hidden="true"></span>
-      <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/SGC-Horizontal.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <span class="ps-logo-box" aria-hidden="true">
+        <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/SGC-Horizontal.png" alt="" loading="lazy" decoding="async">
+      </span>
       <span class="ps-meta">
         <span class="ps-num" aria-hidden="true">03</span>
         <span class="ps-name">Golf Carts<span class="ps-go" aria-hidden="true">↗</span></span>
@@ -1054,12 +458,14 @@ html, body { margin: 0; padding: 0; }
       <span class="ps-bar" aria-hidden="true"></span>
     </a>
 
-    <a class="ps-panel ps-panel--fleet" href="https://ddfintech.net/brands/saera-fleet/"
-       aria-label="Saera Fleet — visit the brand page">
+    <a class="ps-panel ps-panel--fleet" href="https://ddfintech.net/"
+       aria-label="Saera Fleet — visit the home page">
       <span class="ps-bg" aria-hidden="true"></span>
       <span class="ps-shade" aria-hidden="true"></span>
       <span class="ps-grad" aria-hidden="true"></span>
-      <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/2-1-e1784715698625.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <span class="ps-logo-box" aria-hidden="true">
+        <img class="ps-logo" src="https://ddfintech.net/wp-content/uploads/2026/07/2-1-e1784715698625.webp" alt="" loading="lazy" decoding="async">
+      </span>
       <span class="ps-meta">
         <span class="ps-num" aria-hidden="true">04</span>
         <span class="ps-name">Saera Fleet<span class="ps-go" aria-hidden="true">↗</span></span>
@@ -1070,250 +476,6 @@ html, body { margin: 0; padding: 0; }
 
   </div>
 </section>
-
-<!-- ═══════════════════════════════════════
-     Your page content continues here —
-     the slider never captures scroll or wheel.
-══════════════════════════════════════════ -->
-
-
-<script>
-(function () {
-  'use strict';
-
-  var hs = document.getElementById('hs');
-  if (!hs) return;
-
-  var slides = Array.prototype.slice.call(hs.querySelectorAll('.hs-slide'));
-  var pills  = Array.prototype.slice.call(hs.querySelectorAll('.hs-pill'));
-  var hsCur  = document.getElementById('hsCur');
-  var live   = document.getElementById('hsLive');
-  var TOTAL  = slides.length;
-  if (TOTAL < 2) return;
-
-  /* ── TIMING ──
-     Read off #hs, where the custom properties are declared, so the
-     CSS stays the single source of truth and a theme's :root
-     variables can't be picked up by mistake. */
-  function cssMs(name, fallback) {
-    var raw = getComputedStyle(hs).getPropertyValue(name).trim();
-    if (!raw) return fallback;
-    var n = parseFloat(raw);
-    if (isNaN(n)) return fallback;
-    return /ms\s*$/.test(raw) ? n : n * 1000;
-  }
-  var DWELL = cssMs('--hs-dwell', 5800);
-  var FADE  = cssMs('--hs-fade', 1100);
-
-  /* ── STATE ── */
-  var current  = 0;
-  var elapsed  = 0;      /* ms accrued on the current slide */
-  var lastTs   = null;
-  var rafId    = null;
-  var running  = false;
-  var leaveT   = null;
-
-  /* Reasons the clock is held. Autoplay runs only when every one
-     is false, so hover, tab-blur and off-screen can't clobber
-     each other the way a single `paused` flag did. */
-  var hold = { hover: false, hidden: false, offscreen: false };
-
-  function pad(n) { return n < 10 ? '0' + n : '' + n; }
-  function held() { return hold.hover || hold.hidden || hold.offscreen; }
-
-  /* ── PROGRESS CLOCK ────────────────────────────────────────
-     One rAF loop owns both the pill fill and the advance. They
-     read the same `elapsed`, so they cannot drift apart, and a
-     pause freezes the bar exactly where the timer stopped.
-  ── */
-  function paint() {
-    pills[current].firstElementChild.style.setProperty(
-      '--hs-p', (elapsed / DWELL).toFixed(4)
-    );
-  }
-
-  function tick(ts) {
-    rafId = null;
-    if (!running) return;
-
-    if (lastTs === null) lastTs = ts;
-    /* Clamp the delta: a backgrounded tab or a long main-thread
-       stall would otherwise hand us one enormous frame and skip
-       a slide the moment we come back. */
-    elapsed += Math.min(ts - lastTs, 100);
-    lastTs = ts;
-
-    if (elapsed >= DWELL) {
-      elapsed = DWELL;
-      paint();
-      go(current + 1);
-      return;
-    }
-
-    paint();
-    rafId = requestAnimationFrame(tick);
-  }
-
-  function play() {
-    if (running || held()) return;
-    running = true;
-    lastTs = null;                        /* resume without a jump */
-    if (rafId === null) rafId = requestAnimationFrame(tick);
-  }
-
-  function stop() {
-    running = false;
-    lastTs = null;
-    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
-  }
-
-  function restartClock() {
-    stop();
-    elapsed = 0;
-    paint();
-    play();
-  }
-
-  /* ── SLIDE CHANGE ──────────────────────────────────────────
-     No lock: clicks always respond. The outgoing slide keeps
-     `is-in` for one fade so its copy and Ken Burns hold their
-     pose while dissolving; `is-active` is what actually fades.
-  ── */
-  function go(idx) {
-    idx = ((idx % TOTAL) + TOTAL) % TOTAL;
-
-    if (idx === current) { restartClock(); return; }
-
-    var outgoing = slides[current];
-
-    outgoing.classList.remove('is-active');
-    pills[current].classList.remove('is-active');
-    pills[current].removeAttribute('aria-current');
-    pills[current].firstElementChild.style.setProperty('--hs-p', '0');
-
-    /* Strip `is-in` from every slide that is done fading, then let
-       the one just retired keep it for FADE ms. Re-running this
-       resets the timer, which is correct for rapid clicking. */
-    clearTimeout(leaveT);
-    slides.forEach(function (s) {
-      if (s !== outgoing) s.classList.remove('is-in');
-    });
-    leaveT = setTimeout(function () {
-      outgoing.classList.remove('is-in');
-    }, FADE);
-
-    current = idx;
-
-    var incoming = slides[current];
-    /* Reflow between remove and add so the entrance keyframes
-       actually restart when you return to a recent slide. */
-    incoming.classList.remove('is-in');
-    void incoming.offsetWidth;
-    incoming.classList.add('is-in', 'is-active');
-
-    pills[current].classList.add('is-active');
-    pills[current].setAttribute('aria-current', 'true');
-
-    hsCur.textContent = pad(current + 1);
-    live.textContent = 'Slide ' + (current + 1) + ' of ' + TOTAL;
-
-    restartClock();
-  }
-
-  var next = function () { go(current + 1); };
-  var prev = function () { go(current - 1); };
-
-  /* ── HOLD: HOVER ───────────────────────────────────────────
-     Only the controls pause the clock, not the whole hero. The
-     hero is full-viewport, so hovering it means "cursor is
-     somewhere on the page" — pausing there stalls the slider
-     indefinitely. Hovering a pill or arrow is real intent.
-  ── */
-  if (window.matchMedia('(hover: hover)').matches) {
-    [document.getElementById('hsPills'),
-     document.getElementById('hsPrev'),
-     document.getElementById('hsNext')].forEach(function (el) {
-      if (!el) return;
-      el.addEventListener('mouseenter', function () { hold.hover = true; stop(); });
-      el.addEventListener('mouseleave', function () { hold.hover = false; play(); });
-    });
-  }
-
-  /* ── HOLD: TAB VISIBILITY ── */
-  document.addEventListener('visibilitychange', function () {
-    hold.hidden = document.hidden;
-    if (document.hidden) stop(); else play();
-  });
-
-  /* ── HOLD: OFF-SCREEN ──
-     Scrolled past means nobody is watching; don't burn frames
-     or race through slides behind the user's back. */
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (entries) {
-      hold.offscreen = !entries[0].isIntersecting;
-      if (hold.offscreen) stop(); else play();
-    }, { threshold: 0.25 }).observe(hs);
-  }
-
-  /* ── SWIPE ──
-     Tracks a single touch and bails on a vertical gesture so
-     page scrolling is never hijacked. */
-  var tx = 0, ty = 0, tid = null;
-
-  hs.addEventListener('touchstart', function (e) {
-    if (tid !== null) return;
-    var t = e.changedTouches[0];
-    tid = t.identifier;
-    tx = t.clientX;
-    ty = t.clientY;
-  }, { passive: true });
-
-  hs.addEventListener('touchend', function (e) {
-    var t = null, i;
-    for (i = 0; i < e.changedTouches.length; i++) {
-      if (e.changedTouches[i].identifier === tid) { t = e.changedTouches[i]; break; }
-    }
-    tid = null;
-    if (!t) return;
-    var dx = t.clientX - tx;
-    var dy = t.clientY - ty;
-    if (Math.abs(dx) > Math.abs(dy) * 1.6 && Math.abs(dx) > 44) {
-      dx < 0 ? next() : prev();
-    }
-  }, { passive: true });
-
-  hs.addEventListener('touchcancel', function () { tid = null; }, { passive: true });
-
-  /* ── CONTROLS ── */
-  pills.forEach(function (p) {
-    p.addEventListener('click', function () { go(+p.dataset.idx); });
-  });
-  document.getElementById('hsPrev').addEventListener('click', prev);
-  document.getElementById('hsNext').addEventListener('click', next);
-
-  /* ── KEYBOARD ──
-     Left/Right only. Up/Down must stay with the page — stealing
-     them breaks scrolling while the hero has focus. */
-  hs.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
-  });
-
-  /* ── DECODE-AHEAD ──
-     Pull the next two backgrounds into cache so the first
-     crossfade dissolves into a painted image, not a black frame. */
-  slides.slice(1).forEach(function (s) {
-    var url = getComputedStyle(s.querySelector('.hs-bg')).backgroundImage;
-    var m = /url\((['"]?)(.*?)\1\)/.exec(url);
-    if (m) { var i = new Image(); i.src = m[2]; }
-  });
-
-  /* ── BOOT ──
-     Slide 1 ships with is-active + is-in so it paints on the
-     first frame with no JS-induced flash. */
-  restartClock();
-}());
-</script>
 
 <script>
 (function () {
