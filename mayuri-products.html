@@ -1,0 +1,872 @@
+<!-- ══════════════════════════════════════════════════════════════
+     MAYURI PRODUCT RANGE &mdash; scoped WordPress-embed component
+     Paste this whole block into a WordPress page / HTML block.
+     Everything lives under #mpr so theme CSS can't leak in and
+     this component's CSS can't leak out. Same defensive pattern
+     as the #hs hero component already in this repo (index.html).
+══════════════════════════════════════════════════════════════ -->
+
+<div id="mpr">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+#mpr {
+  --mpr-black: #0a0a0a;
+  --mpr-white: #ffffff;
+  --mpr-gray-1: #f4f4f4;
+  --mpr-gray-2: #e2e2e2;
+  --mpr-gray-3: #9a9a9a;
+  --mpr-gray-4: #4a4a4a;
+  --mpr-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: 'Montserrat', Arial, sans-serif;
+  background: var(--mpr-white);
+  color: var(--mpr-black);
+  -webkit-font-smoothing: antialiased;
+}
+
+#mpr {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+}
+#mpr *, #mpr *::before, #mpr *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  list-style: none;
+  font-family: inherit;
+}
+
+#mpr button, #mpr a, #mpr input, #mpr select, #mpr textarea {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-decoration: none !important;
+  background: none !important;
+  border: 0 !important;
+  outline: none;
+  cursor: pointer;
+}
+#mpr input, #mpr select, #mpr textarea { cursor: text; }
+#mpr img { display: block; max-width: 100%; height: auto; }
+#mpr section { padding: 88px 6vw; }
+#mpr .mpr-eyebrow {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--mpr-gray-4); margin-bottom: 16px;
+}
+#mpr h1, #mpr h2, #mpr h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.05; }
+#mpr p { line-height: 1.65; color: var(--mpr-gray-4); font-weight: 400; }
+
+/* ── TOP NAV ───────────────────────────── */
+#mpr .mpr-nav {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 6vw; background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--mpr-gray-2);
+}
+#mpr .mpr-nav-brand { font-size: 20px; font-weight: 900; letter-spacing: 0.02em; }
+#mpr .mpr-nav-links { display: flex; gap: 32px; }
+#mpr .mpr-nav-links a {
+  font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  padding-bottom: 3px; border-bottom: 2px solid transparent !important; transition: border-color .25s var(--mpr-ease);
+}
+#mpr .mpr-nav-links a:hover { border-bottom-color: var(--mpr-black) !important; }
+#mpr .mpr-nav-cta {
+  background: var(--mpr-black) !important; color: var(--mpr-white);
+  padding: 10px 22px !important; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+/* ── HERO ──────────────────────────────── */
+#mpr .mpr-hero {
+  position: relative; min-height: 92vh; display: flex; align-items: flex-end;
+  padding: 0; overflow: hidden; background: var(--mpr-black);
+}
+#mpr .mpr-hero img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0.72;
+}
+#mpr .mpr-hero::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.35) 100%);
+}
+#mpr .mpr-hero-content { position: relative; z-index: 2; padding: 8vw 6vw 6vw; color: var(--mpr-white); max-width: 900px; }
+#mpr .mpr-hero-content .mpr-eyebrow { color: var(--mpr-gray-2); }
+#mpr .mpr-hero h1 { font-size: clamp(40px, 6.5vw, 92px); color: var(--mpr-white); }
+#mpr .mpr-hero p { color: var(--mpr-gray-2); font-size: clamp(15px, 1.4vw, 19px); max-width: 560px; margin-top: 18px; }
+#mpr .mpr-hero-actions { display: flex; gap: 16px; margin-top: 36px; flex-wrap: wrap; }
+#mpr .mpr-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 15px 30px !important; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; transition: all .25s var(--mpr-ease);
+}
+#mpr .mpr-btn-primary { background: var(--mpr-white) !important; color: var(--mpr-black); }
+#mpr .mpr-btn-primary:hover { background: var(--mpr-gray-2) !important; }
+#mpr .mpr-btn-outline { border: 1.5px solid var(--mpr-white) !important; color: var(--mpr-white); }
+#mpr .mpr-btn-outline:hover { background: var(--mpr-white) !important; color: var(--mpr-black); }
+#mpr .mpr-btn-dark { background: var(--mpr-black) !important; color: var(--mpr-white); }
+#mpr .mpr-btn-dark:hover { background: var(--mpr-gray-4) !important; }
+#mpr .mpr-btn-ghost { border: 1.5px solid var(--mpr-black) !important; color: var(--mpr-black); }
+#mpr .mpr-btn-ghost:hover { background: var(--mpr-black) !important; color: var(--mpr-white); }
+
+/* ── FEATURE STRIP ─────────────────────── */
+#mpr .mpr-strip { background: var(--mpr-black); color: var(--mpr-white); padding: 56px 6vw; }
+#mpr .mpr-strip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 40px; }
+#mpr .mpr-strip-item .mpr-strip-num { font-size: 12px; font-weight: 700; color: var(--mpr-gray-3); letter-spacing: 0.15em; margin-bottom: 10px; }
+#mpr .mpr-strip-item h3 { font-size: 19px; color: var(--mpr-white); margin-bottom: 8px; font-weight: 700; }
+#mpr .mpr-strip-item p { color: var(--mpr-gray-3); font-size: 14px; }
+
+/* ── ABOUT ─────────────────────────────── */
+#mpr .mpr-about { display: grid; grid-template-columns: 1fr 1.3fr; gap: 60px; align-items: start; }
+#mpr .mpr-about h2 { font-size: clamp(28px,3vw,42px); margin-bottom: 4px; }
+#mpr .mpr-about-body p { margin-bottom: 16px; font-size: 15.5px; }
+#mpr .mpr-plants { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 28px; }
+#mpr .mpr-plant-card { border: 1px solid var(--mpr-gray-2); padding: 20px; }
+#mpr .mpr-plant-card .mpr-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mpr-gray-3); margin-bottom: 8px; }
+#mpr .mpr-plant-card p { font-size: 13.5px; margin: 0; }
+
+/* ── CATEGORY SECTION HEADER ───────────── */
+#mpr .mpr-cat-head { text-align: center; max-width: 720px; margin: 0 auto 56px; }
+#mpr .mpr-cat-head h2 { font-size: clamp(30px,4vw,54px); }
+#mpr .mpr-cat-head p { margin-top: 14px; font-size: 16px; }
+#mpr .mpr-cat-cargo { background: var(--mpr-gray-1); }
+
+/* ── MODEL SWITCHER ────────────────────── */
+#mpr .mpr-switcher { max-width: 1400px; margin: 0 auto; }
+#mpr .mpr-tabs {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 40px; border-bottom: 1px solid var(--mpr-gray-2); padding-bottom: 0;
+}
+#mpr .mpr-tab {
+  padding: 14px 24px !important; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.03em; text-transform: uppercase; color: var(--mpr-gray-4);
+  border-bottom: 2px solid transparent !important; transition: all .2s var(--mpr-ease);
+}
+#mpr .mpr-tab:hover { color: var(--mpr-black); }
+#mpr .mpr-tab.is-active { color: var(--mpr-black); border-bottom-color: var(--mpr-black) !important; }
+
+#mpr .mpr-panel { display: none; }
+#mpr .mpr-panel.is-active { display: block; animation: mpr-fade .5s var(--mpr-ease); }
+@keyframes mpr-fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+#mpr .mpr-model {
+  display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center;
+}
+#mpr .mpr-model-media { position: relative; background: var(--mpr-white); }
+#mpr .mpr-model-media img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+#mpr .mpr-model-info .mpr-model-name { font-size: clamp(26px,2.6vw,38px); margin-bottom: 10px; }
+#mpr .mpr-model-info .mpr-model-tag { font-size: 15.5px; font-weight: 600; color: var(--mpr-black); margin-bottom: 14px; }
+#mpr .mpr-model-info .mpr-model-desc { margin-bottom: 26px; font-size: 15px; }
+#mpr .mpr-model-actions { display: flex; gap: 14px; margin-bottom: 8px; flex-wrap: wrap; }
+
+#mpr .mpr-spec-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: var(--mpr-gray-2); border: 1px solid var(--mpr-gray-2); margin-top: 48px;
+}
+#mpr .mpr-spec-cell { background: var(--mpr-white); padding: 20px 22px; }
+#mpr .mpr-spec-cell .mpr-spec-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mpr-gray-3); margin-bottom: 6px; }
+#mpr .mpr-spec-cell .mpr-spec-val { font-size: 15px; font-weight: 600; }
+
+#mpr .mpr-features { margin-top: 44px; }
+#mpr .mpr-features h3 { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px; color: var(--mpr-gray-4); }
+#mpr .mpr-feature-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 10px 24px; }
+#mpr .mpr-feature-list li { font-size: 14px; padding-left: 20px; position: relative; }
+#mpr .mpr-feature-list li::before { content: ''; position: absolute; left: 0; top: 7px; width: 8px; height: 8px; background: var(--mpr-black); }
+
+/* thumbnail rail below each panel to pick a model within category */
+#mpr .mpr-rail { display: flex; gap: 14px; margin-top: 56px; overflow-x: auto; padding-bottom: 6px; }
+#mpr .mpr-rail-item {
+  flex: 0 0 auto; width: 190px; text-align: left; border: 1px solid var(--mpr-gray-2) !important;
+  transition: border-color .2s var(--mpr-ease);
+}
+#mpr .mpr-rail-item.is-active { border-color: var(--mpr-black) !important; }
+#mpr .mpr-rail-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+#mpr .mpr-rail-item span { display: block; padding: 10px 12px; font-size: 12.5px; font-weight: 700; }
+
+/* ── COMPARISON TABLE ──────────────────── */
+#mpr .mpr-compare-wrap { overflow-x: auto; margin-top: 20px; }
+#mpr table.mpr-compare { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 13.5px; }
+#mpr table.mpr-compare th, #mpr table.mpr-compare td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--mpr-gray-2); }
+#mpr table.mpr-compare thead th { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mpr-gray-3); font-weight: 700; border-bottom: 2px solid var(--mpr-black); }
+#mpr table.mpr-compare tbody th { font-weight: 700; white-space: nowrap; }
+#mpr table.mpr-compare tbody tr:hover td, #mpr table.mpr-compare tbody tr:hover th { background: var(--mpr-gray-1); }
+
+/* ── ENQUIRY ───────────────────────────── */
+#mpr .mpr-enquiry { background: var(--mpr-black); color: var(--mpr-white); }
+#mpr .mpr-enquiry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+#mpr .mpr-enquiry h2 { font-size: clamp(30px,3.6vw,48px); color: var(--mpr-white); }
+#mpr .mpr-enquiry p.mpr-lead { color: var(--mpr-gray-3); margin-top: 14px; font-size: 16px; max-width: 460px; }
+#mpr .mpr-contact-list { margin-top: 36px; display: flex; flex-direction: column; gap: 18px; }
+#mpr .mpr-contact-list a { font-size: 15px; font-weight: 600; color: var(--mpr-white); display: flex; align-items: center; gap: 10px; }
+#mpr .mpr-contact-list .mpr-contact-label { display: block; font-size: 11px; color: var(--mpr-gray-3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 3px; }
+
+#mpr .mpr-form { display: flex; flex-direction: column; gap: 16px; }
+#mpr .mpr-field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mpr-gray-3); margin-bottom: 8px; }
+#mpr .mpr-field input, #mpr .mpr-field select, #mpr .mpr-field textarea {
+  width: 100%; background: transparent !important; border-bottom: 1.5px solid var(--mpr-gray-4) !important;
+  color: var(--mpr-white); padding: 10px 2px !important; font-size: 15px;
+}
+#mpr .mpr-field select option { color: var(--mpr-black); }
+#mpr .mpr-field textarea { resize: vertical; min-height: 70px; }
+#mpr .mpr-form .mpr-btn-primary { align-self: flex-start; margin-top: 8px; }
+#mpr .mpr-form-note { font-size: 12px; color: var(--mpr-gray-3); margin-top: 4px; }
+
+/* ── FOOTER ────────────────────────────── */
+#mpr .mpr-footer { padding: 48px 6vw; border-top: 1px solid var(--mpr-gray-2); }
+#mpr .mpr-footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px; }
+#mpr .mpr-footer h4 { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; color: var(--mpr-gray-4); }
+#mpr .mpr-footer p, #mpr .mpr-footer a { font-size: 13.5px; color: var(--mpr-gray-4); display: block; margin-bottom: 6px; }
+#mpr .mpr-footer-bottom { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--mpr-gray-2); font-size: 11.5px; color: var(--mpr-gray-3); }
+
+@media (max-width: 880px) {
+  #mpr .mpr-nav-links { display: none; }
+  #mpr section { padding: 64px 6vw; }
+  #mpr .mpr-about, #mpr .mpr-model, #mpr .mpr-enquiry-grid { grid-template-columns: 1fr; }
+  #mpr .mpr-footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  #mpr .mpr-spec-grid { grid-template-columns: repeat(2,1fr); }
+  #mpr .mpr-plants { grid-template-columns: 1fr; }
+}
+</style>
+
+<!-- NAV -->
+<nav class="mpr-nav">
+  <div class="mpr-nav-brand">MAYURI</div>
+  <div class="mpr-nav-links">
+    <a href="#mpr-passenger">Passenger Range</a>
+    <a href="#mpr-cargo">Cargo &amp; Utility</a>
+    <a href="#mpr-compare">Compare</a>
+    <a href="#mpr-about">About Saera</a>
+  </div>
+  <a href="#mpr-enquiry" class="mpr-nav-cta">Enquire Now</a>
+</nav>
+
+<!-- HERO -->
+<header class="mpr-hero">
+  <img src="https://ddfintech.net/wp-content/uploads/2026/07/1-2.webp" alt="Mayuri Grand passenger e-rickshaw">
+  <div class="mpr-hero-content">
+    <div class="mpr-eyebrow">Saera Electric Auto &middot; Since 2011</div>
+    <h1>The Mayuri Range.</h1>
+    <p>Zero-emission electric three-wheelers engineered for every route &mdash; from four-seater passenger rides to 350&nbsp;kg cargo hauls. India's first e-rickshaw maker, ICAT-certified, built for the long run.</p>
+    <div class="mpr-hero-actions">
+      <a href="#mpr-passenger" class="mpr-btn mpr-btn-primary">Explore Passenger Range</a>
+      <a href="#mpr-cargo" class="mpr-btn mpr-btn-outline">Explore Cargo &amp; Utility</a>
+    </div>
+  </div>
+</header>
+
+<!-- FEATURE STRIP -->
+<section class="mpr-strip" style="padding-top:56px;padding-bottom:56px;">
+  <div class="mpr-strip-grid">
+    <div class="mpr-strip-item">
+      <div class="mpr-strip-num">01</div>
+      <h3>Mayuri Eco Technology</h3>
+      <p>Near-zero ecological disruption and zero tailpipe emissions across the entire range.</p>
+    </div>
+    <div class="mpr-strip-item">
+      <div class="mpr-strip-num">02</div>
+      <h3>Advanced 130Ah Battery</h3>
+      <p>Ride longer hours with enhanced battery power on every Mayuri model.</p>
+    </div>
+    <div class="mpr-strip-item">
+      <div class="mpr-strip-num">03</div>
+      <h3>Best-in-Class Mileage</h3>
+      <p>Unmatched power and efficiency from the E-3 wheeler platform.</p>
+    </div>
+    <div class="mpr-strip-item">
+      <div class="mpr-strip-num">04</div>
+      <h3>ICAT Certified</h3>
+      <p>First company to receive a Vehicle Approval Certificate from ICAT, Manesar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="mpr-about">
+  <div class="mpr-about">
+    <div>
+      <div class="mpr-eyebrow">About the manufacturer</div>
+      <h2>Saera Electric Auto Pvt. Ltd.</h2>
+    </div>
+    <div class="mpr-about-body">
+      <p>Mayuri is the flagship electric three-wheeler brand of Saera Electric Auto Pvt. Ltd. (SEAPL), part of the Satra Group of Companies. Commenced in 2011, Saera is an ISO 9001:2015 certified company and was the first to introduce e-rickshaws in India &mdash; and the first to receive a Vehicle Approval Certificate from the International Centre for Automotive Technology (ICAT), Manesar.</p>
+      <p>Saera manufactures cleaner, greener electric three-wheelers (passenger e-rickshaws and cargo e-loaders), electric low-speed two-wheelers (Yogo Bikes), and electric golf carts &mdash; with a production capacity of 60,000 electric three-wheelers and 2 lakh electric two-wheelers per year.</p>
+      <div class="mpr-plants">
+        <div class="mpr-plant-card">
+          <div class="mpr-label">Plant 1</div>
+          <p>A-145 B, RIICO Industrial Area, Bhiwadi, Rajasthan 301019</p>
+        </div>
+        <div class="mpr-plant-card">
+          <div class="mpr-label">Plant 2</div>
+          <p>Plot No 8&ndash;10, Sector 7 Industrial Growth Centre, NH-8, Industrial Model Township, Bawal, Haryana 123501</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PASSENGER RANGE -->
+<section id="mpr-passenger">
+  <div class="mpr-cat-head">
+    <div class="mpr-eyebrow">Category 01</div>
+    <h2>Passenger E-Rickshaws</h2>
+    <p>Four models built for daily passenger transport &mdash; from the value-focused PRO&nbsp;1000 to the fully-loaded Grand.</p>
+  </div>
+
+  <div class="mpr-switcher">
+    <div class="mpr-tabs" data-mpr-tabs="passenger">
+      <button class="mpr-tab is-active" data-mpr-tab="grand">Mayuri Grand</button>
+      <button class="mpr-tab" data-mpr-tab="star">Mayuri Star</button>
+      <button class="mpr-tab" data-mpr-tab="prostar">Mayuri Pro Star</button>
+      <button class="mpr-tab" data-mpr-tab="pro1000">Mayuri PRO 1000</button>
+    </div>
+
+    <!-- GRAND -->
+    <div class="mpr-panel is-active" data-mpr-panel="grand">
+      <div class="mpr-model">
+        <div class="mpr-model-media">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/1-2.webp" alt="Mayuri Grand passenger e-rickshaw">
+        </div>
+        <div class="mpr-model-info">
+          <h3 class="mpr-model-name">Mayuri Grand</h3>
+          <div class="mpr-model-tag">Premium four-seater &mdash; zero emissions, loaded with comforts.</div>
+          <p class="mpr-model-desc">Saera's top-of-the-line four-seater passenger e-rickshaw, offering zero-emission, smooth rides with a strong build, reliable performance, and the longest feature list in the Mayuri passenger range.</p>
+          <div class="mpr-model-actions">
+            <a href="#mpr-enquiry" class="mpr-btn mpr-btn-dark" data-mpr-fill="Mayuri Grand">Enquire About Grand</a>
+            <a href="https://wa.me/919220508868?text=Hi%2C%20I%27m%20interested%20in%20the%20Mayuri%20Grand" class="mpr-btn mpr-btn-ghost">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="mpr-spec-grid">
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Motor</div><div class="mpr-spec-val">BLDC, 1200W, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Battery</div><div class="mpr-spec-val">Advanced 130Ah</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charging Time</div><div class="mpr-spec-val">8 hours (15A charger)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Controller</div><div class="mpr-spec-val">50A, 24 MOSFETs, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Chassis</div><div class="mpr-spec-val">High-rigidity monocoque</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Brakes (F / R)</div><div class="mpr-spec-val">Lever drum / Paddle drum</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Suspension (F / R)</div><div class="mpr-spec-val">43mm telescopic / Leaf spring</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tyres (F / R)</div><div class="mpr-spec-val">3.75-12 / 3.75-12</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Wheelbase</div><div class="mpr-spec-val">2030 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">L &times; W &times; H</div><div class="mpr-spec-val">2690 &times; 1000 &times; 1710 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Ground Clearance</div><div class="mpr-spec-val">200 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charger</div><div class="mpr-spec-val">SMPS, fluctuation-protected</div></div>
+      </div>
+      <div class="mpr-features">
+        <h3>Key Features</h3>
+        <ul class="mpr-feature-list">
+          <li>Heavy chassis</li><li>Wide front glass with wiper</li><li>Stepney (spare wheel) with cover</li><li>Handle lock</li><li>Aluminium carrier</li><li>FM radio, double speakers</li><li>Central locking</li><li>Heavy curtain</li><li>Alloy wheels</li><li>Taxi light</li><li>LED cabin light</li><li>Rear-view camera</li><li>Cabin fan</li><li>Bottle holder</li><li>Mobile charger with holder</li><li>LED head lamps with DRL</li><li>LED indicators</li><li>Basket</li><li>Digital meter</li><li>Heavy-duty front shockers</li>
+        </ul>
+      </div>
+      <div class="mpr-rail" data-mpr-rail="passenger">
+        <button class="mpr-rail-item is-active" data-mpr-goto="grand"><img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-99.png" alt="Mayuri Grand"><span>Mayuri Grand</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="star"><img src="https://ddfintech.net/wp-content/uploads/2026/07/2-2.webp" alt="Mayuri Star"><span>Mayuri Star</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="prostar"><img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_44_42-PM.webp" alt="Mayuri Pro Star"><span>Mayuri Pro Star</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="pro1000"><img src="https://ddfintech.net/wp-content/uploads/2026/07/3-1.webp" alt="Mayuri PRO 1000"><span>Mayuri PRO 1000</span></button>
+      </div>
+    </div>
+
+    <!-- STAR -->
+    <div class="mpr-panel" data-mpr-panel="star">
+      <div class="mpr-model">
+        <div class="mpr-model-media">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/2-2.webp" alt="Mayuri Star passenger e-rickshaw">
+        </div>
+        <div class="mpr-model-info">
+          <h3 class="mpr-model-name">Mayuri Star</h3>
+          <div class="mpr-model-tag">Double chassis, alloy wheels, fastest charging in the range.</div>
+          <p class="mpr-model-desc">A stylish passenger electric rickshaw with a strong double-chassis build, 48V motor, alloy wheels and smooth zero-emission performance &mdash; with the quickest charging time in the passenger range.</p>
+          <div class="mpr-model-actions">
+            <a href="#mpr-enquiry" class="mpr-btn mpr-btn-dark" data-mpr-fill="Mayuri Star">Enquire About Star</a>
+            <a href="https://wa.me/919220508868?text=Hi%2C%20I%27m%20interested%20in%20the%20Mayuri%20Star" class="mpr-btn mpr-btn-ghost">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="mpr-spec-grid">
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Motor</div><div class="mpr-spec-val">BLDC, 1000W, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Battery</div><div class="mpr-spec-val">Advanced 130Ah</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charging Time</div><div class="mpr-spec-val">4 hours (15A charger)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Controller</div><div class="mpr-spec-val">50A, 24 MOSFETs, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Chassis</div><div class="mpr-spec-val">High-rigidity monocoque (double)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Brakes (F / R)</div><div class="mpr-spec-val">Lever drum / Paddle drum</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Suspension (F / R)</div><div class="mpr-spec-val">43mm telescopic / Leaf spring</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tyres (F / R)</div><div class="mpr-spec-val">3.75-12 / 3.75-12</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Wheelbase</div><div class="mpr-spec-val">2030 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">L &times; W &times; H</div><div class="mpr-spec-val">2690 &times; 1000 &times; 1710 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Ground Clearance</div><div class="mpr-spec-val">200 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charger</div><div class="mpr-spec-val">SMPS, fluctuation-protected</div></div>
+      </div>
+      <div class="mpr-features">
+        <h3>Key Features</h3>
+        <ul class="mpr-feature-list">
+          <li>Double chassis</li><li>Front glass with wiper</li><li>Steel roof</li><li>Standard carrier</li><li>FM radio, double speakers</li><li>Heavy curtain</li><li>Alloy wheels</li><li>Taxi light</li><li>LED cabin light</li><li>Central locking</li><li>LED head lamps with DRL</li><li>LED indicators</li><li>Arm rest with sun shade</li>
+        </ul>
+      </div>
+      <div class="mpr-rail" data-mpr-rail="passenger">
+        <button class="mpr-rail-item" data-mpr-goto="grand"><img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-99.png" alt="Mayuri Grand"><span>Mayuri Grand</span></button>
+        <button class="mpr-rail-item is-active" data-mpr-goto="star"><img src="https://ddfintech.net/wp-content/uploads/2026/07/2-2.webp" alt="Mayuri Star"><span>Mayuri Star</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="prostar"><img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_44_42-PM.webp" alt="Mayuri Pro Star"><span>Mayuri Pro Star</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="pro1000"><img src="https://ddfintech.net/wp-content/uploads/2026/07/3-1.webp" alt="Mayuri PRO 1000"><span>Mayuri PRO 1000</span></button>
+      </div>
+    </div>
+
+    <!-- PRO STAR -->
+    <div class="mpr-panel" data-mpr-panel="prostar">
+      <div class="mpr-model">
+        <div class="mpr-model-media">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_44_42-PM.webp" alt="Mayuri Pro Star passenger e-rickshaw, Flexi Sky Blue">
+        </div>
+        <div class="mpr-model-info">
+          <h3 class="mpr-model-name">Mayuri Pro Star</h3>
+          <div class="mpr-model-tag">1200W power with a durable, heavy-duty steel-roof build.</div>
+          <p class="mpr-model-desc">A powerful passenger electric rickshaw featuring a 1200W motor, alloy wheels, steel roof and durable heavy-duty design for smooth, zero-emission rides. Shown here in the Flexi Sky Blue finish.</p>
+          <div class="mpr-model-actions">
+            <a href="#mpr-enquiry" class="mpr-btn mpr-btn-dark" data-mpr-fill="Mayuri Pro Star">Enquire About Pro Star</a>
+            <a href="https://wa.me/919220508868?text=Hi%2C%20I%27m%20interested%20in%20the%20Mayuri%20Pro%20Star" class="mpr-btn mpr-btn-ghost">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="mpr-spec-grid">
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Motor</div><div class="mpr-spec-val">BLDC, 1200W, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Battery</div><div class="mpr-spec-val">Advanced 130Ah</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charging Time</div><div class="mpr-spec-val">8 hours (15A charger)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Controller</div><div class="mpr-spec-val">50A, 24 MOSFETs, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Chassis</div><div class="mpr-spec-val">High-rigidity monocoque (double, heavy-duty)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Brakes (F / R)</div><div class="mpr-spec-val">Lever drum / Paddle drum</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Suspension (F / R)</div><div class="mpr-spec-val">43mm telescopic / Leaf spring</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tyres (F / R)</div><div class="mpr-spec-val">3.75-12 / 3.75-12</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Wheelbase</div><div class="mpr-spec-val">2030 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">L &times; W &times; H</div><div class="mpr-spec-val">2690 &times; 1000 &times; 1710 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Ground Clearance</div><div class="mpr-spec-val">200 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charger</div><div class="mpr-spec-val">SMPS, fluctuation-protected</div></div>
+      </div>
+      <div class="mpr-features">
+        <h3>Key Features</h3>
+        <ul class="mpr-feature-list">
+          <li>Double chassis (heavy-duty)</li><li>Front glass with wiper</li><li>Steel roof</li><li>Standard carrier</li><li>FM radio, double speakers</li><li>Heavy curtain</li><li>Alloy wheels</li><li>Taxi light</li><li>LED cabin light</li><li>Central locking</li><li>Arm rest with sun shade</li>
+        </ul>
+      </div>
+      <div class="mpr-rail" data-mpr-rail="passenger">
+        <button class="mpr-rail-item" data-mpr-goto="grand"><img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-99.png" alt="Mayuri Grand"><span>Mayuri Grand</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="star"><img src="https://ddfintech.net/wp-content/uploads/2026/07/2-2.webp" alt="Mayuri Star"><span>Mayuri Star</span></button>
+        <button class="mpr-rail-item is-active" data-mpr-goto="prostar"><img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_44_42-PM.webp" alt="Mayuri Pro Star"><span>Mayuri Pro Star</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="pro1000"><img src="https://ddfintech.net/wp-content/uploads/2026/07/3-1.webp" alt="Mayuri PRO 1000"><span>Mayuri PRO 1000</span></button>
+      </div>
+    </div>
+
+    <!-- PRO 1000 -->
+    <div class="mpr-panel" data-mpr-panel="pro1000">
+      <div class="mpr-model">
+        <div class="mpr-model-media">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/3-1.webp" alt="Mayuri PRO 1000 passenger e-rickshaw">
+        </div>
+        <div class="mpr-model-info">
+          <h3 class="mpr-model-name">Mayuri PRO 1000</h3>
+          <div class="mpr-model-tag">Dependable, economical, and built for daily duty.</div>
+          <p class="mpr-model-desc">A powerful yet economical electric rickshaw with a 48V, 1000W motor, sturdy build, steel roof and smooth performance for daily passenger transport.</p>
+          <div class="mpr-model-actions">
+            <a href="#mpr-enquiry" class="mpr-btn mpr-btn-dark" data-mpr-fill="Mayuri PRO 1000">Enquire About PRO 1000</a>
+            <a href="https://wa.me/919220508868?text=Hi%2C%20I%27m%20interested%20in%20the%20Mayuri%20PRO%201000" class="mpr-btn mpr-btn-ghost">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="mpr-spec-grid">
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Motor</div><div class="mpr-spec-val">BLDC, 1000W, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Battery</div><div class="mpr-spec-val">Advanced 130Ah</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charging Time</div><div class="mpr-spec-val">8 hours (15A charger)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Controller</div><div class="mpr-spec-val">50A, 24 MOSFETs, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Chassis</div><div class="mpr-spec-val">High-rigidity monocoque</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Brakes (F / R)</div><div class="mpr-spec-val">Lever drum / Paddle drum</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Suspension (F / R)</div><div class="mpr-spec-val">43mm telescopic / Leaf spring</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tyres (F / R)</div><div class="mpr-spec-val">3.75-12 / 3.75-12</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Wheelbase</div><div class="mpr-spec-val">2030 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">L &times; W &times; H</div><div class="mpr-spec-val">2690 &times; 1000 &times; 1710 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Ground Clearance</div><div class="mpr-spec-val">200 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charger</div><div class="mpr-spec-val">SMPS, fluctuation-protected</div></div>
+      </div>
+      <div class="mpr-features">
+        <h3>Key Features</h3>
+        <ul class="mpr-feature-list">
+          <li>Heavy chassis</li><li>Front glass with wiper</li><li>Steel roof</li><li>FM radio, double speakers</li><li>Heavy curtain</li><li>LED cabin light</li><li>Stepney cover with lock</li><li>Wide wind screen with wiper</li><li>Stylish handle</li>
+        </ul>
+      </div>
+      <div class="mpr-rail" data-mpr-rail="passenger">
+        <button class="mpr-rail-item" data-mpr-goto="grand"><img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-99.png" alt="Mayuri Grand"><span>Mayuri Grand</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="star"><img src="https://ddfintech.net/wp-content/uploads/2026/07/2-2.webp" alt="Mayuri Star"><span>Mayuri Star</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="prostar"><img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_44_42-PM.webp" alt="Mayuri Pro Star"><span>Mayuri Pro Star</span></button>
+        <button class="mpr-rail-item is-active" data-mpr-goto="pro1000"><img src="https://ddfintech.net/wp-content/uploads/2026/07/3-1.webp" alt="Mayuri PRO 1000"><span>Mayuri PRO 1000</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CARGO & UTILITY -->
+<section id="mpr-cargo" class="mpr-cat-cargo">
+  <div class="mpr-cat-head">
+    <div class="mpr-eyebrow">Category 02</div>
+    <h2>Cargo &amp; Utility</h2>
+    <p>Built for load, not comfort &mdash; open loaders, closed loaders, delivery vans and municipal waste carts up to 350&nbsp;kg capacity.</p>
+  </div>
+
+  <div class="mpr-switcher">
+    <div class="mpr-tabs" data-mpr-tabs="cargo">
+      <button class="mpr-tab is-active" data-mpr-tab="ecart">E-Cart Loader</button>
+      <button class="mpr-tab" data-mpr-tab="closeloader">Close Loader</button>
+      <button class="mpr-tab" data-mpr-tab="dv">Mayuri DV</button>
+      <button class="mpr-tab" data-mpr-tab="dustbin">Dustbin Cart</button>
+    </div>
+
+    <!-- E-CART LOADER -->
+    <div class="mpr-panel is-active" data-mpr-panel="ecart">
+      <div class="mpr-model">
+        <div class="mpr-model-media">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/5-1.webp" alt="Mayuri E-Cart Loader cargo e-rickshaw">
+        </div>
+        <div class="mpr-model-info">
+          <h3 class="mpr-model-name">Mayuri E-Cart Loader</h3>
+          <div class="mpr-model-tag">Open-body cargo loader for heavy, cost-effective urban transport.</div>
+          <p class="mpr-model-desc">A powerful electric three-wheeler cargo loader proudly made in India, built for heavy loads with zero emissions. Designed for cost-effective, low-maintenance goods transport within cities. Lithium-battery variants charge in about 5&ndash;6 hours; lead-acid variants take 10&ndash;12 hours; the standard SMPS charger is rated for 8 hours.</p>
+          <div class="mpr-model-actions">
+            <a href="#mpr-enquiry" class="mpr-btn mpr-btn-dark" data-mpr-fill="Mayuri E-Cart Loader">Enquire About E-Cart Loader</a>
+            <a href="https://wa.me/919220508868?text=Hi%2C%20I%27m%20interested%20in%20the%20Mayuri%20E-Cart%20Loader" class="mpr-btn mpr-btn-ghost">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="mpr-spec-grid">
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Motor</div><div class="mpr-spec-val">BLDC, 1200W, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Battery</div><div class="mpr-spec-val">Advanced 130Ah</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charging Time</div><div class="mpr-spec-val">8 hrs SMPS &middot; Li-ion 5&ndash;6 hrs &middot; Lead-acid 10&ndash;12 hrs</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Controller</div><div class="mpr-spec-val">50A, 24 MOSFETs, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Chassis</div><div class="mpr-spec-val">High-rigidity monocoque</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Brakes (F / R)</div><div class="mpr-spec-val">Lever drum / Paddle drum</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Suspension (F / R)</div><div class="mpr-spec-val">43mm telescopic / Leaf spring</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tyres (F / R)</div><div class="mpr-spec-val">3.75-12 / 3.75-12</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Wheelbase</div><div class="mpr-spec-val">2030 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">L &times; W &times; H</div><div class="mpr-spec-val">2580 &times; 970 &times; 1800 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Ground Clearance</div><div class="mpr-spec-val">200 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Warranty</div><div class="mpr-spec-val">6 mo motor &amp; controller &middot; 1 yr chassis</div></div>
+      </div>
+      <div class="mpr-features">
+        <h3>Key Features</h3>
+        <ul class="mpr-feature-list">
+          <li>Heavy chassis</li><li>Front glass with wiper</li><li>Steel roof</li><li>FM radio, double speakers</li><li>LED cabin light</li><li>Heavy-duty shockers</li><li>Wider tyres for better grip</li><li>Massive loading capacity</li>
+        </ul>
+      </div>
+      <div class="mpr-rail" data-mpr-rail="cargo">
+        <button class="mpr-rail-item is-active" data-mpr-goto="ecart"><img src="https://ddfintech.net/wp-content/uploads/2026/07/5-1.webp" alt="E-Cart Loader"><span>E-Cart Loader</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="closeloader"><img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-93.webp" alt="Close Loader"><span>Close Loader</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="dv"><img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_15_30-PM.webp" alt="Mayuri DV"><span>Mayuri DV</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="dustbin"><img src="https://ddfintech.net/wp-content/uploads/2026/07/4-1.webp" alt="Dustbin Cart"><span>Dustbin Cart</span></button>
+      </div>
+    </div>
+
+    <!-- CLOSE LOADER -->
+    <div class="mpr-panel" data-mpr-panel="closeloader">
+      <div class="mpr-model">
+        <div class="mpr-model-media">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-93.webp" alt="Mayuri Close Loader enclosed cargo e-rickshaw">
+        </div>
+        <div class="mpr-model-info">
+          <h3 class="mpr-model-name">Mayuri Close Loader</h3>
+          <div class="mpr-model-tag">Fully enclosed box body for secure goods transport, up to 350 kg.</div>
+          <p class="mpr-model-desc">A powerful electric three-wheeler built for heavy cargo with a fully enclosed box body, ideal for secure inter-city and intra-city goods movement. Carries up to 350 kg of goods in a single trip with a strong, wear-resistant, low-maintenance body.</p>
+          <div class="mpr-model-actions">
+            <a href="#mpr-enquiry" class="mpr-btn mpr-btn-dark" data-mpr-fill="Mayuri Close Loader">Enquire About Close Loader</a>
+            <a href="https://wa.me/919220508868?text=Hi%2C%20I%27m%20interested%20in%20the%20Mayuri%20Close%20Loader" class="mpr-btn mpr-btn-ghost">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="mpr-spec-grid">
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Motor</div><div class="mpr-spec-val">BLDC, 1200W, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Battery</div><div class="mpr-spec-val">Advanced 130Ah</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charging Time</div><div class="mpr-spec-val">8 hours (15A charger)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Load Capacity</div><div class="mpr-spec-val">Up to 350 kg</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Chassis</div><div class="mpr-spec-val">High-rigidity monocoque</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Brakes (F / R)</div><div class="mpr-spec-val">Lever drum / Paddle drum</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Suspension (F / R)</div><div class="mpr-spec-val">43mm telescopic / Leaf spring</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tyres (F / R)</div><div class="mpr-spec-val">3.75-12 / 3.75-12</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Wheelbase</div><div class="mpr-spec-val">2030 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">L &times; W &times; H</div><div class="mpr-spec-val">2580 &times; 970 &times; 1800 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Ground Clearance</div><div class="mpr-spec-val">200 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Warranty</div><div class="mpr-spec-val">6 mo motor &amp; controller &middot; 1 yr chassis</div></div>
+      </div>
+      <div class="mpr-features">
+        <h3>Key Features</h3>
+        <ul class="mpr-feature-list">
+          <li>Heavy chassis</li><li>Front glass with wiper</li><li>Steel roof</li><li>FM radio, double speakers</li><li>LED cabin light</li><li>Closed box storage</li><li>Stepney with cover</li><li>Big box loader</li><li>Strong suspension</li>
+        </ul>
+      </div>
+      <div class="mpr-rail" data-mpr-rail="cargo">
+        <button class="mpr-rail-item" data-mpr-goto="ecart"><img src="https://ddfintech.net/wp-content/uploads/2026/07/5-1.webp" alt="E-Cart Loader"><span>E-Cart Loader</span></button>
+        <button class="mpr-rail-item is-active" data-mpr-goto="closeloader"><img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-93.webp" alt="Close Loader"><span>Close Loader</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="dv"><img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_15_30-PM.webp" alt="Mayuri DV"><span>Mayuri DV</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="dustbin"><img src="https://ddfintech.net/wp-content/uploads/2026/07/4-1.webp" alt="Dustbin Cart"><span>Dustbin Cart</span></button>
+      </div>
+    </div>
+
+    <!-- DV -->
+    <div class="mpr-panel" data-mpr-panel="dv">
+      <div class="mpr-model">
+        <div class="mpr-model-media">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_15_30-PM.webp" alt="Mayuri DV delivery van cargo three-wheeler">
+        </div>
+        <div class="mpr-model-info">
+          <h3 class="mpr-model-name">Mayuri DV</h3>
+          <div class="mpr-model-tag">Delivery van / cargo three-wheeler with fast 4-hour charging.</div>
+          <p class="mpr-model-desc">A robust electric three-wheeler cargo loader built for urban logistics and last-mile delivery, combining zero emissions with dependable performance and one of the fastest charging times in the range.</p>
+          <div class="mpr-model-actions">
+            <a href="#mpr-enquiry" class="mpr-btn mpr-btn-dark" data-mpr-fill="Mayuri DV">Enquire About Mayuri DV</a>
+            <a href="https://wa.me/919220508868?text=Hi%2C%20I%27m%20interested%20in%20the%20Mayuri%20DV" class="mpr-btn mpr-btn-ghost">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="mpr-spec-grid">
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Motor</div><div class="mpr-spec-val">BLDC, 1200W, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Battery</div><div class="mpr-spec-val">Advanced 130Ah</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charging Time</div><div class="mpr-spec-val">4 hours (15A charger)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Controller</div><div class="mpr-spec-val">50A, 24 MOSFETs, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Chassis</div><div class="mpr-spec-val">High-rigidity monocoque</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Brakes (F / R)</div><div class="mpr-spec-val">Lever drum / Paddle drum</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Suspension (F / R)</div><div class="mpr-spec-val">43mm telescopic / Leaf spring</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tyres (F / R)</div><div class="mpr-spec-val">3.75-12 / 3.75-12</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Wheelbase</div><div class="mpr-spec-val">2030 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">L &times; W &times; H</div><div class="mpr-spec-val">2580 &times; 970 &times; 1800 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Ground Clearance</div><div class="mpr-spec-val">200 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charger</div><div class="mpr-spec-val">SMPS, fluctuation-protected</div></div>
+      </div>
+      <div class="mpr-features">
+        <h3>Key Features</h3>
+        <ul class="mpr-feature-list">
+          <li>Heavy chassis</li><li>Front glass with wiper</li><li>Steel roof</li><li>FM radio, double speakers</li><li>LED cabin light</li><li>Strong suspension</li><li>Big box loader</li><li>Wide front view</li>
+        </ul>
+      </div>
+      <div class="mpr-rail" data-mpr-rail="cargo">
+        <button class="mpr-rail-item" data-mpr-goto="ecart"><img src="https://ddfintech.net/wp-content/uploads/2026/07/5-1.webp" alt="E-Cart Loader"><span>E-Cart Loader</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="closeloader"><img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-93.webp" alt="Close Loader"><span>Close Loader</span></button>
+        <button class="mpr-rail-item is-active" data-mpr-goto="dv"><img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_15_30-PM.webp" alt="Mayuri DV"><span>Mayuri DV</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="dustbin"><img src="https://ddfintech.net/wp-content/uploads/2026/07/4-1.webp" alt="Dustbin Cart"><span>Dustbin Cart</span></button>
+      </div>
+    </div>
+
+    <!-- DUSTBIN CART -->
+    <div class="mpr-panel" data-mpr-panel="dustbin">
+      <div class="mpr-model">
+        <div class="mpr-model-media">
+          <img src="https://ddfintech.net/wp-content/uploads/2026/07/4-1.webp" alt="Mayuri Dustbin Cart waste-collection vehicle">
+        </div>
+        <div class="mpr-model-info">
+          <h3 class="mpr-model-name">Mayuri Dustbin Cart</h3>
+          <div class="mpr-model-tag">Purpose-built for municipal &amp; institutional waste collection.</div>
+          <p class="mpr-model-desc">An eco-friendly electric three-wheeler purpose-built for municipal and institutional waste collection, with a durable build, hydraulic tilting mechanism and a segregated wet &amp; dry waste box.</p>
+          <div class="mpr-model-actions">
+            <a href="#mpr-enquiry" class="mpr-btn mpr-btn-dark" data-mpr-fill="Mayuri Dustbin Cart">Enquire About Dustbin Cart</a>
+            <a href="https://wa.me/919220508868?text=Hi%2C%20I%27m%20interested%20in%20the%20Mayuri%20Dustbin%20Cart" class="mpr-btn mpr-btn-ghost">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="mpr-spec-grid">
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Motor</div><div class="mpr-spec-val">BLDC, 1200W, 48V</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Battery</div><div class="mpr-spec-val">Advanced 130Ah</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charging Time</div><div class="mpr-spec-val">8 hours (15A charger)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Waste Box</div><div class="mpr-spec-val">0.5 cu.ft, wet &amp; dry segregation</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tilting</div><div class="mpr-spec-val">Hydraulic mechanism</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Brakes (F / R)</div><div class="mpr-spec-val">Lever drum / Paddle drum</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Suspension (F / R)</div><div class="mpr-spec-val">43mm telescopic (heavy-duty) / Leaf spring</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Tyres (F / R)</div><div class="mpr-spec-val">3.75-12 / 3.75-12 (bigger alloys)</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Wheelbase</div><div class="mpr-spec-val">2000 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">L &times; W &times; H</div><div class="mpr-spec-val">2600 &times; 1180 &times; 1680 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Ground Clearance</div><div class="mpr-spec-val">200 mm</div></div>
+        <div class="mpr-spec-cell"><div class="mpr-spec-label">Charger</div><div class="mpr-spec-val">SMPS, fluctuation-protected</div></div>
+      </div>
+      <div class="mpr-features">
+        <h3>Key Features</h3>
+        <ul class="mpr-feature-list">
+          <li>Heavy chassis</li><li>Front glass with wiper</li><li>Steel roof</li><li>LED cabin light</li><li>0.5 cu.ft wet &amp; dry waste box</li><li>Hydraulic tilting mechanism</li><li>Heavy-duty front shockers</li><li>Stylish alloys with bigger tyres</li>
+        </ul>
+      </div>
+      <div class="mpr-rail" data-mpr-rail="cargo">
+        <button class="mpr-rail-item" data-mpr-goto="ecart"><img src="https://ddfintech.net/wp-content/uploads/2026/07/5-1.webp" alt="E-Cart Loader"><span>E-Cart Loader</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="closeloader"><img src="https://ddfintech.net/wp-content/uploads/2026/07/Untitled-design-93.webp" alt="Close Loader"><span>Close Loader</span></button>
+        <button class="mpr-rail-item" data-mpr-goto="dv"><img src="https://ddfintech.net/wp-content/uploads/2026/07/ChatGPT-Image-Jul-30-2026-04_15_30-PM.webp" alt="Mayuri DV"><span>Mayuri DV</span></button>
+        <button class="mpr-rail-item is-active" data-mpr-goto="dustbin"><img src="https://ddfintech.net/wp-content/uploads/2026/07/4-1.webp" alt="Dustbin Cart"><span>Dustbin Cart</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section id="mpr-compare">
+  <div class="mpr-cat-head">
+    <div class="mpr-eyebrow">Side by side</div>
+    <h2>Compare the Range</h2>
+    <p>Every Mayuri model at a glance.</p>
+  </div>
+
+  <h3 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mpr-gray-4);margin-bottom:12px;">Passenger Range</h3>
+  <div class="mpr-compare-wrap">
+    <table class="mpr-compare">
+      <thead><tr><th></th><th>Mayuri Grand</th><th>Mayuri Star</th><th>Mayuri Pro Star</th><th>Mayuri PRO 1000</th></tr></thead>
+      <tbody>
+        <tr><th>Motor Power</th><td>1200W</td><td>1000W</td><td>1200W</td><td>1000W</td></tr>
+        <tr><th>Charging Time</th><td>8 hrs</td><td>4 hrs</td><td>8 hrs</td><td>8 hrs</td></tr>
+        <tr><th>Chassis</th><td>Monocoque</td><td>Double chassis</td><td>Double chassis (HD)</td><td>Heavy chassis</td></tr>
+        <tr><th>Roof</th><td>&mdash;</td><td>Steel roof</td><td>Steel roof</td><td>Steel roof</td></tr>
+        <tr><th>Dimensions (L&times;W&times;H)</th><td>2690&times;1000&times;1710 mm</td><td>2690&times;1000&times;1710 mm</td><td>2690&times;1000&times;1710 mm</td><td>2690&times;1000&times;1710 mm</td></tr>
+        <tr><th>Standout</th><td>Rear-view camera, cabin fan, central locking</td><td>Fastest charging (4 hrs)</td><td>Heavy-duty build</td><td>Most economical</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mpr-gray-4);margin:44px 0 12px;">Cargo &amp; Utility Range</h3>
+  <div class="mpr-compare-wrap">
+    <table class="mpr-compare">
+      <thead><tr><th></th><th>E-Cart Loader</th><th>Close Loader</th><th>Mayuri DV</th><th>Dustbin Cart</th></tr></thead>
+      <tbody>
+        <tr><th>Motor Power</th><td>1200W</td><td>1200W</td><td>1200W</td><td>1200W</td></tr>
+        <tr><th>Charging Time</th><td>8 hrs (5&ndash;6 hrs Li-ion)</td><td>8 hrs</td><td>4 hrs</td><td>8 hrs</td></tr>
+        <tr><th>Body Type</th><td>Open cargo bed</td><td>Enclosed box</td><td>Delivery box</td><td>Segregated waste box</td></tr>
+        <tr><th>Load Capacity</th><td>Heavy-duty, high volume</td><td>Up to 350 kg</td><td>Cargo box class</td><td>0.5 cu.ft waste box</td></tr>
+        <tr><th>Dimensions (L&times;W&times;H)</th><td>2580&times;970&times;1800 mm</td><td>2580&times;970&times;1800 mm</td><td>2580&times;970&times;1800 mm</td><td>2600&times;1180&times;1680 mm</td></tr>
+        <tr><th>Warranty</th><td>6 mo motor/controller &middot; 1 yr chassis</td><td>6 mo motor/controller &middot; 1 yr chassis</td><td>&mdash;</td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ENQUIRY -->
+<section id="mpr-enquiry" class="mpr-enquiry">
+  <div class="mpr-enquiry-grid">
+    <div>
+      <div class="mpr-eyebrow" style="color:var(--mpr-gray-3);">Get in touch</div>
+      <h2>Ready to go electric?</h2>
+      <p class="mpr-lead">Talk to a Mayuri dealer for the latest on-road pricing, financing options, and a test ride near you.</p>
+      <div class="mpr-contact-list">
+        <a href="tel:+919220508868"><span><span class="mpr-contact-label">Sales</span>+91 92205 08868</span></a>
+        <a href="tel:+919319696898"><span><span class="mpr-contact-label">Service</span>+91 93196 96898</span></a>
+        <a href="mailto:info@saeraauto.com"><span><span class="mpr-contact-label">Email</span>info@saeraauto.com</span></a>
+        <a href="#" style="cursor:default;"><span><span class="mpr-contact-label">Corporate Office</span>Saera Tower, Plot No 1, Sector-11, Dwarka, New Delhi &ndash; 110075</span></a>
+      </div>
+    </div>
+    <form class="mpr-form" id="mprForm" action="mailto:info@saeraauto.com" method="post" enctype="text/plain">
+      <div class="mpr-field">
+        <label for="mpr-name">Full Name</label>
+        <input type="text" id="mpr-name" name="Name" required>
+      </div>
+      <div class="mpr-field">
+        <label for="mpr-phone">Phone Number</label>
+        <input type="tel" id="mpr-phone" name="Phone" required>
+      </div>
+      <div class="mpr-field">
+        <label for="mpr-city">City</label>
+        <input type="text" id="mpr-city" name="City">
+      </div>
+      <div class="mpr-field">
+        <label for="mpr-model">Model of Interest</label>
+        <select id="mpr-model" name="Model">
+          <option>Mayuri Grand</option>
+          <option>Mayuri Star</option>
+          <option>Mayuri Pro Star</option>
+          <option>Mayuri PRO 1000</option>
+          <option>Mayuri E-Cart Loader</option>
+          <option>Mayuri Close Loader</option>
+          <option>Mayuri DV</option>
+          <option>Mayuri Dustbin Cart</option>
+        </select>
+      </div>
+      <div class="mpr-field">
+        <label for="mpr-msg">Message</label>
+        <textarea id="mpr-msg" name="Message" rows="3"></textarea>
+      </div>
+      <button type="submit" class="mpr-btn mpr-btn-primary">Submit Enquiry</button>
+      <p class="mpr-form-note">Opens your email client addressed to info@saeraauto.com. Replace the form action with your CRM/lead endpoint when embedding on saeraauto.com.</p>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="mpr-footer">
+  <div class="mpr-footer-grid">
+    <div>
+      <h4>Mayuri &middot; Saera Electric Auto Pvt. Ltd.</h4>
+      <p>Satra Group of Companies &middot; ISO 9001:2015 certified &middot; India's first e-rickshaw manufacturer &middot; ICAT, Manesar approved.</p>
+    </div>
+    <div>
+      <h4>Manufacturing</h4>
+      <p>Plant 1 &mdash; Bhiwadi, Rajasthan</p>
+      <p>Plant 2 &mdash; Bawal, Haryana</p>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <a href="tel:+919220508868">Sales: +91 92205 08868</a>
+      <a href="tel:+919319696898">Service: +91 93196 96898</a>
+      <a href="mailto:info@saeraauto.com">info@saeraauto.com</a>
+    </div>
+  </div>
+  <div class="mpr-footer-bottom">
+    Specifications and features as published by Saera Electric Auto (saeraauto.com) and may vary due to ongoing product enhancement. Product imagery is for illustration purposes only. Please confirm the latest specifications, variants, and prices with an authorised Mayuri dealer before purchase.
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.getElementById('mpr');
+  if (!root) return;
+
+  function activateTab(group, key) {
+    root.querySelectorAll('[data-mpr-tabs="' + group + '"] .mpr-tab').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.getAttribute('data-mpr-tab') === key);
+    });
+    root.querySelectorAll('.mpr-switcher [data-mpr-panel]').forEach(function (panel) {
+      var belongsToGroup = panel.querySelector('[data-mpr-rail="' + group + '"]') !== null;
+      if (belongsToGroup) {
+        panel.classList.toggle('is-active', panel.getAttribute('data-mpr-panel') === key);
+      }
+    });
+    root.querySelectorAll('[data-mpr-rail="' + group + '"] .mpr-rail-item').forEach(function (item) {
+      item.classList.toggle('is-active', item.getAttribute('data-mpr-goto') === key);
+    });
+  }
+
+  root.querySelectorAll('[data-mpr-tabs]').forEach(function (tabs) {
+    var group = tabs.getAttribute('data-mpr-tabs');
+    tabs.querySelectorAll('.mpr-tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        activateTab(group, btn.getAttribute('data-mpr-tab'));
+      });
+    });
+  });
+
+  root.querySelectorAll('[data-mpr-rail]').forEach(function (rail) {
+    var group = rail.getAttribute('data-mpr-rail');
+    rail.querySelectorAll('.mpr-rail-item').forEach(function (item) {
+      item.addEventListener('click', function () {
+        activateTab(group, item.getAttribute('data-mpr-goto'));
+      });
+    });
+  });
+
+  var modelSelect = root.querySelector('#mpr-model');
+  root.querySelectorAll('[data-mpr-fill]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      if (modelSelect) {
+        var val = link.getAttribute('data-mpr-fill');
+        Array.prototype.forEach.call(modelSelect.options, function (opt) {
+          if (opt.value === val) modelSelect.value = val;
+        });
+      }
+    });
+  });
+})();
+</script>
+
+</div>
