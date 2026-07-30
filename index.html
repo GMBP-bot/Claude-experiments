@@ -201,6 +201,7 @@ html, body { margin: 0; padding: 0; }
   max-width: min(340px, 66%);
   display: flex;
   align-items: flex-start;
+  overflow: hidden;   /* clips the per-brand zoom below at the box edge */
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.55s ease 0.12s, transform 0.6s var(--ps-ease) 0.12s;
@@ -219,9 +220,28 @@ html, body { margin: 0; padding: 0; }
   max-width: 100% !important;
   object-fit: contain;
   object-position: left top;
+  transform-origin: left top;
   /* Guarantees legibility whether the logo art is light or dark,
      and whatever photo it happens to sit on. */
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.75)) drop-shadow(0 0 18px rgba(0,0,0,0.45));
+}
+
+/* Mayuri and Sunehri ship as a small mark sitting in a mostly
+   transparent canvas, unlike the Golf Carts / Fleet files which
+   are cropped tight to their artwork. Scaling the whole box to a
+   shared height therefore left those two looking tiny even
+   though the box itself was the same size as everyone else's.
+   Zooming in from the top-left corner (where the artwork already
+   sits) restores them to a comparable visual weight; the box's
+   overflow:hidden above stops the zoomed image from spilling
+   into the name/tagline below it.
+   Tune ps-logo-zoom per brand if the real crop differs from this
+   estimate — it's based on screenshots, not the source files
+   (this environment can't reach ddfintech.net to measure them). */
+#ps .ps-panel--mayuri .ps-logo,
+#ps .ps-panel--sunehri .ps-logo {
+  --ps-logo-zoom: 2.6;
+  transform: scale(var(--ps-logo-zoom));
 }
 
 /* ── Meta block — number, name, tagline ── */
