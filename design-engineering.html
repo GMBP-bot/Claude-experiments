@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design &amp; Engineering — Saera</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="preload" as="image" href="https://ddfintech.net/wp-content/uploads/2026/01/mayuri-rattan-bawal-studio.png">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   DESIGN & ENGINEERING — page body content
+   Starts where the site header ends, stops where the footer begins.
+
+   Everything is scoped to the #de id, matching the approach already
+   used by the hero build in this repo. The theme is WordPress +
+   Elementor and styles bare `button` / `a` / `h2` / `ul` through
+   class-based wrappers, which out-specifies unscoped rules and
+   repaints our CTAs as grey boxes. An id gives every rule at least
+   1,0,0 and settles it.
+
+   Custom properties are --de-* on #de rather than :root, so the
+   theme's own variables can't reach in and ours can't leak out.
+   Keyframes are de-prefixed because keyframe names are global.
+══════════════════════════════════════════════════════════════ */
+
+html, body { margin: 0; padding: 0; }   /* standalone-page only; drop when pasting into the theme */
+
+/* ────────────────────────────
+   DESIGN TOKENS
+──────────────────────────── */
+#de {
+  /* Brand — greens.
+     Two greens, deliberately. The bright one is for graphics, rules
+     and text on dark ink, where it has room to be vivid. The deep
+     one is the *action* green: white text on the bright green only
+     reaches 3.7:1, which fails WCAG AA, so every filled button and
+     every green-on-white label uses --de-green (5.4:1) instead. */
+  --de-green:        #0D7A38;
+  --de-green-hover:  #0A632E;
+  --de-green-bright: #16A94C;
+  --de-lime:         #8CC63F;
+
+  /* Neutrals — the near-black bands and the paper sections */
+  --de-ink:      #0F1418;
+  --de-ink-2:    #171D22;
+  --de-line-dk:  rgba(255,255,255,0.10);
+  --de-paper:    #FFFFFF;
+  --de-paper-2:  #F4F6F5;
+  --de-line-lt:  #E3E7E5;
+
+  /* Text */
+  --de-text:      #14181B;
+  --de-muted:     #5A6570;
+  --de-on-dk:     #EDF1EF;
+  --de-on-dk-mut: rgba(255,255,255,0.66);
+
+  /* Rhythm */
+  --de-container: 1200px;
+  --de-gutter:    clamp(20px, 5vw, 64px);
+  --de-section-y: clamp(64px, 9vw, 128px);
+  --de-gap:       clamp(28px, 4.4vw, 64px);
+
+  --de-radius:    14px;
+  --de-radius-sm: 10px;
+
+  --de-shadow:    0 18px 44px rgba(15,20,24,0.10);
+  --de-shadow-lg: 0 26px 64px rgba(15,20,24,0.16);
+
+  --de-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ────────────────────────────
+   SCOPED RESET
+   Neutralises inherited theme styling inside this page section only.
+──────────────────────────── */
+#de, #de *, #de *::before, #de *::after {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  border-radius: 0;
+  min-width: 0;
+  list-style: none;
+}
+
+/* Links and buttons are what the theme hits hardest, and it does so
+   with its own !important declarations — specificity alone loses to
+   those. Scoped to this component and never leaves it. */
+#de a,
+#de button {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none !important;
+  line-height: normal;
+  width: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#de a::before, #de a::after,
+#de button::before, #de button::after { content: none; display: none; }
+
+/* ────────────────────────────
+   ROOT
+──────────────────────────── */
+#de {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--de-paper) !important;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--de-text);
+  overflow-x: clip;             /* full-bleed children can't open a h-scrollbar */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#de .de-wrap {
+  width: 100%;
+  max-width: var(--de-container);
+  margin: 0 auto;
+  padding: 0 var(--de-gutter);
+}
+
+#de .de-section { padding: var(--de-section-y) 0; }
+
+/* ────────────────────────────
+   TYPOGRAPHY
+   The theme forces font stack, colour and vertical-rhythm margins on
+   bare h1/h2/h3/p, so those four properties carry flags. Everything
+   else stays clean.
+──────────────────────────── */
+#de .de-eyebrow {
+  display: inline-block;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 3.4px;
+  text-transform: uppercase;
+  color: var(--de-green) !important;
+  margin: 0 0 18px !important;
+}
+#de .de-eyebrow--dk { color: var(--de-green-bright) !important; }
+
+#de .de-h1,
+#de .de-h2,
+#de .de-h3 {
+  font-family: 'Montserrat', sans-serif !important;
+  color: var(--de-text) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+  margin: 0 !important;
+  text-wrap: balance;
+}
+
+#de .de-h1 { font-size: clamp(34px, 5.2vw, 66px) !important; line-height: 1.04 !important; }
+#de .de-h2 { font-size: clamp(27px, 3.3vw, 44px) !important; line-height: 1.12 !important; }
+#de .de-h3 { font-size: clamp(18px, 1.5vw, 21px) !important; line-height: 1.28 !important; font-weight: 700 !important; }
+
+#de .de-h1--dk,
+#de .de-h2--dk,
+#de .de-h3--dk { color: var(--de-on-dk) !important; }
+
+#de .de-lead,
+#de .de-body {
+  font-family: 'Montserrat', sans-serif !important;
+  color: var(--de-muted) !important;
+  margin: 0 !important;
+}
+#de .de-lead { font-size: clamp(16px, 1.35vw, 19px) !important; line-height: 1.7 !important; font-weight: 400 !important; }
+#de .de-body { font-size: 15.5px !important; line-height: 1.75 !important; }
+
+#de .de-lead--dk { color: var(--de-on-dk-mut) !important; }
+#de .de-body--dk { color: var(--de-on-dk-mut) !important; }
+
+#de .de-stack > * + * { margin-top: 20px !important; }
+
+/* ────────────────────────────
+   BUTTONS
+   Hover is a lift + shadow + arrow travel, not a colour swap alone,
+   which matches the arrow-CTA pattern used across the live site.
+──────────────────────────── */
+#de .de-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 30px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  line-height: 1 !important;
+  white-space: nowrap;
+  transition: transform 0.3s var(--de-ease),
+              box-shadow 0.3s var(--de-ease),
+              background-color 0.25s ease,
+              border-color 0.25s ease,
+              color 0.25s ease;
+}
+
+#de .de-btn__arrow {
+  display: inline-block;
+  transition: transform 0.32s var(--de-ease);
+}
+#de .de-btn:hover .de-btn__arrow { transform: translateX(5px); }
+
+#de .de-btn--primary {
+  background: var(--de-green) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 22px rgba(13,122,56,0.26) !important;
+}
+#de .de-btn--primary:hover {
+  background: var(--de-green-hover) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px rgba(13,122,56,0.34) !important;
+}
+
+/* Ghost on dark backgrounds */
+#de .de-btn--ghost {
+  border: 1.5px solid rgba(255,255,255,0.42) !important;
+  color: #fff !important;
+}
+#de .de-btn--ghost:hover {
+  border-color: #fff !important;
+  background: rgba(255,255,255,0.12) !important;
+  transform: translateY(-3px);
+}
+
+/* Ghost on light backgrounds */
+#de .de-btn--outline {
+  border: 1.5px solid var(--de-green) !important;
+  color: var(--de-green) !important;
+}
+#de .de-btn--outline:hover {
+  background: var(--de-green) !important;
+  color: #fff !important;
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(13,122,56,0.24) !important;
+}
+
+/* Inverted — for use on the green closing band */
+#de .de-btn--invert {
+  background: #fff !important;
+  color: var(--de-green) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.18) !important;
+}
+#de .de-btn--invert:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.26) !important;
+}
+
+#de .de-btn:focus-visible {
+  outline: 2.5px solid var(--de-green-bright);
+  outline-offset: 3px;
+}
+#de .de-btn--ghost:focus-visible,
+#de .de-btn--invert:focus-visible { outline-color: #fff; }
+
+#de .de-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+/* ────────────────────────────
+   1 — HERO
+──────────────────────────── */
+#de .de-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(520px, 78vh, 780px);
+  padding: clamp(96px, 14vh, 160px) 0 clamp(56px, 8vh, 92px);
+  background: var(--de-ink) !important;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+#de .de-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+#de .de-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+/* Weighted left so the copy stays legible over a bright studio shot. */
+#de .de-hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(100deg,
+      rgba(15,20,24,0.94) 0%,
+      rgba(15,20,24,0.80) 30%,
+      rgba(15,20,24,0.42) 62%,
+      rgba(15,20,24,0.14) 100%),
+    linear-gradient(to top,
+      rgba(15,20,24,0.88) 0%,
+      rgba(15,20,24,0.00) 52%);
+  pointer-events: none;
+}
+
+#de .de-hero__inner { max-width: 720px; }
+#de .de-hero .de-lead { margin-top: 22px !important; max-width: 560px; }
+#de .de-hero .de-actions { margin-top: 36px; }
+
+/* Hairline accent under the eyebrow, echoing the site's tracked labels */
+#de .de-hero .de-eyebrow { position: relative; padding-left: 46px !important; }
+#de .de-hero .de-eyebrow::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 32px;
+  height: 2px;
+  background: var(--de-green-bright);
+}
+
+/* ────────────────────────────
+   2 — STATS BAND
+──────────────────────────── */
+#de .de-stats {
+  background: var(--de-ink-2) !important;
+  border-top: 1px solid var(--de-line-dk);
+}
+
+#de .de-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--de-line-dk);
+  border: 1px solid var(--de-line-dk);
+  border-radius: var(--de-radius);
+  overflow: hidden;
+}
+
+#de .de-stat {
+  background: var(--de-ink-2);
+  padding: clamp(26px, 3vw, 40px) clamp(20px, 2.2vw, 30px);
+  transition: background 0.35s ease;
+}
+#de .de-stat:hover { background: #1E262C; }
+
+#de .de-stat__num {
+  display: block;
+  font-size: clamp(32px, 3.6vw, 50px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--de-green-bright);
+  font-variant-numeric: tabular-nums;
+}
+#de .de-stat__label {
+  display: block;
+  margin-top: 12px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: #fff !important;
+  line-height: 1.5 !important;
+}
+#de .de-stat__note {
+  display: block;
+  margin-top: 8px !important;
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+  color: var(--de-on-dk-mut) !important;
+}
+
+/* Heritage clarification — the live page carries "40+ years" and
+   "15 years" side by side; this keeps them explicitly distinct. */
+#de .de-stats__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 28px;
+  margin-top: 26px;
+  padding-top: 26px;
+  border-top: 1px solid var(--de-line-dk);
+}
+#de .de-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px !important;
+  border: 1px solid var(--de-line-dk);
+  border-radius: 999px;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.6px;
+  color: var(--de-on-dk) !important;
+}
+#de .de-chip svg { width: 15px; height: 15px; flex: 0 0 auto; stroke: var(--de-green-bright); }
+#de .de-stats__foot p { font-size: 13.5px !important; line-height: 1.65 !important; color: var(--de-on-dk-mut) !important; margin: 0 !important; flex: 1 1 300px; }
+
+/* ── Video — click-to-load facade.
+   A live iframe on page load pulls ~1MB of YouTube player and sets
+   third-party cookies before anyone presses play. The facade is a
+   poster + button; the iframe is injected on click. */
+#de .de-video {
+  position: relative;
+  margin-top: clamp(36px, 5vw, 60px);
+  border-radius: var(--de-radius);
+  overflow: hidden;
+  background: #000 !important;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--de-line-dk);
+}
+#de .de-video img,
+#de .de-video iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+}
+#de .de-video__play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15,20,24,0.34) !important;
+  transition: background 0.3s ease;
+}
+#de .de-video__play:hover { background: rgba(15,20,24,0.14) !important; }
+#de .de-video__play span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--de-green);
+  box-shadow: 0 12px 34px rgba(0,0,0,0.4);
+  transition: transform 0.32s var(--de-ease);
+}
+#de .de-video__play:hover span { transform: scale(1.09); }
+#de .de-video__play svg { width: 26px; height: 26px; fill: #fff; margin-left: 4px; }
+#de .de-video__play:focus-visible { outline: 3px solid var(--de-green-bright); outline-offset: -3px; }
+
+/* ────────────────────────────
+   3 & 4 — SPLIT FEATURE BLOCKS
+──────────────────────────── */
+#de .de-split .de-wrap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--de-gap);
+  align-items: center;
+}
+#de .de-split--alt { background: var(--de-paper-2) !important; }
+
+/* The media is first in source order in both split blocks, which keeps
+   the mobile stack consistent. On wide screens the alternating block
+   pushes its image to column 2 and the copy back-fills column 1, so
+   the two sections mirror each other without duplicating markup. */
+#de .de-split--alt .de-split__media { grid-column: 2; grid-row: 1; }
+
+#de .de-split__media {
+  position: relative;
+  border-radius: var(--de-radius);
+  overflow: hidden;
+  box-shadow: var(--de-shadow);
+  background: var(--de-paper-2) !important;
+}
+#de .de-split__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform 0.7s var(--de-ease);
+}
+#de .de-split__media:hover img { transform: scale(1.045); }
+
+#de .de-split .de-actions { margin-top: 32px; }
+
+/* Bullet lists — the theme's `ul` styling is stripped by the reset,
+   so the marker is rebuilt as a green tick. */
+#de .de-list { margin-top: 22px !important; }
+#de .de-list li {
+  position: relative;
+  padding-left: 30px !important;
+  font-size: 15.5px !important;
+  line-height: 1.55 !important;
+  color: var(--de-text) !important;
+  font-weight: 500;
+}
+#de .de-list li + li { margin-top: 13px !important; }
+#de .de-list li::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0.36em;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--de-green);
+  /* Tick, drawn as a mask so it inherits the fill and needs no image */
+  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M12 2a10 10 0 100 20 10 10 0 000-20zm-1.2 14.3l-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4-7 7z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M12 2a10 10 0 100 20 10 10 0 000-20zm-1.2 14.3l-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4-7 7z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* ────────────────────────────
+   SECTION HEADER (shared)
+──────────────────────────── */
+#de .de-head { max-width: 720px; margin-bottom: clamp(38px, 4.5vw, 60px); }
+#de .de-head--center { margin-left: auto; margin-right: auto; text-align: center; }
+#de .de-head .de-lead { margin-top: 18px !important; }
+
+/* ────────────────────────────
+   5 — ENGINEERING EXCELLENCE (icon grid, dark)
+──────────────────────────── */
+#de .de-excellence { background: var(--de-ink) !important; }
+
+#de .de-grid {
+  display: grid;
+  gap: clamp(18px, 2vw, 26px);
+}
+#de .de-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#de .de-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+#de .de-card {
+  padding: clamp(26px, 2.8vw, 38px);
+  border-radius: var(--de-radius);
+  border: 1px solid var(--de-line-dk);
+  background: var(--de-ink-2) !important;
+  transition: transform 0.4s var(--de-ease),
+              border-color 0.3s ease,
+              background 0.3s ease;
+}
+#de .de-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(22,169,76,0.55);
+  background: #1B2329 !important;
+}
+
+#de .de-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 22px;
+  border-radius: var(--de-radius-sm);
+  background: rgba(22,169,76,0.14) !important;
+  transition: background 0.3s ease;
+}
+#de .de-card:hover .de-card__icon { background: rgba(22,169,76,0.24) !important; }
+#de .de-card__icon svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: var(--de-green-bright);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#de .de-card .de-body { margin-top: 12px !important; }
+
+/* Light variant, used by the facilities grid */
+#de .de-card--light {
+  background: var(--de-paper) !important;
+  border: 1px solid var(--de-line-lt);
+  box-shadow: var(--de-shadow);
+}
+#de .de-card--light:hover {
+  background: var(--de-paper) !important;
+  border-color: rgba(13,122,56,0.4);
+  box-shadow: var(--de-shadow-lg);
+}
+#de .de-card--light .de-card__icon { background: rgba(13,122,56,0.10) !important; }
+#de .de-card--light:hover .de-card__icon { background: rgba(13,122,56,0.18) !important; }
+#de .de-card--light .de-card__icon svg { stroke: var(--de-green); }
+
+#de .de-card__step {
+  display: block;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.4px;
+  color: var(--de-green) !important;
+  margin-bottom: 10px !important;
+}
+
+/* ────────────────────────────
+   6 — FACILITIES
+──────────────────────────── */
+#de .de-facilities { background: var(--de-paper-2) !important; }
+
+/* ────────────────────────────
+   7 — CLOSING CTA BAND
+──────────────────────────── */
+#de .de-cta {
+  position: relative;
+  background: linear-gradient(115deg, #0A5C2A 0%, var(--de-green) 52%, #10893F 100%) !important;
+  overflow: hidden;
+  text-align: center;
+}
+/* Subtle diagonal texture, echoing the brand band on the live page */
+#de .de-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    58deg,
+    rgba(255,255,255,0.05) 0 2px,
+    rgba(255,255,255,0) 2px 26px
+  );
+  pointer-events: none;
+}
+#de .de-cta .de-wrap { position: relative; z-index: 1; }
+#de .de-cta .de-h2 { color: #fff !important; max-width: 820px; margin: 0 auto !important; }
+#de .de-cta .de-lead { color: rgba(255,255,255,0.86) !important; max-width: 620px; margin: 20px auto 0 !important; }
+#de .de-cta .de-actions { justify-content: center; margin-top: 34px; }
+
+/* ────────────────────────────
+   SCROLL-IN MOTION
+   Elements start displaced and are released by IntersectionObserver.
+   .de-ready is set by JS on first run — without it, a visitor with
+   JS disabled would be left staring at an empty page.
+──────────────────────────── */
+#de.de-ready .de-anim {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.75s var(--de-ease), transform 0.75s var(--de-ease);
+  transition-delay: calc(var(--de-i, 0) * 90ms);
+}
+#de.de-ready .de-anim.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ────────────────────────────
+   RESPONSIVE
+──────────────────────────── */
+@media (max-width: 1024px) {
+  #de .de-grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #de .de-stats__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #de .de-split .de-wrap { grid-template-columns: minmax(0, 1fr); }
+  /* Reset the desktop-only reorder so every block stacks text-first */
+  #de .de-split--alt .de-split__media { grid-column: auto; grid-row: auto; }
+  #de .de-hero__inner { max-width: none; }
+}
+
+@media (max-width: 780px) {
+  #de .de-grid--3 { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 640px) {
+  #de .de-grid--4 { grid-template-columns: minmax(0, 1fr); }
+  #de .de-stats__grid { grid-template-columns: minmax(0, 1fr); }
+  #de .de-hero { min-height: 0; align-items: flex-start; }
+  #de .de-btn { width: 100%; padding: 16px 24px !important; }
+  #de .de-actions { gap: 11px; }
+  #de .de-hero__media img { object-position: center 40%; }
+  #de .de-video__play span { width: 60px; height: 60px; }
+}
+
+/* ────────────────────────────
+   REDUCED MOTION
+   Movement goes, content stays. The !important is deliberate: the
+   .de-anim rules are two-class-qualified and would otherwise
+   out-specify this and leave the page stuck at opacity 0.
+──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #de.de-ready .de-anim,
+  #de.de-ready .de-anim.is-in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  #de .de-btn,
+  #de .de-card,
+  #de .de-split__media img,
+  #de .de-video__play span { transition-duration: 0.01ms !important; }
+  #de .de-btn:hover,
+  #de .de-card:hover { transform: none; }
+  #de .de-split__media:hover img { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE BODY — Design & Engineering
+     Site header sits above this. Site footer sits below it.
+══════════════════════════════════════════════════════════════════ -->
+<main class="de" id="de">
+
+  <!-- ─────────── 1 · HERO ─────────── -->
+  <section class="de-hero" aria-labelledby="de-hero-title">
+    <div class="de-hero__media">
+      <img src="https://ddfintech.net/wp-content/uploads/2026/01/mayuri-rattan-bawal-studio.png"
+           alt="A Saera designer refining a full-scale clay model of an electric three-wheeler at the Bawal design studio."
+           fetchpriority="high" decoding="async" width="1920" height="1080">
+    </div>
+    <div class="de-hero__scrim" aria-hidden="true"></div>
+
+    <div class="de-wrap">
+      <div class="de-hero__inner">
+        <p class="de-eyebrow de-anim">Design &amp; Engineering</p>
+        <h1 class="de-h1 de-h1--dk de-anim" style="--de-i:1" id="de-hero-title">Made to advance mobility &amp; everyday life</h1>
+        <p class="de-lead de-lead--dk de-anim" style="--de-i:2">
+          Saera's design and engineering are inseparable — grounded in real needs, bold innovation,
+          and decades of real-world impact.
+        </p>
+        <div class="de-actions de-anim" style="--de-i:3">
+          <a class="de-btn de-btn--primary" href="/brands/mayuri">
+            Explore Our Brands <span class="de-btn__arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a class="de-btn de-btn--ghost" href="https://saeragolfcart.com/" target="_blank" rel="noopener">
+            Visit Saera Golf Carts <span class="de-btn__arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─────────── 2 · VERIFIED STATS BAND ─────────── -->
+  <section class="de-section de-stats" aria-labelledby="de-stats-title">
+    <div class="de-wrap">
+      <div class="de-head de-anim">
+        <h2 class="de-h2 de-h2--dk" id="de-stats-title">Built on a record, not a claim</h2>
+        <p class="de-lead de-lead--dk">
+          Every figure below is drawn from Saera Electric Auto's operating history.
+        </p>
+      </div>
+
+      <div class="de-stats__grid de-anim" style="--de-i:1">
+        <div class="de-stat">
+          <span class="de-stat__num">2011</span>
+          <span class="de-stat__label">Founded</span>
+          <span class="de-stat__note">Saera Electric Auto, founded by Vijay Kapoor — known as the Father of the E‑Rickshaw in India.</span>
+        </div>
+        <div class="de-stat">
+          <span class="de-stat__num">First</span>
+          <span class="de-stat__label">In India</span>
+          <span class="de-stat__note">First company to introduce the e‑rickshaw in India, and the first to receive ICAT vehicle approval.</span>
+        </div>
+        <div class="de-stat">
+          <span class="de-stat__num" data-de-count="2">2</span>
+          <span class="de-stat__label">Manufacturing Plants</span>
+          <span class="de-stat__note">Bhiwadi, Rajasthan &amp; Bawal, Haryana.</span>
+        </div>
+        <div class="de-stat">
+          <span class="de-stat__num" data-de-count="450" data-de-suffix="+">450+</span>
+          <span class="de-stat__label">Dealers</span>
+          <span class="de-stat__note">A network spanning more than 25 states across the country.</span>
+        </div>
+      </div>
+
+      <div class="de-stats__foot de-anim" style="--de-i:2">
+        <span class="de-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/>
+          </svg>
+          ISO 9001:2015 Certified
+        </span>
+        <span class="de-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+          </svg>
+          Since 2011 · 15+ Years of Electric Mobility Engineering
+        </span>
+        <p>
+          Separately, founder Vijay Kapoor brings over 40 years in the Indian automotive components
+          industry, dating back to 1972 — the engineering heritage Saera was built on.
+        </p>
+      </div>
+
+      <!-- Click-to-load facade; the iframe is injected only on activation. -->
+      <div class="de-video de-anim" style="--de-i:3">
+        <img src="https://i.ytimg.com/vi/Zu6HIn4Jmxc/maxresdefault.jpg"
+             alt="Saera brand film covering fifteen years of leadership in electric mobility."
+             loading="lazy" decoding="async" width="1280" height="720">
+        <button class="de-video__play" type="button"
+                data-de-video="Zu6HIn4Jmxc"
+                aria-label="Play the Saera brand film on YouTube">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─────────── 3 · MAYURI ─────────── -->
+  <section class="de-section de-split" aria-labelledby="de-mayuri-title">
+    <div class="de-wrap">
+      <div class="de-split__media de-anim">
+        <img src="https://ddfintech.net/wp-content/uploads/2026/01/Untitled-design-13-2.png"
+             alt="A blue Mayuri electric three-wheeler carrying passengers along a tree-lined city road."
+             loading="lazy" decoding="async" width="1200" height="900">
+      </div>
+
+      <div class="de-anim" style="--de-i:1">
+        <p class="de-eyebrow">Mayuri</p>
+        <h2 class="de-h2" id="de-mayuri-title">The origin of electric mobility in India</h2>
+        <div class="de-stack">
+          <p class="de-body">
+            Saera's engineering journey spans decades of hands-on innovation and category creation.
+            With Mayuri's leadership in electric mobility and our continued work across Saera's other
+            brands, we have shaped:
+          </p>
+        </div>
+        <ul class="de-list">
+          <li>India's electric mobility landscape</li>
+          <li>Industry perception of last-mile transport</li>
+          <li>Standards for durable and usable design</li>
+          <li>Tech adoption in everyday transport</li>
+        </ul>
+        <div class="de-stack" style="margin-top:22px">
+          <p class="de-body">
+            Our contributions extend beyond products — they have influenced how people move, work
+            and thrive in modern India.
+          </p>
+        </div>
+        <div class="de-actions">
+          <a class="de-btn de-btn--primary" href="/brands/mayuri/">
+            Visit Mayuri <span class="de-btn__arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─────────── 4 · SAERA GOLF CARTS (mirrored) ─────────── -->
+  <section class="de-section de-split de-split--alt" aria-labelledby="de-golf-title">
+    <div class="de-wrap">
+      <div class="de-split__media de-anim">
+        <img src="https://ddfintech.net/wp-content/uploads/2026/01/Untitled-design-9-3.png"
+             alt="A robotic arm welding vehicle components on the Saera production line."
+             loading="lazy" decoding="async" width="1200" height="900">
+      </div>
+
+      <div class="de-anim" style="--de-i:1">
+        <p class="de-eyebrow">Saera Golf Carts</p>
+        <h2 class="de-h2" id="de-golf-title">Designed for smart mobility</h2>
+        <div class="de-stack">
+          <p class="de-body">
+            Saera Golf Carts bring Saera's engineering strength to light electric vehicles for leisure,
+            community and commercial settings. We design every cart with:
+          </p>
+        </div>
+        <ul class="de-list">
+          <li>User comfort and safety</li>
+          <li>Energy efficiency and durability</li>
+          <li>Modern design and intelligent features</li>
+        </ul>
+        <div class="de-stack" style="margin-top:22px">
+          <p class="de-body">
+            Purposeful engineering ensures each cart delivers smooth operation and long life —
+            whether navigating resort greens or community pathways.
+          </p>
+        </div>
+        <div class="de-actions">
+          <a class="de-btn de-btn--outline" href="https://saeragolfcart.com/" target="_blank" rel="noopener">
+            Visit Saera Golf Carts <span class="de-btn__arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─────────── 5 · ENGINEERING EXCELLENCE ─────────── -->
+  <section class="de-section de-excellence" aria-labelledby="de-excellence-title">
+    <div class="de-wrap">
+      <div class="de-head de-head--center de-anim">
+        <p class="de-eyebrow de-eyebrow--dk">Excellence in every detail</p>
+        <h2 class="de-h2 de-h2--dk" id="de-excellence-title">Engineering real-world impact</h2>
+        <p class="de-lead de-lead--dk">
+          At Saera, design isn't surface deep — it's a systems-level approach. From early concept
+          validation through prototyping and testing, our teams iterate relentlessly to build vehicles
+          that perform in diverse, demanding conditions.
+        </p>
+      </div>
+
+      <div class="de-grid de-grid--4">
+        <article class="de-card de-anim">
+          <div class="de-card__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="7" r="3.2"/><path d="M4.5 20a7.5 7.5 0 0115 0"/>
+            </svg>
+          </div>
+          <h3 class="de-h3 de-h3--dk">Human behavior</h3>
+          <p class="de-body de-body--dk">How people actually ride, load, park and live with a vehicle — observed first, engineered second.</p>
+        </article>
+
+        <article class="de-card de-anim" style="--de-i:1">
+          <div class="de-card__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 19V9l4-3 4 3 4-3 4 3v10"/><path d="M4 19h16"/><path d="M10 19v-4h4v4"/>
+            </svg>
+          </div>
+          <h3 class="de-h3 de-h3--dk">Operational demands</h3>
+          <p class="de-body de-body--dk">Daily duty cycles, payloads and road realities that define what a vehicle must endure.</p>
+        </article>
+
+        <article class="de-card de-anim" style="--de-i:2">
+          <div class="de-card__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 21c5-2 8-6 8-11V5l-8-2-8 2v5c0 5 3 9 8 11z"/><path d="M12 12c0-2.5 2-4.5 4.5-4.5"/>
+            </svg>
+          </div>
+          <h3 class="de-h3 de-h3--dk">Environmental sustainability</h3>
+          <p class="de-body de-body--dk">Clean propulsion, efficient materials and long service life designed in from the start.</p>
+        </article>
+
+        <article class="de-card de-anim" style="--de-i:3">
+          <div class="de-card__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3 17l5-6 4 4 4-7 5 5"/><path d="M3 21h18"/>
+            </svg>
+          </div>
+          <h3 class="de-h3 de-h3--dk">Real-world performance</h3>
+          <p class="de-body de-body--dk">Validated against the conditions vehicles meet in service, not only in the lab.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─────────── 6 · FACILITIES / CAPABILITIES ─────────── -->
+  <section class="de-section de-facilities" aria-labelledby="de-facilities-title">
+    <div class="de-wrap">
+      <div class="de-head de-anim">
+        <p class="de-eyebrow">Facilities built for constant innovation</p>
+        <h2 class="de-h2" id="de-facilities-title">Where multidisciplinary teams work together</h2>
+        <p class="de-lead">
+          Our technical facilities and engineering centres are designed to support creativity, precision
+          and real-world validation — so every product released under Saera meets high standards of
+          design, engineering and reliability.
+        </p>
+      </div>
+
+      <div class="de-grid de-grid--3">
+        <article class="de-card de-card--light de-anim">
+          <div class="de-card__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 2.8l8 4.4v9.6l-8 4.4-8-4.4V7.2l8-4.4z"/><path d="M4 7.2l8 4.4 8-4.4"/><path d="M12 11.6V21"/>
+            </svg>
+          </div>
+          <span class="de-card__step">01</span>
+          <h3 class="de-h3">Visualize designs in 3D</h3>
+          <p class="de-body">Concepts are modelled and reviewed in three dimensions long before the first part is cut.</p>
+        </article>
+
+        <article class="de-card de-card--light de-anim" style="--de-i:1">
+          <div class="de-card__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M14.5 3.5l6 6-9.5 9.5-6-6z"/><path d="M8 16l-3.5 3.5"/><path d="M17 6.9l-3 3"/>
+            </svg>
+          </div>
+          <span class="de-card__step">02</span>
+          <h3 class="de-h3">Build and test prototypes</h3>
+          <p class="de-body">Working prototypes turn sketches into hardware that can be measured, stressed and refined.</p>
+        </article>
+
+        <article class="de-card de-card--light de-anim" style="--de-i:2">
+          <div class="de-card__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 14a8 8 0 0116 0"/><path d="M12 14l4.5-4"/><circle cx="12" cy="14" r="1.4"/><path d="M3 19h18"/>
+            </svg>
+          </div>
+          <span class="de-card__step">03</span>
+          <h3 class="de-h3">Validate performance in realistic settings</h3>
+          <p class="de-body">Vehicles are proven against the loads, surfaces and duty cycles they will actually face.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─────────── 7 · CLOSING CTA ─────────── -->
+  <section class="de-section de-cta" aria-labelledby="de-cta-title">
+    <div class="de-wrap">
+      <h2 class="de-h2 de-anim" id="de-cta-title">Engineering the next decade of Indian mobility</h2>
+      <p class="de-lead de-anim" style="--de-i:1">
+        Join the network carrying Saera's engineering to every corner of the country.
+      </p>
+      <div class="de-actions de-anim" style="--de-i:2">
+        <a class="de-btn de-btn--invert" href="/apply/">
+          Become a Dealer <span class="de-btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+<!-- ═══════════════════════════════════════════════════════════════
+     Site footer continues below.
+══════════════════════════════════════════════════════════════════ -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  var de = document.getElementById('de');
+  if (!de) return;
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── SCROLL-IN ────────────────────────────────────────────────
+     .de-ready is what arms the hidden state. It's added from JS, so
+     if this script never runs — or IntersectionObserver is missing —
+     the page renders fully visible instead of blank. */
+  var anims = Array.prototype.slice.call(de.querySelectorAll('.de-anim'));
+
+  if ('IntersectionObserver' in window && anims.length) {
+    de.classList.add('de-ready');
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in');
+        io.unobserve(entry.target);          /* one-shot: no re-animation on scroll-up */
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    anims.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ── STAT COUNT-UP ────────────────────────────────────────────
+     Only fires for elements already carrying their final value in
+     the markup, so the number is correct with JS off and correct
+     again the moment the animation ends. */
+  var counters = Array.prototype.slice.call(de.querySelectorAll('[data-de-count]'));
+
+  if (counters.length && 'IntersectionObserver' in window && !reduced) {
+    var cio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        cio.unobserve(entry.target);
+        countUp(entry.target);
+      });
+    }, { threshold: 0.6 });
+
+    counters.forEach(function (el) { cio.observe(el); });
+  }
+
+  function countUp(el) {
+    var target = parseInt(el.getAttribute('data-de-count'), 10);
+    if (isNaN(target)) return;
+    var suffix = el.getAttribute('data-de-suffix') || '';
+    var DURATION = 1400;
+    var start = null;
+
+    function frame(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / DURATION, 1);
+      /* ease-out-cubic — fast off the mark, settles on the number */
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased) + suffix;
+      if (p < 1) requestAnimationFrame(frame);
+      else el.textContent = target + suffix;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ── VIDEO FACADE ─────────────────────────────────────────────
+     Swap the poster for a real player only once the user asks for
+     it. autoplay=1 is required here because the click that loads
+     the iframe is not the click that starts the player. */
+  var playBtn = de.querySelector('[data-de-video]');
+  if (playBtn) {
+    playBtn.addEventListener('click', function () {
+      var id = playBtn.getAttribute('data-de-video');
+      var shell = playBtn.parentNode;
+      var frame = document.createElement('iframe');
+
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) +
+                  '?autoplay=1&rel=0&modestbranding=1';
+      frame.title = 'Saera brand film';
+      frame.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+      frame.setAttribute('allowfullscreen', '');
+
+      shell.innerHTML = '';
+      shell.appendChild(frame);
+      frame.focus();
+    });
+  }
+}());
+</script>
+
+</body>
+</html>
